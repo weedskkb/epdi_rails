@@ -1,0 +1,24 @@
+<h1>仕訳データ一覧</h1>
+
+<table>
+  <thead>
+    <tr>
+      <th>履歴NO</th>
+      <th>行NO</th>
+      <th>借方部門</th>
+      <th>貸方部門</th>
+      <th>金額</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% @journal_entries.each do |row| %>
+      <tr>
+        <td><%= row.capture_history_no %></td>
+        <td><%= row.row_no %></td>
+        <td><%= row.debit_department_no %></td>
+        <td><%= row.credit_department_no %></td>
+        <td><%= number_to_currency(row.amount, unit: "¥", precision: 0) %></td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>

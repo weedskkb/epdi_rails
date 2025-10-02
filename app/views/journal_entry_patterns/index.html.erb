@@ -1,0 +1,22 @@
+<h1>仕訳パターンマスタ</h1>
+
+<table>
+  <thead>
+    <tr>
+      <th>パターンNO</th>
+      <th>グループNO</th>
+      <th>パターン名</th>
+      <th>行NO</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% @patterns.each do |pattern| %>
+      <tr>
+        <td><%= pattern.journal_entry_pattern_no %></td>
+        <td><%= pattern.journal_entry_pattern_group_no %></td>
+        <td><%= pattern.journal_entry_pattern_name %></td>
+        <td><%= pattern.row_no %></td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>

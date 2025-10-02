@@ -1,0 +1,20 @@
+<h1>会社マスタ</h1>
+
+<table>
+  <thead>
+    <tr>
+      <th>会社NO</th>
+      <th>会社名</th>
+      <th>取引先NO</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% @companies.each do |company| %>
+      <tr>
+        <td><%= company.company_no %></td>
+        <td><%= company.company_name %></td>
+        <td><%= company.supplier_no %></td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>

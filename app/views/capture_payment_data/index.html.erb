@@ -1,0 +1,38 @@
+<h1>支払データ取込</h1>
+
+<%= form_with model: @view_model, url: capture_capture_payment_data_path, local: true, method: :post, html: { multipart: true } do |form| %>
+  <div>
+    <%= form.label :target_month, "対象月" %>
+    <%= form.text_field :target_month, placeholder: "YYYY-MM" %>
+    <% if form.object.errors[:target_month].present? %>
+      <div class="error"><%= form.object.errors[:target_month].join(', ') %></div>
+    <% end %>
+  </div>
+
+  <div>
+    <%= form.label :capture_category_id, "取込データ" %>
+    <%= form.select :capture_category_id, form.object.capture_category_options, include_blank: "選択してください" %>
+    <% if form.object.errors[:capture_category_id].present? %>
+      <div class="error"><%= form.object.errors[:capture_category_id].join(', ') %></div>
+    <% end %>
+  </div>
+
+  <div>
+    <%= form.label :file, "対象ファイル" %>
+    <%= form.file_field :file, multiple: false %>
+    <% if form.object.errors[:file].present? %>
+      <div class="error"><%= form.object.errors[:file].join(', ') %></div>
+    <% end %>
+  </div>
+
+  <div>
+    <label>
+      <%= form.check_box :overwrite %>
+      上書き取込
+    </label>
+  </div>
+
+  <div>
+    <%= form.submit "取込" %>
+  </div>
+<% end %>

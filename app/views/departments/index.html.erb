@@ -1,0 +1,20 @@
+<h1>部門マスタ</h1>
+
+<table>
+  <thead>
+    <tr>
+      <th>部門NO</th>
+      <th>部門名</th>
+      <th>会社NO</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% @departments.each do |department| %>
+      <tr>
+        <td><%= department.department_no %></td>
+        <td><%= department.department_name %></td>
+        <td><%= department.company_no %></td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>

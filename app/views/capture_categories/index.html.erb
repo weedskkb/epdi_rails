@@ -1,0 +1,22 @@
+<h1>取込区分マスタ</h1>
+
+<table>
+  <thead>
+    <tr>
+      <th>区分NO</th>
+      <th>区分名</th>
+      <th>摘要</th>
+      <th>支払条件</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% @capture_categories.each do |category| %>
+      <tr>
+        <td><%= category.capture_category_no %></td>
+        <td><%= category.capture_category_name %></td>
+        <td><%= category.abstract %></td>
+        <td><%= category.payment_terms %></td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>

@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8">
+    <title>EPDI</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <%= csrf_meta_tags %>
+    <%= csp_meta_tag %>
+  </head>
+  <body>
+    <header>
+      <nav>
+        <% if signed_in? %>
+          <span>ログイン中: <%= current_user.login_id %></span>
+          <%= button_to "ログアウト", logout_path, method: :delete %>
+        <% end %>
+      </nav>
+    </header>
+
+    <% flash.each do |type, message| %>
+      <div class="flash <%= type %>"><%= message %></div>
+    <% end %>
+
+    <%= yield %>
+  </body>
+</html>

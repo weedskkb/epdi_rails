@@ -1,0 +1,18 @@
+<h1>取引先マスタ</h1>
+
+<table>
+  <thead>
+    <tr>
+      <th>取引先NO</th>
+      <th>取引先名</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% @suppliers.each do |supplier| %>
+      <tr>
+        <td><%= supplier.supplier_no %></td>
+        <td><%= supplier.supplier_name %></td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>

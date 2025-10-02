@@ -1,0 +1,38 @@
+<%= form_with model: @user, local: true do |form| %>
+  <div>
+    <%= form.label :login_id, "ログインID" %>
+    <%= form.text_field :login_id %>
+    <% if form.object.errors[:login_id].present? %>
+      <div class="error"><%= form.object.errors[:login_id].join(', ') %></div>
+    <% end %>
+  </div>
+
+  <div>
+    <%= form.label :password, "パスワード" %>
+    <%= form.password_field :password %>
+    <% if form.object.errors[:password].present? %>
+      <div class="error"><%= form.object.errors[:password].join(', ') %></div>
+    <% end %>
+  </div>
+
+  <div>
+    <%= form.label :autholity_no, "権限" %>
+    <%= form.select :autholity_no, @authority_options, include_blank: "選択してください" %>
+  </div>
+
+  <div>
+    <%= form.label :status_no, "ステータス" %>
+    <%= form.select :status_no, @status_options, include_blank: "選択してください" %>
+  </div>
+
+  <div>
+    <label>
+      <%= form.check_box :delete_flg %>
+      削除フラグ
+    </label>
+  </div>
+
+  <div>
+    <%= form.submit %>
+  </div>
+<% end %>
