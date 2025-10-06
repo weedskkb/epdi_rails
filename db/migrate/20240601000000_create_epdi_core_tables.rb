@@ -159,12 +159,11 @@ class CreateEPDICoreTables < ActiveRecord::Migration[7.1]
 
     create_table :"TRN_CAPTURE_HISTORY", primary_key: "CAPTURE_HISTORY_NO", id: :integer do |t|
       t.integer  "CAPTURE_CATEGORY_NO", null: false
-      t.datetime "TARGET_MONTH", null: false
-      t.boolean  "OVERWRITE", default: false, null: false
+      t.date "ACCRUAL_MONTH"
+      t.date "PAYMENT_MONTH"
+      t.boolean  "LOCK_FLG", default: false, null: false
       t.integer  "CREATE_USER_ID", null: false
       t.datetime "CREATE_DATE", null: false
-      t.integer  "UPDATE_USER_ID"
-      t.datetime "UPDATE_DATE"
     end
 
     create_table :"TRN_CAPTURE_DATA", primary_key: "CAPTURE_DATA_NO", id: :integer do |t|
@@ -179,52 +178,45 @@ class CreateEPDICoreTables < ActiveRecord::Migration[7.1]
       t.integer  "SECOND_AMMOUNT", null: false
       t.integer  "TAX_CLASS_NO"
       t.integer  "TAX_RATE_NO"
-      t.integer  "DETAIL_DIVISION_NO"
-      t.string   "SUMMARY", limit: 255
-      t.integer  "JOURNAL_ENTRY_PATTERN_NO"
-      t.boolean  "ERROR_FLG", default: false, null: false
-      t.boolean  "DELETE_FLG", default: false, null: false
       t.datetime "CREATE_DATE", null: false
       t.integer  "CREATE_USER_ID", null: false
-      t.datetime "UPDATE_DATE"
-      t.integer  "UPDATE_USER_ID"
+      t.string "LIST_CD"
     end
 
     create_table :"TRN_JOURNAL_ENTRY_DATA", primary_key: "JOURNAL_ENTRY_DATA_NO", id: :integer do |t|
-      t.integer  "CAPTURE_HISTORY_NO", null: false
+      t.integer  "JOURNAL_ENTRY_HISTORY_NO", null: false
+      t.integer  "EXCEL_ROW_NO", null: false
       t.integer  "ROW_NO", null: false
-      t.integer  "DEBIT_COMPANY_NO"
+      t.date     "DATE", null: false
+      t.integer  "COMPANY_NO", null: false
+      t.integer  "DEPARTMENT_NO"
       t.integer  "DEBIT_DEPARTMENT_NO"
       t.integer  "DEBIT_ACCOUNT_NO"
       t.integer  "DEBIT_SUB_ACCOUNT_NO"
-      t.integer  "DEBIT_SUPPLIER_NO"
-      t.integer  "DEBIT_TAX_RATE_NO"
+      t.integer  "DEBIT_AMMOUNT", null: false
       t.integer  "DEBIT_TAX_CLASS_NO"
-      t.integer  "CREDIT_COMPANY_NO"
+      t.integer  "DEBIT_TAX_RATE_NO"
+      t.integer  "DEBIT_SUPPLIER_NO"
       t.integer  "CREDIT_DEPARTMENT_NO"
       t.integer  "CREDIT_ACCOUNT_NO"
       t.integer  "CREDIT_SUB_ACCOUNT_NO"
-      t.integer  "CREDIT_SUPPLIER_NO"
-      t.integer  "CREDIT_TAX_RATE_NO"
+      t.integer  "CREDIT_AMMOUNT", null: false
       t.integer  "CREDIT_TAX_CLASS_NO"
-      t.integer  "AMMOUNT", null: false
-      t.integer  "SECOND_AMMOUNT", null: false
-      t.boolean  "DELETE_FLG", default: false, null: false
+      t.integer  "CREDIT_TAX_RATE_NO"
+      t.integer  "CREDIT_SUPPLIER_NO"
+      t.string  "ABSTRACT"
       t.datetime "CREATE_DATE", null: false
       t.integer  "CREATE_USER_ID", null: false
-      t.datetime "UPDATE_DATE"
-      t.integer  "UPDATE_USER_ID"
-      t.integer  "DEPARTMENT_NO"
     end
 
     create_table :"TRN_JOURNAL_ENTRY_HISTORY", primary_key: "JOURNAL_ENTRY_HISTORY_NO", id: :integer do |t|
+      t.integer  "CAPTURE_HISTORY_NO", null: false
       t.integer  "CAPTURE_CATEGORY_NO", null: false
-      t.datetime "TARGET_MONTH", null: false
-      t.boolean  "DELETE_FLG", default: false, null: false
+      t.date "ACCRUAL_MONTH", null: false
+      t.date "PAYMENT_MONTH", null: false
+      t.boolean  "EXECUTE_FLG", default: false, null: false
       t.integer  "CREATE_USER_ID", null: false
       t.datetime "CREATE_DATE", null: false
-      t.integer  "UPDATE_USER_ID"
-      t.datetime "UPDATE_DATE"
     end
 
     create_table :"TRN_USER", primary_key: "USER_ID", id: :integer do |t|
@@ -248,7 +240,6 @@ class CreateEPDICoreTables < ActiveRecord::Migration[7.1]
     add_foreign_key :"MST_SUB_ACCOUNT", :"MST_ACCOUNT", column: "ACCOUNT_NO", primary_key: "ACCOUNT_NO"
     add_foreign_key :"TRN_CAPTURE_DATA", :"MST_DEPARTMENT", column: "DEPARTMENT_NO", primary_key: "DEPARTMENT_NO"
     add_foreign_key :"TRN_CAPTURE_DATA", :"TRN_CAPTURE_HISTORY", column: "CAPTURE_HISTORY_NO", primary_key: "CAPTURE_HISTORY_NO"
-    add_foreign_key :"TRN_JOURNAL_ENTRY_DATA", :"TRN_CAPTURE_HISTORY", column: "CAPTURE_HISTORY_NO", primary_key: "CAPTURE_HISTORY_NO"
     add_foreign_key :"TRN_JOURNAL_ENTRY_HISTORY", :"MST_CAPTURE_CATEGORY", column: "CAPTURE_CATEGORY_NO", primary_key: "CAPTURE_CATEGORY_NO"
     add_foreign_key :"TRN_USER", :"MST_AUTHOLITY", column: "AUTHOLITY_NO", primary_key: "AUTHOLITY_NO"
     add_foreign_key :"TRN_USER", :"MST_USER_STATUS", column: "STATUS_NO", primary_key: "STATUS_NO"

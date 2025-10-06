@@ -1,11 +1,37 @@
 <h1>支払データ取込</h1>
 
 <%= form_with model: @view_model, url: capture_capture_payment_data_path, local: true, method: :post, html: { multipart: true } do |form| %>
+  <section class="capturecategory-radio">
+    <ul style="list-style: none; text-align:left;">
+      <li><input type="radio" name="SelectCategory" class="uniquedata" id="storedata" value="1" /><label for="storedata"> 店舗データ</label></li>
+      <li><input type="radio" name="SelectCategory" class="uniquedata" id="fixeddata" value="1" /><label for="fixeddata"> 固定費データ</label></li>
+      <li><input type="radio" name="SelectCategory" class="wholedata" id="wholedata" value="2" /><label for="wholedata"> 卸データ</label></li>
+      <li><input type="radio" name="SelectCategory" class="sharedata" id="sharedata" value="2" /><label for="sharedata"> 共有データ</label></li>
+    </ul>
+    <input type="hidden" />
+  </section>
+
   <div>
     <%= form.label :target_month, "対象月" %>
     <%= form.text_field :target_month, placeholder: "YYYY-MM" %>
     <% if form.object.errors[:target_month].present? %>
       <div class="error"><%= form.object.errors[:target_month].join(', ') %></div>
+    <% end %>
+  </div>
+
+  <div>
+    <%= form.label :accrual_month, "発生月" %>
+    <%= form.text_field :accrual_month, placeholder: "YYYY-MM" %>
+    <% if form.object.errors[:accrual_month].present? %>
+      <div class="error"><%= form.object.errors[:accrual_month].join(', ') %></div>
+    <% end %>
+  </div>
+
+  <div>
+    <%= form.label :payment_month, "支払月" %>
+    <%= form.text_field :payment_month, placeholder: "YYYY-MM" %>
+    <% if form.object.errors[:payment_month].present? %>
+      <div class="error"><%= form.object.errors[:payment_month].join(', ') %></div>
     <% end %>
   </div>
 

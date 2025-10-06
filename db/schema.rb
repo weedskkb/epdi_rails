@@ -180,65 +180,56 @@ ActiveRecord::Schema[8.0].define(version: 2024_06_01_000000) do
     t.integer "SECOND_AMMOUNT", null: false
     t.integer "TAX_CLASS_NO"
     t.integer "TAX_RATE_NO"
-    t.integer "DETAIL_DIVISION_NO"
-    t.string "SUMMARY"
-    t.integer "JOURNAL_ENTRY_PATTERN_NO"
-    t.boolean "ERROR_FLG", default: false, null: false
-    t.boolean "DELETE_FLG", default: false, null: false
     t.datetime "CREATE_DATE", null: false
     t.integer "CREATE_USER_ID", null: false
-    t.datetime "UPDATE_DATE"
-    t.integer "UPDATE_USER_ID"
+    t.string "LIST_CD"
     t.index ["CAPTURE_HISTORY_NO"], name: "fk_rails_8171a22b36"
     t.index ["DEPARTMENT_NO"], name: "fk_rails_f543574a4f"
   end
 
   create_table "TRN_CAPTURE_HISTORY", primary_key: "CAPTURE_HISTORY_NO", id: :integer, charset: "utf8mb4", collation: "utf8mb4_general_ci", force: :cascade do |t|
     t.integer "CAPTURE_CATEGORY_NO", null: false
-    t.datetime "TARGET_MONTH", null: false
-    t.boolean "OVERWRITE", default: false, null: false
+    t.date "ACCRUAL_MONTH"
+    t.date "PAYMENT_MONTH"
+    t.boolean "LOCK_FLG", default: false, null: false
     t.integer "CREATE_USER_ID", null: false
     t.datetime "CREATE_DATE", null: false
-    t.integer "UPDATE_USER_ID"
-    t.datetime "UPDATE_DATE"
   end
 
   create_table "TRN_JOURNAL_ENTRY_DATA", primary_key: "JOURNAL_ENTRY_DATA_NO", id: :integer, charset: "utf8mb4", collation: "utf8mb4_general_ci", force: :cascade do |t|
-    t.integer "CAPTURE_HISTORY_NO", null: false
+    t.integer "JOURNAL_ENTRY_HISTORY_NO", null: false
+    t.integer "EXCEL_ROW_NO", null: false
     t.integer "ROW_NO", null: false
-    t.integer "DEBIT_COMPANY_NO"
+    t.date "DATE", null: false
+    t.integer "COMPANY_NO", null: false
+    t.integer "DEPARTMENT_NO"
     t.integer "DEBIT_DEPARTMENT_NO"
     t.integer "DEBIT_ACCOUNT_NO"
     t.integer "DEBIT_SUB_ACCOUNT_NO"
-    t.integer "DEBIT_SUPPLIER_NO"
-    t.integer "DEBIT_TAX_RATE_NO"
+    t.integer "DEBIT_AMMOUNT", null: false
     t.integer "DEBIT_TAX_CLASS_NO"
-    t.integer "CREDIT_COMPANY_NO"
+    t.integer "DEBIT_TAX_RATE_NO"
+    t.integer "DEBIT_SUPPLIER_NO"
     t.integer "CREDIT_DEPARTMENT_NO"
     t.integer "CREDIT_ACCOUNT_NO"
     t.integer "CREDIT_SUB_ACCOUNT_NO"
-    t.integer "CREDIT_SUPPLIER_NO"
-    t.integer "CREDIT_TAX_RATE_NO"
+    t.integer "CREDIT_AMMOUNT", null: false
     t.integer "CREDIT_TAX_CLASS_NO"
-    t.integer "AMMOUNT", null: false
-    t.integer "SECOND_AMMOUNT", null: false
-    t.boolean "DELETE_FLG", default: false, null: false
+    t.integer "CREDIT_TAX_RATE_NO"
+    t.integer "CREDIT_SUPPLIER_NO"
+    t.string "ABSTRACT"
     t.datetime "CREATE_DATE", null: false
     t.integer "CREATE_USER_ID", null: false
-    t.datetime "UPDATE_DATE"
-    t.integer "UPDATE_USER_ID"
-    t.integer "DEPARTMENT_NO"
-    t.index ["CAPTURE_HISTORY_NO"], name: "fk_rails_8f7d8376e3"
   end
 
   create_table "TRN_JOURNAL_ENTRY_HISTORY", primary_key: "JOURNAL_ENTRY_HISTORY_NO", id: :integer, charset: "utf8mb4", collation: "utf8mb4_general_ci", force: :cascade do |t|
+    t.integer "CAPTURE_HISTORY_NO", null: false
     t.integer "CAPTURE_CATEGORY_NO", null: false
-    t.datetime "TARGET_MONTH", null: false
-    t.boolean "DELETE_FLG", default: false, null: false
+    t.date "ACCRUAL_MONTH", null: false
+    t.date "PAYMENT_MONTH", null: false
+    t.boolean "EXECUTE_FLG", default: false, null: false
     t.integer "CREATE_USER_ID", null: false
     t.datetime "CREATE_DATE", null: false
-    t.integer "UPDATE_USER_ID"
-    t.datetime "UPDATE_DATE"
     t.index ["CAPTURE_CATEGORY_NO"], name: "fk_rails_98e1ec1471"
   end
 
@@ -262,7 +253,6 @@ ActiveRecord::Schema[8.0].define(version: 2024_06_01_000000) do
   add_foreign_key "MST_SUB_ACCOUNT", "MST_ACCOUNT", column: "ACCOUNT_NO", primary_key: "ACCOUNT_NO"
   add_foreign_key "TRN_CAPTURE_DATA", "MST_DEPARTMENT", column: "DEPARTMENT_NO", primary_key: "DEPARTMENT_NO"
   add_foreign_key "TRN_CAPTURE_DATA", "TRN_CAPTURE_HISTORY", column: "CAPTURE_HISTORY_NO", primary_key: "CAPTURE_HISTORY_NO"
-  add_foreign_key "TRN_JOURNAL_ENTRY_DATA", "TRN_CAPTURE_HISTORY", column: "CAPTURE_HISTORY_NO", primary_key: "CAPTURE_HISTORY_NO"
   add_foreign_key "TRN_JOURNAL_ENTRY_HISTORY", "MST_CAPTURE_CATEGORY", column: "CAPTURE_CATEGORY_NO", primary_key: "CAPTURE_CATEGORY_NO"
   add_foreign_key "TRN_USER", "MST_AUTHOLITY", column: "AUTHOLITY_NO", primary_key: "AUTHOLITY_NO"
   add_foreign_key "TRN_USER", "MST_USER_STATUS", column: "STATUS_NO", primary_key: "STATUS_NO"

@@ -31,3 +31,5 @@ gem 'pry-rails'
 gem 'pry-doc'
 gem 'pry-stack_explorer'
 gem 'pry-byebug'
+
+gem 'rubyXL'
