@@ -46,6 +46,6 @@ class CapturePaymentDataViewModel
   private
 
   def file_presence
-    errors.add(:file, "ファイルを選択してください") if file.blank?
+    errors.add(:file, "ファイルまたはフォルダを選択してください") if file.blank?
   end
 end

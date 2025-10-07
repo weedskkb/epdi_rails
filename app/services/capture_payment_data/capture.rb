@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
-require 'rubyXL'
+require 'roo'
+require 'roo-xls'
 
 module CapturePaymentData
   class Capture
@@ -115,7 +116,9 @@ module CapturePaymentData
       raise InvalidFileError, 'ファイルを選択してください。' if files.empty?
 
       files.map { |file| select_worksheet(file) }
-    rescue Zip::Error, RubyXL::ParseError
+    rescue InvalidFileError
+      raise
+    rescue StandardError
       raise InvalidFileError, 'Excelファイルの読み込みに失敗しました。'
     end
 
@@ -124,7 +127,8 @@ module CapturePaymentData
       return [] if file.blank?
 
       if file.is_a?(Array)
-        file
+        # file
+        file[1..]
       elsif file.respond_to?(:values)
         file.values
       else
@@ -135,18 +139,54 @@ module CapturePaymentData
     def select_worksheet(file)
       temp = file.respond_to?(:tempfile) ? file.tempfile : file
       temp.rewind if temp.respond_to?(:rewind)
-      workbook = RubyXL::Parser.parse(temp.path)
+      workbook = open_workbook(temp.path, detect_extension(file))
 
-      worksheet = if capture_category == CATEGORY_WHOLESALE
-                    name = wholesale_sheet_name
-                    workbook.worksheets.find { |sheet| sheet.sheet_name == name } || workbook.worksheets.first
-                  else
-                    workbook.worksheets.first
-                  end
+      sheet_name = if capture_category == CATEGORY_WHOLESALE
+                     name = wholesale_sheet_name
+                     workbook.sheets.include?(name) ? name : workbook.sheets.first
+                   else
+                     workbook.sheets.first
+                   end
 
-      raise InvalidFileError, '対象シートが存在しません。' unless worksheet
+      raise InvalidFileError, '対象シートが存在しません。' unless sheet_name
 
-      worksheet
+      workbook.default_sheet = sheet_name
+      workbook
+    end
+
+    def open_workbook(path, extension)
+      candidates = extension ? [extension] : [:xlsx, :xls]
+
+      candidates.each do |ext|
+        begin
+          return Roo::Spreadsheet.open(path, extension: ext)
+        rescue StandardError
+          next
+        end
+      end
+
+      raise InvalidFileError, 'Excelファイルの読み込みに失敗しました。'
+    end
+
+    def detect_extension(file)
+      filename = if file.respond_to?(:original_filename)
+                   file.original_filename.to_s
+                 elsif file.respond_to?(:path)
+                   File.basename(file.path.to_s)
+                 else
+                   ''
+                 end
+
+      ext = File.extname(filename).delete('.').downcase
+
+      case ext
+      when 'xlsx', 'xlsm'
+        :xlsx
+      when 'xls'
+        :xls
+      else
+        nil
+      end
     end
 
     def wholesale_sheet_name
@@ -513,16 +553,8 @@ module CapturePaymentData
       @capture_category_record ||= CaptureCategory.find(capture_category)
     end
 
-    def cell_at(sheet, row_idx, col_idx)
-      row = sheet[row_idx]
-      return nil unless row
-
-      row.cells[col_idx]
-    end
-
     def cell_value(sheet, row_idx, col_idx)
-      cell = cell_at(sheet, row_idx, col_idx)
-      cell&.value
+      sheet.cell(row_idx + 1, col_idx + 1)
     end
 
     def cell_integer(sheet, row_idx, col_idx)
@@ -548,19 +580,34 @@ module CapturePaymentData
     end
 
     def last_row_index(sheet)
-      rows = sheet.sheet_data.rows
-      (rows.size - 1).downto(0) do |idx|
-        row = rows[idx]
-        return idx if row && row.cells.any? { |cell| !cell.nil? && !cell.value.nil? }
+      last = sheet.last_row
+      return 0 unless last
+
+      (last - 1).downto(0) do |idx|
+        row = sheet.row(idx + 1)
+        return idx if row&.any? { |value| value_present?(value) }
       end
+
       0
     end
 
     def last_column_index(sheet, reference_row)
-      row = sheet[reference_row]
-      return 0 unless row
+      row = sheet.row(reference_row + 1)
+      return 0 if row.nil? || row.empty?
 
-      row.cells.size
+      length = row.size
+      while length.positive? && !value_present?(row[length - 1])
+        length -= 1
+      end
+
+      length
+    end
+
+    def value_present?(value)
+      return false if value.nil?
+      return value.present? if value.respond_to?(:present?)
+
+      !(value.is_a?(String) && value.strip.empty?)
     end
   end
 end

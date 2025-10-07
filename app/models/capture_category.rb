@@ -21,6 +21,6 @@ class CaptureCategory < ApplicationRecord
   belongs_to :tax_class, class_name: "TaxClass", foreign_key: "TAX_CLASS_NO", optional: true
 
   def name_with_code
-    capture_category_name + '(' + capture_category_no.to_s + ')'
+    capture_category_no.to_s + ' ' + capture_category_name
   end
 end

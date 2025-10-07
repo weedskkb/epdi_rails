@@ -30,6 +30,6 @@ class CapturePaymentDataController < ApplicationController
 
   def capture_params
     params.require(:capture_payment_data_view_model)
-          .permit(:target_month, :capture_category_id, :accrual_month, :payment_month, :overwrite, :file)
+          .permit(:target_month, :capture_category_id, :accrual_month, :payment_month, :overwrite, file: [])
   end
 end

@@ -44,8 +44,20 @@
   </div>
 
   <div>
-    <%= form.label :file, "対象ファイル" %>
-    <%= form.file_field :file, multiple: false %>
+    <%= form.label :file, "対象ファイル / フォルダ" %>
+    <div class="file-input-group">
+      <%= form.file_field :file, multiple: true, data: { behavior: "capture-file-input" } %>
+      <div class="file-input-toggles">
+        <label>
+          <input type="radio" name="capture-file-input-mode" value="file" checked>
+          ファイル選択
+        </label>
+        <label>
+          <input type="radio" name="capture-file-input-mode" value="folder">
+          フォルダ選択
+        </label>
+      </div>
+    </div>
     <% if form.object.errors[:file].present? %>
       <div class="error"><%= form.object.errors[:file].join(', ') %></div>
     <% end %>
@@ -62,3 +74,47 @@
     <%= form.submit "取込" %>
   </div>
 <% end %>
+
+<script>
+  (function() {
+    var initialized = false;
+
+    function setup() {
+      if (initialized) return;
+      var input = document.querySelector('[data-behavior="capture-file-input"]');
+      if (!input) return;
+      var modes = document.getElementsByName('capture-file-input-mode');
+      if (!modes.length) return;
+
+      function updateAttributes(mode) {
+        if (mode === 'folder') {
+          input.setAttribute('webkitdirectory', '');
+          input.setAttribute('directory', '');
+        } else {
+          input.removeAttribute('webkitdirectory');
+          input.removeAttribute('directory');
+        }
+        input.value = '';
+      }
+
+      Array.prototype.forEach.call(modes, function(modeInput) {
+        modeInput.addEventListener('change', function(event) {
+          if (event.target.checked) {
+            updateAttributes(event.target.value);
+          }
+        });
+      });
+
+      updateAttributes('file');
+      initialized = true;
+    }
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', setup);
+    } else {
+      setup();
+    }
+
+    document.addEventListener('turbo:load', setup);
+  })();
+</script>
