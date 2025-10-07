@@ -113,6 +113,7 @@ module CapturePaymentData
 
     def load_sheets
       files = uploaded_files
+      files = files.filter{ |file| ['xlsx', 'xls'].include?(detect_extension(file).to_s.downcase) }
       raise InvalidFileError, 'ファイルを選択してください。' if files.empty?
 
       files.map { |file| select_worksheet(file) }
@@ -264,15 +265,19 @@ module CapturePaymentData
     end
 
     def record_initial_history
+      target_month = parse_month_string(target_month_value)
+      payment_month = parse_month_string(payment_month_value)
+      accrual_month = parse_month_string(accrual_month_value)
+
       @base_history = case capture_category
                       when CATEGORY_STORE
                         nil
                       when CATEGORY_FIXED
-                        create_history(accrual_month: target_month_value, payment_month: target_month_value)
+                        create_history(accrual_month: target_month, payment_month: target_month)
                       when CATEGORY_WHOLESALE
-                        create_history(payment_month: next_month_string(target_month_value))
+                        create_history(payment_month: target_month.next_month)
                       else
-                        create_history(accrual_month: accrual_month_value, payment_month: payment_month_value)
+                        create_history(accrual_month: accrual_month, payment_month: payment_month)
                       end
     end
 
@@ -475,8 +480,8 @@ module CapturePaymentData
     def find_or_create_store_history(payment_month)
       TrnCaptureHistory.find_or_create_by!(
         CAPTURE_CATEGORY_NO: capture_category,
-        ACCRUAL_MONTH: target_month_value,
-        PAYMENT_MONTH: payment_month
+        ACCRUAL_MONTH: parse_month_string(target_month_value),
+        PAYMENT_MONTH: parse_month_string(payment_month)
       ) do |history|
         history.lock_flg = false
         history.create_user_id = user_id
@@ -527,8 +532,10 @@ module CapturePaymentData
       date.next_month.strftime('%Y-%m')
     end
 
+    # TODO: 変更の必要あり
     def tax_rate_for(value)
-      value.present? ? 8 : nil
+      # value.present? ? 8 : nil
+      return 8 unless value.nil?
     end
 
     def tax_class_for(value)
