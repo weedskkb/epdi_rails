@@ -342,7 +342,7 @@ module CapturePaymentData
               second_amount: 0,
               tax_rate_no: tax_rate_for(cell_string(sheet, 3, col_idx)),
               tax_class_no: tax_class_for(cell_string(sheet, 3, col_idx))
-            )
+            ) if amount != 0
           end
         end
       end
@@ -378,7 +378,7 @@ module CapturePaymentData
               list_cd: list_cd,
               amount: amount,
               second_amount: 0
-            )
+            ) if amount != 0
           end
         end
       end
@@ -410,7 +410,7 @@ module CapturePaymentData
               list_cd: list_cd,
               amount: amount,
               second_amount: 0
-            )
+            ) if amount != 0
           end
         end
       end
@@ -439,7 +439,7 @@ module CapturePaymentData
               list_cd: capture_category.to_s,
               amount: amount,
               second_amount: 0
-            )
+            ) if amount != 0
           end
         end
       end
@@ -472,7 +472,7 @@ module CapturePaymentData
             list_cd: capture_category.to_s,
             amount: amount,
             second_amount: second_amount
-          )
+          ) if amount != 0
         end
       end
     end
