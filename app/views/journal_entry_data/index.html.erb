@@ -1,24 +1,125 @@
-<h1>仕訳データ一覧</h1>
+<h1>仕訳データ作成</h1>
 
-<table>
-  <thead>
-    <tr>
-      <th>履歴NO</th>
-      <th>行NO</th>
-      <th>借方部門</th>
-      <th>貸方部門</th>
-      <th>金額</th>
-    </tr>
-  </thead>
-  <tbody>
-    <% @journal_entries.each do |row| %>
-      <tr>
-        <td><%= row.capture_history_no %></td>
-        <td><%= row.row_no %></td>
-        <td><%= row.debit_department_no %></td>
-        <td><%= row.credit_department_no %></td>
-        <td><%= number_to_currency(row.amount, unit: "¥", precision: 0) %></td>
-      </tr>
+<% if flash[:alert].present? %>
+  <div class="alert"><%= flash[:alert] %></div>
+<% end %>
+
+<%= form_with model: @form,
+              url: journal_entry_data_display_path,
+              scope: :journal_entry_data_list_form,
+              local: true,
+              html: { data: { behavior: "journal-entry-data-form" } } do |form| %>
+  <div>
+    <%= form.label :payment_month, "支払月" %>
+    <%= form.month_field :payment_month %>
+    <% if form.object.errors[:payment_month].present? %>
+      <div class="error"><%= form.object.errors[:payment_month].join(", ") %></div>
     <% end %>
-  </tbody>
-</table>
+  </div>
+
+  <div>
+    <%= form.label :supplier, "取引先" %>
+    <%= form.select :supplier,
+                    options_for_select([["全件", 0]] + @form.supplier_options, @form.supplier) %>
+    <% if form.object.errors[:supplier].present? %>
+      <div class="error"><%= form.object.errors[:supplier].join(", ") %></div>
+    <% end %>
+  </div>
+
+  <div>
+    <%= form.label :fund_transfer_date, "資金移動日" %>
+    <%= form.date_field :fund_transfer_date %>
+    <% if form.object.errors[:fund_transfer_date].present? %>
+      <div class="error"><%= form.object.errors[:fund_transfer_date].join(", ") %></div>
+    <% end %>
+  </div>
+
+  <div>
+    <label>
+      <%= form.check_box :except_already_output %>
+      出力済みを除く
+    </label>
+  </div>
+
+  <div>
+    <%= form.submit "参照", name: nil %>
+    <%= form.submit "CSV出力",
+                    name: nil,
+                    formaction: journal_entry_data_export_path,
+                    data: { export_auth_token: form_authenticity_token(form_options: { action: journal_entry_data_export_path, method: :post }) } %>
+  </div>
+<% end %>
+
+<% if @journal_entries.present? %>
+  <h2>作成される仕訳内容</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>会社</th>
+        <th>伝票日付</th>
+        <th>借方部門</th>
+        <th>借方科目</th>
+        <th>借方補助科目</th>
+        <th>借方取引先</th>
+        <th>借方金額</th>
+        <th>貸方部門</th>
+        <th>貸方科目</th>
+        <th>貸方補助科目</th>
+        <th>貸方取引先</th>
+        <th>貸方金額</th>
+        <th>摘要</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% @journal_entries.each do |entry| %>
+        <tr>
+          <td class="number"><%= entry.company_no %></td>
+          <td><%= entry.date&.respond_to?(:strftime) ? entry.date.strftime("%Y/%m/%d") : entry.date %></td>
+          <td class="number"><%= entry.debit_department_no %></td>
+          <td class="number"><%= entry.debit_account_no %></td>
+          <td class="number"><%= entry.debit_sub_account_no %></td>
+          <td class="number"><%= entry.debit_supplier_no %></td>
+          <td class="number"><%= entry.debit_amount %></td>
+          <td class="number"><%= entry.credit_department_no %></td>
+          <td class="number"><%= entry.credit_account_no %></td>
+          <td class="number"><%= entry.credit_sub_account_no %></td>
+          <td class="number"><%= entry.credit_supplier_no %></td>
+          <td class="number"><%= entry.credit_amount %></td>
+          <td><%= entry.abstract %></td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+<% end %>
+
+<script>
+  (function() {
+    function setup() {
+      var form = document.querySelector('[data-behavior="journal-entry-data-form"]');
+      if (!form || form.dataset.csrfSwapInitialized === 'true') return;
+
+      var tokenInput = form.querySelector('input[name="authenticity_token"]');
+      if (!tokenInput) return;
+
+      var defaultToken = tokenInput.value;
+
+      form.addEventListener('submit', function(event) {
+        var submitter = event.submitter || document.activeElement;
+        if (!submitter) return;
+
+        var token = submitter.dataset ? submitter.dataset.exportAuthToken : null;
+        tokenInput.value = token || defaultToken;
+      });
+
+      form.dataset.csrfSwapInitialized = 'true';
+    }
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', setup);
+    } else {
+      setup();
+    }
+
+    document.addEventListener('turbo:load', setup);
+  })();
+</script>

@@ -212,8 +212,8 @@ class CreateEPDICoreTables < ActiveRecord::Migration[7.1]
     create_table :"TRN_JOURNAL_ENTRY_HISTORY", primary_key: "JOURNAL_ENTRY_HISTORY_NO", id: :integer do |t|
       t.integer  "CAPTURE_HISTORY_NO", null: false
       t.integer  "CAPTURE_CATEGORY_NO", null: false
-      t.date "ACCRUAL_MONTH", null: false
-      t.date "PAYMENT_MONTH", null: false
+      t.date "ACCRUAL_MONTH"
+      t.date "PAYMENT_MONTH"
       t.boolean  "EXECUTE_FLG", default: false, null: false
       t.integer  "CREATE_USER_ID", null: false
       t.datetime "CREATE_DATE", null: false

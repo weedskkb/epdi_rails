@@ -302,6 +302,7 @@ DEPENDENCIES
   roo
   roo-xls
   rspec-rails (~> 6.1)
+  rubyzip (~> 2.3)
   spring
   web-console
 

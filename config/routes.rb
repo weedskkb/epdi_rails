@@ -15,6 +15,8 @@ Rails.application.routes.draw do
 
   resources :payment_data, only: [:index]
   resources :journal_entry_data, only: [:index]
+  post "/journal_entry_data/display", to: "journal_entry_data#display", as: :journal_entry_data_display
+  post "/journal_entry_data/export", to: "journal_entry_data#export", as: :journal_entry_data_export
   resources :companies, only: [:index]
   resources :departments, only: [:index]
   resources :capture_categories, only: [:index]
