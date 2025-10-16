@@ -3,9 +3,9 @@
 <%= form_with model: @view_model, url: capture_capture_payment_data_path, local: true, method: :post, html: { multipart: true } do |form| %>
   <section class="capturecategory-radio">
     <ul style="list-style: none; text-align:left;">
-      <li><input type="radio" name="SelectCategory" class="uniquedata" id="storedata" value="1" /><label for="storedata"> 店舗データ</label></li>
-      <li><input type="radio" name="SelectCategory" class="uniquedata" id="fixeddata" value="1" /><label for="fixeddata"> 固定費データ</label></li>
-      <li><input type="radio" name="SelectCategory" class="wholedata" id="wholedata" value="2" /><label for="wholedata"> 卸データ</label></li>
+      <li><input type="radio" name="SelectCategory" class="uniquedata" id="storedata" value="1" /><label for="storedata"> 店舗データ: 16 経費(店舗)ﾏﾈｰｼﾞｬｰ振込</label></li>
+      <li><input type="radio" name="SelectCategory" class="uniquedata" id="fixeddata" value="1" /><label for="fixeddata"> 固定費データ: 24 経費(家賃)固定費</label></li>
+      <li><input type="radio" name="SelectCategory" class="wholedata" id="wholedata" value="2" /><label for="wholedata"> 卸データ: 1 医薬品(卸)</label></li>
       <li><input type="radio" name="SelectCategory" class="sharedata" id="sharedata" value="2" /><label for="sharedata"> 共有データ</label></li>
     </ul>
     <input type="hidden" />
