@@ -21,6 +21,7 @@ module CapturePaymentData
       @base_history = nil
     end
 
+    # CapturePaymentDataApplication::Capture()
     def call
       return failure('セッションが無効です。') if view_model.user.blank?
 
@@ -82,6 +83,7 @@ module CapturePaymentData
       view_model.payment_month.to_s.presence
     end
 
+    # CapturePaymentDataApplication::CheckMonth()
     def ensure_month_requirements
       case capture_category
       when CATEGORY_WHOLESALE, CATEGORY_STORE, CATEGORY_FIXED
@@ -94,6 +96,7 @@ module CapturePaymentData
       end
     end
 
+    # CapturePaymentDataApplication::CheckHistory()
     def ensure_history_uniqueness
       return if capture_category.zero?
 
@@ -111,6 +114,7 @@ module CapturePaymentData
       view_model.errors.add(:base, '既に取込済みです。') if exists
     end
 
+    # CapturePaymentDataApplication::Save() - load Excel sheets
     def load_sheets
       files = uploaded_files
       files = files.filter{ |file| ['xlsx', 'xls'].include?(detect_extension(file).to_s.downcase) }
@@ -137,6 +141,7 @@ module CapturePaymentData
       end
     end
 
+    # CapturePaymentDataApplication::Save() - select worksheet
     def select_worksheet(file)
       temp = file.respond_to?(:tempfile) ? file.tempfile : file
       temp.rewind if temp.respond_to?(:rewind)
@@ -190,6 +195,7 @@ module CapturePaymentData
       end
     end
 
+    # CapturePaymentDataApplication::Save() - sheet naming
     def wholesale_sheet_name
       date = parse_month_string(target_month_value)
       return '' unless date
@@ -205,6 +211,7 @@ module CapturePaymentData
       nil
     end
 
+    # CapturePaymentDataApplication::CheckCategory()
     def ensure_category_match(sheets)
       return if [CATEGORY_WHOLESALE, CATEGORY_STORE, CATEGORY_FIXED].include?(capture_category)
       return if sheets.empty?
@@ -213,6 +220,7 @@ module CapturePaymentData
       view_model.errors.add(:base, '取引先とエクセルの区分が間違っています。') unless value == capture_category.to_s
     end
 
+    # CapturePaymentDataApplication::CheckDepartment()
     def ensure_departments_exist(sheets)
       start_row = case capture_category
                   when CATEGORY_WHOLESALE then 5
@@ -239,6 +247,7 @@ module CapturePaymentData
       view_model.errors.add(:base, "登録されていない店舗番号があります。(店舗番号：#{missing})") if missing
     end
 
+    # CapturePaymentDataApplication::Overwrite()
     def process_overwrite
       history_numbers = case capture_category
                         when CATEGORY_STORE, CATEGORY_FIXED
@@ -264,6 +273,7 @@ module CapturePaymentData
       end
     end
 
+    # CapturePaymentDataApplication::RecordHistory() - initialize
     def record_initial_history
       target_month = parse_month_string(target_month_value)
       payment_month = parse_month_string(payment_month_value)
@@ -281,6 +291,7 @@ module CapturePaymentData
                       end
     end
 
+    # CapturePaymentDataApplication::RecordHistory() - create entry
     def create_history(accrual_month: nil, payment_month:)
       TrnCaptureHistory.create!(
         capture_category_no: capture_category,
@@ -292,6 +303,7 @@ module CapturePaymentData
       )
     end
 
+    # CapturePaymentDataApplication::Capture() - dispatch
     def import_sheets(sheets)
       case capture_category
       when CATEGORY_STORE
@@ -307,6 +319,7 @@ module CapturePaymentData
       end
     end
 
+    # CapturePaymentDataApplication::Capture() - store branch
     def import_store_data(sheets)
       sheets.each do |sheet|
         last_row = last_row_index(sheet)
@@ -348,6 +361,7 @@ module CapturePaymentData
       end
     end
 
+    # CapturePaymentDataApplication::Capture() - fixed branch
     def import_fixed_data(sheets)
       history_no = base_history_id
       sheets.each do |sheet|
@@ -384,6 +398,7 @@ module CapturePaymentData
       end
     end
 
+    # CapturePaymentDataApplication::Capture() - wholesale branch
     def import_wholesale_data(sheets)
       history_no = base_history_id
       sheets.each do |sheet|
@@ -416,6 +431,7 @@ module CapturePaymentData
       end
     end
 
+    # CapturePaymentDataApplication::Capture() - expense summary branch
     def import_expense_summary_data(sheets)
       history_no = base_history_id
       sheets.each do |sheet|
@@ -445,6 +461,7 @@ module CapturePaymentData
       end
     end
 
+    # CapturePaymentDataApplication::Capture() - shared branch
     def import_shared_data(sheets)
       history_no = base_history_id
       category = capture_category_record
@@ -477,6 +494,7 @@ module CapturePaymentData
       end
     end
 
+    # CapturePaymentDataApplication::existHistory()/getHistoryNo()
     def find_or_create_store_history(payment_month)
       TrnCaptureHistory.find_or_create_by!(
         CAPTURE_CATEGORY_NO: capture_category,
@@ -489,6 +507,7 @@ module CapturePaymentData
       end
     end
 
+    # CapturePaymentDataApplication::getHistoryNo()
     def base_history_id
       @base_history&.capture_history_no
     end
@@ -516,6 +535,7 @@ module CapturePaymentData
       Department.find_by!(DEPARTMENT_NO: department_no).company_no
     end
 
+    # CapturePaymentDataApplication::getPaymentMonth()
     def payment_month_from_term(accrual_month, term)
       date = parse_month_string(accrual_month)
       return accrual_month unless date
@@ -525,6 +545,7 @@ module CapturePaymentData
       date.advance(months: offset).strftime('%Y-%m')
     end
 
+    # CapturePaymentDataApplication::CheckHistory() - month increment
     def next_month_string(value)
       date = parse_month_string(value)
       return value unless date
@@ -533,11 +554,13 @@ module CapturePaymentData
     end
 
     # TODO: 変更の必要あり
+    # CapturePaymentDataApplication::getTaxRate()
     def tax_rate_for(value)
       # value.present? ? 8 : nil
       return 8 unless value.nil?
     end
 
+    # CapturePaymentDataApplication::getTaxClass()
     def tax_class_for(value)
       case value.to_s
       when '8' then 0
@@ -560,10 +583,12 @@ module CapturePaymentData
       @capture_category_record ||= CaptureCategory.find(capture_category)
     end
 
+    # CapturePaymentDataApplication::GetCellValue()
     def cell_value(sheet, row_idx, col_idx)
       sheet.cell(row_idx + 1, col_idx + 1)
     end
 
+    # CapturePaymentDataApplication::GetCellValue() - numeric conversion
     def cell_integer(sheet, row_idx, col_idx)
       value = cell_value(sheet, row_idx, col_idx)
       return nil if value.nil?
@@ -575,6 +600,7 @@ module CapturePaymentData
       end
     end
 
+    # CapturePaymentDataApplication::GetCellValue() - string conversion
     def cell_string(sheet, row_idx, col_idx)
       value = cell_value(sheet, row_idx, col_idx)
       return '' if value.nil?
