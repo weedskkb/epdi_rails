@@ -28,12 +28,12 @@ module CapturePaymentData
       view_model.valid?
       ensure_month_requirements
       ensure_history_uniqueness unless view_model.overwrite?
-      return failure('入力内容を確認してください') if view_model.errors.any?
+      return failure(view_model.errors.full_messages.join("\n")) if view_model.errors.any?
 
       sheets = load_sheets
       ensure_category_match(sheets)
       ensure_departments_exist(sheets)
-      return failure('入力内容を確認してください') if view_model.errors.any?
+      return failure(view_model.errors.full_messages.join("\n")) if view_model.errors.any?
 
       ActiveRecord::Base.transaction do
         process_overwrite if view_model.overwrite?
