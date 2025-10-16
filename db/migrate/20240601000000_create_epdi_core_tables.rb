@@ -193,14 +193,14 @@ class CreateEPDICoreTables < ActiveRecord::Migration[7.1]
       t.integer  "DEBIT_DEPARTMENT_NO"
       t.integer  "DEBIT_ACCOUNT_NO"
       t.integer  "DEBIT_SUB_ACCOUNT_NO"
-      t.integer  "DEBIT_AMMOUNT", null: false
+      t.integer  "DEBIT_AMMOUNT"
       t.integer  "DEBIT_TAX_CLASS_NO"
       t.integer  "DEBIT_TAX_RATE_NO"
       t.integer  "DEBIT_SUPPLIER_NO"
       t.integer  "CREDIT_DEPARTMENT_NO"
       t.integer  "CREDIT_ACCOUNT_NO"
       t.integer  "CREDIT_SUB_ACCOUNT_NO"
-      t.integer  "CREDIT_AMMOUNT", null: false
+      t.integer  "CREDIT_AMMOUNT"
       t.integer  "CREDIT_TAX_CLASS_NO"
       t.integer  "CREDIT_TAX_RATE_NO"
       t.integer  "CREDIT_SUPPLIER_NO"
