@@ -1,11 +1,12 @@
 #!/usr/bin/env ruby
 # frozen_string_literal: true
-# ruby runner/csv_dir_diff.rb ../../check/LEFT ../../check/RIGHT --headers --ignore-cols CSJS005,CSJS100
+# ruby runner/csv_dir_diff.rb ../../check/LEFT ../../check/RIGHT --headers --ignore-cols CSJS005,CSJS100,CAPTURE_DATA_NO,CAPTURE_HISTORY_NO,CREATE_DATE,CREATE_USER_ID
+# mysql -u kkb_rails -ppassword -D epdi -B -e "SELECT * FROM trn_capture_data order by row_no,account_no" | sed 's/\t/,/g' > trn_capture_mydata.csv
+
 
 require 'csv'
 require 'optparse'
 require 'set'
-
 begin
   require 'unicode_normalize'
 rescue LoadError
@@ -116,7 +117,7 @@ rescue => e
 end
 
 # セル単位の差分（l/r の行を位置で突き合わせ）
-def diff_cells(norm_l, norm_r, col_labels, label_prefix: nil)
+def diff_cells(norm_l, norm_r, col_labels)
   diffs = []
   max_len = [norm_l.length, norm_r.length].max
   max_len.times do |i|
@@ -128,15 +129,12 @@ def diff_cells(norm_l, norm_r, col_labels, label_prefix: nil)
         lv = l[j]
         rv = r[j]
         next if lv == rv
-        diffs << { row: i + 1, col: j + 1, col_name: (col_labels && col_labels[j]),
-                   left: lv, right: rv, tag: label_prefix }
+        diffs << { row: i + 1, col: j + 1, col_name: (col_labels && col_labels[j]), left: lv, right: rv }
       end
     elsif l && !r
-      diffs << { row: i + 1, col: nil, col_name: nil, left: l.join(','), right: nil,
-                 note: 'row-only-left', tag: label_prefix }
+      diffs << { row: i + 1, col: nil, col_name: nil, left: l.join(','), right: nil, note: 'row-only-left' }
     elsif r && !l
-      diffs << { row: i + 1, col: nil, col_name: nil, left: nil, right: r.join(','), 
-                 note: 'row-only-right', tag: label_prefix }
+      diffs << { row: i + 1, col: nil, col_name: nil, left: nil, right: r.join(','), note: 'row-only-right' }
     end
   end
   diffs
@@ -152,10 +150,7 @@ def compare_one_pair(key, left_path, right_path, options)
   header_l, rows_l = read_csv(left_path, options)
   header_r, rows_r = read_csv(right_path, options)
 
-  puts "[DIFF] key='#{key}'"
-  puts "  LEFT : #{left_path}"
-  puts "  RIGHT: #{right_path}"
-
+  # === ヘッダあり ===
   if options[:headers]
     # ヘッダ名を正規化
     norm_header_l = header_l.map { |h| norm_name(h) }
@@ -164,6 +159,10 @@ def compare_one_pair(key, left_path, right_path, options)
     # 共通列
     common_cols = norm_header_l & norm_header_r
     if common_cols.empty?
+      # 比較できないので NG 扱い（理由は出す）
+      puts "[DIFF] key='#{key}' NG"
+      puts "  LEFT : #{left_path}"
+      puts "  RIGHT: #{right_path}"
       puts "  (no common headers; skip)"
       return
     end
@@ -172,7 +171,7 @@ def compare_one_pair(key, left_path, right_path, options)
     h2i_l = norm_header_l.each_with_index.to_h
     h2i_r = norm_header_r.each_with_index.to_h
 
-    # 除外列：名前も数値もサポート（数値で指定された場合は該当名を抽出）
+    # 除外列：名前も数値もサポート
     ignore_idx_l = parse_ignore_indices(options[:ignore_cols], true, h2i_l)
     ignore_idx_r = parse_ignore_indices(options[:ignore_cols], true, h2i_r)
     ignore_names_by_num_l = ignore_idx_l.map { |i| norm_header_l[i] }.compact
@@ -184,7 +183,8 @@ def compare_one_pair(key, left_path, right_path, options)
     # 比較に使う列 = 共通列 - 除外列名（正規化済）
     compare_names = common_cols - ignore_names_all
     if compare_names.empty?
-      puts "  (no columns to compare after ignoring: #{options[:ignore_cols].join(', ')})"
+      # 比較対象列が無い＝有意差なし扱いで OK とする
+      puts "[DIFF] key='#{key}' OK"
       return
     end
 
@@ -195,27 +195,30 @@ def compare_one_pair(key, left_path, right_path, options)
     norm_l = rows_l.map { |row| idx_l.map { |i| row[i] } }
     norm_r = rows_r.map { |row| idx_r.map { |i| row[i] } }
 
-    # --- 常にセル単位で差分出力 ---
-    # 行順無視モードでも、ここでは“そのままの行順で”位置合わせしてセル差分を出す
+    # 常にセル単位で差分
     col_labels = compare_names
     c_diffs = diff_cells(norm_l, norm_r, col_labels)
 
     if c_diffs.empty?
-      puts "  (no cell differences after ignoring cols: #{options[:ignore_cols].join(', ')})"
+      puts "[DIFF] key='#{key}' OK"
     else
+      puts "[DIFF] key='#{key}' NG"
+      puts "  LEFT : #{left_path}"
+      puts "  RIGHT: #{right_path}"
       c_diffs.each do |d|
         if d[:note] == 'row-only-left'
-          puts "  - row #{d[:row]+1} (only in LEFT): #{d[:left]}"
+          puts "  - row #{d[:row]} (only in LEFT): #{d[:left]}"
         elsif d[:note] == 'row-only-right'
-          puts "  + row #{d[:row]+1} (only in RIGHT): #{d[:right]}"
+          puts "  + row #{d[:row]} (only in RIGHT): #{d[:right]}"
         else
           label = d[:col_name] ? "#{d[:col_name]}(#{d[:col]})" : "col #{d[:col]}"
-          puts "  * row #{d[:row]+1},  #{label}: LEFT='#{d[:left]}' RIGHT='#{d[:right]}'"
+          puts "  * row #{d[:row]},  #{label}: LEFT='#{d[:left]}' RIGHT='#{d[:right]}'"
         end
       end
     end
+
+  # === ヘッダなし ===
   else
-    # ヘッダなし：除外列はインデックスで処理
     max_cols = [rows_l.map(&:size).max || 0, rows_r.map(&:size).max || 0].max
     dummy_header = (1..max_cols).map(&:to_s)
     h2i_dummy = dummy_header.each_with_index.to_h
@@ -224,20 +227,21 @@ def compare_one_pair(key, left_path, right_path, options)
     norm_l = rows_l.map { |row| normalize_row(row + Array.new(max_cols - row.size), ignore_idx) }
     norm_r = rows_r.map { |row| normalize_row(row + Array.new(max_cols - row.size), ignore_idx) }
 
-    # --- 常にセル単位 ---
-    col_labels = nil
-    c_diffs = diff_cells(norm_l, norm_r, col_labels)
+    c_diffs = diff_cells(norm_l, norm_r, nil)
     if c_diffs.empty?
-      puts "  (no cell differences after ignoring indices: #{options[:ignore_cols].join(', ')})"
+      puts "[DIFF] key='#{key}' OK"
     else
+      puts "[DIFF] key='#{key}' NG"
+      puts "  LEFT : #{left_path}"
+      puts "  RIGHT: #{right_path}"
       c_diffs.each do |d|
         if d[:note] == 'row-only-left'
-          puts "  - row #{d[:row]+1} (only in LEFT): #{d[:left]}"
+          puts "  - row #{d[:row]} (only in LEFT): #{d[:left]}"
         elsif d[:note] == 'row-only-right'
-          puts "  + row #{d[:row]+1} (only in RIGHT): #{d[:right]}"
+          puts "  + row #{d[:row]} (only in RIGHT): #{d[:right]}"
         else
           label = "col #{d[:col]}"
-          puts "  * row #{d[:row]+1},  #{label}: LEFT='#{d[:left]}' RIGHT='#{d[:right]}'"
+          puts "  * row #{d[:row]},  #{label}: LEFT='#{d[:left]}' RIGHT='#{d[:right]}'"
         end
       end
     end
