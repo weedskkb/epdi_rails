@@ -1,8 +1,7 @@
 #!/usr/bin/env ruby
 # frozen_string_literal: true
-# ruby runner/csv_dir_diff.rb ../../check/LEFT ../../check/RIGHT --headers --ignore-cols CSJS005,CSJS100,CAPTURE_DATA_NO,CAPTURE_HISTORY_NO,CREATE_DATE,CREATE_USER_ID
-# mysql -u kkb_rails -ppassword -D epdi -B -e "SELECT * FROM trn_capture_data order by row_no,account_no" | sed 's/\t/,/g' > trn_capture_mydata.csv
-
+# 例:
+# ruby runner/csv_dir_diff.rb ../../check/LEFT ../../check/RIGHT --headers --ignore-cols CSJS005,CSJS100
 
 require 'csv'
 require 'optparse'
@@ -146,11 +145,14 @@ def build_key_map(paths)
   h
 end
 
-def compare_one_pair(key, left_path, right_path, options)
+# 詳細は配列で返し、サマリー用に OK/NG も返す
+# 戻り値: { key:, status: :ok/:ng, left:, right:, details: [String...] }
+def compare_one_pair_collect(key, left_path, right_path, options)
   header_l, rows_l = read_csv(left_path, options)
   header_r, rows_r = read_csv(right_path, options)
 
-  # === ヘッダあり ===
+  result = { key: key, left: left_path, right: right_path, status: :ng, details: [] }
+
   if options[:headers]
     # ヘッダ名を正規化
     norm_header_l = header_l.map { |h| norm_name(h) }
@@ -159,12 +161,11 @@ def compare_one_pair(key, left_path, right_path, options)
     # 共通列
     common_cols = norm_header_l & norm_header_r
     if common_cols.empty?
-      # 比較できないので NG 扱い（理由は出す）
-      puts "[DIFF] key='#{key}' NG"
-      puts "  LEFT : #{left_path}"
-      puts "  RIGHT: #{right_path}"
-      puts "  (no common headers; skip)"
-      return
+      result[:details] << "[DIFF] key='#{key}' NG"
+      result[:details] << "  LEFT : #{left_path}"
+      result[:details] << "  RIGHT: #{right_path}"
+      result[:details] << "  (no common headers; skip)"
+      return result
     end
 
     # 列名→index（正規化名で引く）
@@ -183,42 +184,42 @@ def compare_one_pair(key, left_path, right_path, options)
     # 比較に使う列 = 共通列 - 除外列名（正規化済）
     compare_names = common_cols - ignore_names_all
     if compare_names.empty?
-      # 比較対象列が無い＝有意差なし扱いで OK とする
-      puts "[DIFF] key='#{key}' OK"
-      return
+      result[:status] = :ok
+      result[:details] << "[DIFF] key='#{key}' OK"
+      return result
     end
 
     idx_l = compare_names.map { |name| h2i_l[name] }.compact
     idx_r = compare_names.map { |name| h2i_r[name] }.compact
 
-    # 行を比較用に（共通列のみ）
     norm_l = rows_l.map { |row| idx_l.map { |i| row[i] } }
     norm_r = rows_r.map { |row| idx_r.map { |i| row[i] } }
 
-    # 常にセル単位で差分
     col_labels = compare_names
     c_diffs = diff_cells(norm_l, norm_r, col_labels)
 
     if c_diffs.empty?
-      puts "[DIFF] key='#{key}' OK"
+      result[:status] = :ok
+      result[:details] << "[DIFF] key='#{key}' OK"
     else
-      puts "[DIFF] key='#{key}' NG"
-      puts "  LEFT : #{left_path}"
-      puts "  RIGHT: #{right_path}"
+      result[:status] = :ng
+      result[:details] << "[DIFF] key='#{key}' NG"
+      result[:details] << "  LEFT : #{left_path}"
+      result[:details] << "  RIGHT: #{right_path}"
       c_diffs.each do |d|
         if d[:note] == 'row-only-left'
-          puts "  - row #{d[:row]} (only in LEFT): #{d[:left]}"
+          result[:details] << "  - row #{d[:row]} (only in LEFT): #{d[:left]}"
         elsif d[:note] == 'row-only-right'
-          puts "  + row #{d[:row]} (only in RIGHT): #{d[:right]}"
+          result[:details] << "  + row #{d[:row]} (only in RIGHT): #{d[:right]}"
         else
           label = d[:col_name] ? "#{d[:col_name]}(#{d[:col]})" : "col #{d[:col]}"
-          puts "  * row #{d[:row]},  #{label}: LEFT='#{d[:left]}' RIGHT='#{d[:right]}'"
+          result[:details] << "  * row #{d[:row]},  #{label}: LEFT='#{d[:left]}' RIGHT='#{d[:right]}'"
         end
       end
     end
 
-  # === ヘッダなし ===
   else
+    # ヘッダなし
     max_cols = [rows_l.map(&:size).max || 0, rows_r.map(&:size).max || 0].max
     dummy_header = (1..max_cols).map(&:to_s)
     h2i_dummy = dummy_header.each_with_index.to_h
@@ -229,23 +230,27 @@ def compare_one_pair(key, left_path, right_path, options)
 
     c_diffs = diff_cells(norm_l, norm_r, nil)
     if c_diffs.empty?
-      puts "[DIFF] key='#{key}' OK"
+      result[:status] = :ok
+      result[:details] << "[DIFF] key='#{key}' OK"
     else
-      puts "[DIFF] key='#{key}' NG"
-      puts "  LEFT : #{left_path}"
-      puts "  RIGHT: #{right_path}"
+      result[:status] = :ng
+      result[:details] << "[DIFF] key='#{key}' NG"
+      result[:details] << "  LEFT : #{left_path}"
+      result[:details] << "  RIGHT: #{right_path}"
       c_diffs.each do |d|
         if d[:note] == 'row-only-left'
-          puts "  - row #{d[:row]} (only in LEFT): #{d[:left]}"
+          result[:details] << "  - row #{d[:row]} (only in LEFT): #{d[:left]}"
         elsif d[:note] == 'row-only-right'
-          puts "  + row #{d[:row]} (only in RIGHT): #{d[:right]}"
+          result[:details] << "  + row #{d[:row]} (only in RIGHT): #{d[:right]}"
         else
           label = "col #{d[:col]}"
-          puts "  * row #{d[:row]},  #{label}: LEFT='#{d[:left]}' RIGHT='#{d[:right]}'"
+          result[:details] << "  * row #{d[:row]},  #{label}: LEFT='#{d[:left]}' RIGHT='#{d[:right]}'"
         end
       end
     end
   end
+
+  result
 end
 
 # ===== メイン処理 =====
@@ -257,15 +262,26 @@ right_map = build_key_map(right_paths)
 
 all_keys = (left_map.keys | right_map.keys).sort
 
+ok_items = []      # ["key", ...]
+ng_items = []      # ["key", "key (ONLY LEFT)", ...]  ※ ONLY もここに入れる
+detail_blocks = [] # [ ["line1", "line2", ...], ... ]
+only_lines = []    # ONLY LEFT/RIGHT の詳細を最後に出す
+
 all_keys.each do |key|
   ls = (left_map[key]  || []).sort_by { |p| File.basename(p) }
   rs = (right_map[key] || []).sort_by { |p| File.basename(p) }
 
   if ls.empty? && !rs.empty?
-    rs.each { |p| puts "[ONLY RIGHT] key='#{key}' -> #{p}" }
+    rs.each do |p|
+      only_lines << "[ONLY RIGHT] key='#{key}' -> #{p}"
+      ng_items   << "#{key} (ONLY RIGHT)"
+    end
     next
   elsif rs.empty? && !ls.empty?
-    ls.each { |p| puts "[ONLY LEFT]  key='#{key}' -> #{p}" }
+    ls.each do |p|
+      only_lines << "[ONLY LEFT]  key='#{key}' -> #{p}"
+      ng_items   << "#{key} (ONLY LEFT)"
+    end
     next
   end
 
@@ -274,7 +290,39 @@ all_keys.each do |key|
   extras_left  = ls.drop(pairs.size)
   extras_right = rs.drop(pairs.size)
 
-  pairs.each { |l, r| compare_one_pair(key, l, r, options) }
-  extras_left.each  { |p| puts "[ONLY LEFT]  key='#{key}' (unpaired) -> #{p}" }
-  extras_right.each { |p| puts "[ONLY RIGHT] key='#{key}' (unpaired) -> #{p}" }
+  pairs.each do |l, r|
+    res = compare_one_pair_collect(key, l, r, options)
+    (res[:status] == :ok ? ok_items : ng_items) << res[:key]
+    detail_blocks << res[:details]
+  end
+
+  extras_left.each  do |p|
+    only_lines << "[ONLY LEFT]  key='#{key}' (unpaired) -> #{p}"
+    ng_items   << "#{key} (ONLY LEFT, unpaired)"
+  end
+  extras_right.each do |p|
+    only_lines << "[ONLY RIGHT] key='#{key}' (unpaired) -> #{p}"
+    ng_items   << "#{key} (ONLY RIGHT, unpaired)"
+  end
+end
+
+# ===== ここから出力 =====
+
+# 1) サマリー（OK / NG 一覧）※ ONLY も NG に集約
+puts "===== SUMMARY ====="
+puts "[OK] (#{ok_items.size})"
+ok_items.each { |k| puts "  #{k}" }
+puts "[NG] (#{ng_items.size})"
+ng_items.each { |k| puts "  #{k}" }
+
+# 2) 詳細（従来どおり）
+puts "\n===== DETAILS ====="
+detail_blocks.each do |block|
+  block.each { |line| puts line }
+end
+
+# 3) 片側のみ（参考に最後で）
+unless only_lines.empty?
+  puts "\n===== ONLY SIDE ====="
+  only_lines.each { |line| puts line }
 end
