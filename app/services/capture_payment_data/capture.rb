@@ -594,9 +594,20 @@ module CapturePaymentData
       return nil if value.nil?
 
       if value.is_a?(Numeric)
-        value.round
+        return nil if value.zero?
+        value.ceil
       elsif value.is_a?(String)
-        Integer(value.delete(','), exception: false)
+        stripped = value.delete(',')
+        return nil if stripped.empty?
+        begin
+          number = Float(stripped)
+          return nil if number.zero?
+          number.ceil
+        rescue ArgumentError, TypeError
+          int_value = Integer(stripped, exception: false)
+          return nil if int_value.nil? || int_value.zero?
+          int_value
+        end
       end
     end
 
