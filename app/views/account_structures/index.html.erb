@@ -1,0 +1,100 @@
+<h1>勘定科目・補助科目一覧</h1>
+
+<style>
+  .account-structure-table {
+    overflow: auto;
+    max-height: calc(100vh - 220px);
+    padding: 8px;
+    background: #ffffff;
+    border-radius: 6px;
+    box-shadow: 0 1px 3px rgba(15, 23, 42, 0.08);
+  }
+
+  .account-structure-table table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 12px;
+    white-space: nowrap;
+    table-layout: fixed;
+  }
+
+  .account-structure-table th {
+    background: #f0f4f9;
+    font-weight: 600;
+    position: sticky;
+    top: 0;
+    z-index: 1;
+  }
+
+  .account-structure-table th,
+  .account-structure-table td {
+    padding: 6px 8px;
+    border-bottom: 1px solid #e4e9f2;
+    text-align: left;
+  }
+
+  .account-structure-table tbody tr:nth-child(even) {
+    background: #f9fbff;
+  }
+
+  .account-structure-table th.wrap,
+  .account-structure-table td.wrap {
+    white-space: normal;
+    overflow-wrap: anywhere;
+    word-break: break-word;
+  }
+
+  .account-structure-table .column-key {
+    display: block;
+    margin-top: 2px;
+    font-size: 10px;
+    color: #64748b;
+    letter-spacing: 0.02em;
+    overflow-wrap: anywhere;
+    word-break: break-all;
+  }
+
+  .account-structure-table .flag {
+    font-weight: 600;
+  }
+</style>
+
+<div class="account-structure-table">
+  <table>
+    <thead>
+      <tr>
+        <th class="wrap">勘定科目NO<span class="column-key">ACCOUNT_NO</span></th>
+        <th class="wrap">勘定科目名<span class="column-key">ACCOUNT_NAME</span></th>
+        <th class="wrap">勘定科目削除フラグ<span class="column-key">ACCOUNT.DELETE_FLG</span></th>
+        <th class="wrap">補助科目NO<span class="column-key">SUB_ACCOUNT_NO</span></th>
+        <th class="wrap">補助科目名<span class="column-key">SUB_ACCOUNT_NAME</span></th>
+        <th class="wrap">補助科目削除フラグ<span class="column-key">SUB_ACCOUNT.DELETE_FLG</span></th>
+      </tr>
+    </thead>
+    <tbody>
+      <% @accounts.each do |account| %>
+        <% sub_accounts = account.sub_accounts.sort_by(&:sub_account_no) %>
+        <% rows = sub_accounts.presence || [nil] %>
+        <% rows.each_with_index do |sub_account, index| %>
+          <tr>
+            <% if index.zero? %>
+              <% rowspan = rows.size %>
+              <td class="wrap" rowspan="<%= rowspan %>"><%= account.account_no %></td>
+              <td class="wrap" rowspan="<%= rowspan %>"><%= account.account_name %></td>
+              <td class="wrap flag" rowspan="<%= rowspan %>"><%= account.delete_flg ? "有" : "無" %></td>
+            <% end %>
+            <td class="wrap"><%= sub_account&.sub_account_no || "-" %></td>
+            <td class="wrap"><%= sub_account&.sub_account_name || "-" %></td>
+            <td class="wrap flag">
+              <% if sub_account.present? %>
+                <%= sub_account.delete_flg ? "有" : "無" %>
+              <% else %>
+                -
+              <% end %>
+            </td>
+          </tr>
+        <% end %>
+      <% end %>
+    </tbody>
+  </table>
+</div>

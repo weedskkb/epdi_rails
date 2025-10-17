@@ -1,0 +1,104 @@
+<h1>勘定科目マスタ</h1>
+
+<style>
+  .accounts-table {
+    overflow: auto;
+    max-height: calc(100vh - 220px);
+    padding: 8px;
+    background: #ffffff;
+    border-radius: 6px;
+    box-shadow: 0 1px 3px rgba(15, 23, 42, 0.08);
+  }
+
+  .accounts-table table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 12px;
+    white-space: nowrap;
+    table-layout: fixed;
+  }
+
+  .accounts-table th {
+    background: #f0f4f9;
+    font-weight: 600;
+    position: sticky;
+    top: 0;
+    z-index: 1;
+  }
+
+  .accounts-table th,
+  .accounts-table td {
+    padding: 6px 8px;
+    border-bottom: 1px solid #e4e9f2;
+    text-align: left;
+  }
+
+  .accounts-table tbody tr:nth-child(even) {
+    background: #f9fbff;
+  }
+
+  .accounts-table th.wrap,
+  .accounts-table td.wrap {
+    white-space: normal;
+    overflow-wrap: anywhere;
+    word-break: break-word;
+  }
+
+  .accounts-table .column-key {
+    display: block;
+    margin-top: 2px;
+    font-size: 10px;
+    color: #64748b;
+    letter-spacing: 0.02em;
+    overflow-wrap: anywhere;
+    word-break: break-all;
+  }
+
+  .accounts-table .sub-account-list {
+    font-size: 11px;
+    color: #334155;
+    display: inline-block;
+  }
+
+  .accounts-table .flag {
+    font-weight: 600;
+  }
+</style>
+
+<div class="accounts-table">
+  <table>
+    <thead>
+      <tr>
+        <th class="wrap">勘定科目NO<span class="column-key">ACCOUNT_NO</span></th>
+        <th class="wrap">勘定科目名<span class="column-key">ACCOUNT_NAME</span></th>
+        <th class="wrap">削除フラグ<span class="column-key">DELETE_FLG</span></th>
+        <th class="wrap">補助科目数</th>
+        <th class="wrap">補助科目一覧</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% @accounts.each do |account| %>
+        <tr>
+          <td class="wrap"><%= account.account_no %></td>
+          <td class="wrap"><%= account.account_name %></td>
+          <td class="wrap flag"><%= account.delete_flg ? "有" : "無" %></td>
+          <td class="wrap"><%= account.sub_accounts.size %></td>
+          <td class="wrap">
+            <% if account.sub_accounts.any? %>
+              <span class="sub-account-list">
+                <%= safe_join(
+                      account.sub_accounts.sort_by(&:sub_account_no).map do |sub_account|
+                        "#{sub_account.sub_account_no} #{sub_account.sub_account_name}"
+                      end,
+                      tag.br
+                    ) %>
+              </span>
+            <% else %>
+              -
+            <% end %>
+          </td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+</div>

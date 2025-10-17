@@ -1,0 +1,85 @@
+<h1>補助科目マスタ</h1>
+
+<style>
+  .sub-accounts-table {
+    overflow: auto;
+    max-height: calc(100vh - 220px);
+    padding: 8px;
+    background: #ffffff;
+    border-radius: 6px;
+    box-shadow: 0 1px 3px rgba(15, 23, 42, 0.08);
+  }
+
+  .sub-accounts-table table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 12px;
+    white-space: nowrap;
+    table-layout: fixed;
+  }
+
+  .sub-accounts-table th {
+    background: #f0f4f9;
+    font-weight: 600;
+    position: sticky;
+    top: 0;
+    z-index: 1;
+  }
+
+  .sub-accounts-table th,
+  .sub-accounts-table td {
+    padding: 6px 8px;
+    border-bottom: 1px solid #e4e9f2;
+    text-align: left;
+  }
+
+  .sub-accounts-table tbody tr:nth-child(even) {
+    background: #f9fbff;
+  }
+
+  .sub-accounts-table th.wrap,
+  .sub-accounts-table td.wrap {
+    white-space: normal;
+    overflow-wrap: anywhere;
+    word-break: break-word;
+  }
+
+  .sub-accounts-table .column-key {
+    display: block;
+    margin-top: 2px;
+    font-size: 10px;
+    color: #64748b;
+    letter-spacing: 0.02em;
+    overflow-wrap: anywhere;
+    word-break: break-all;
+  }
+
+  .sub-accounts-table .flag {
+    font-weight: 600;
+  }
+</style>
+
+<div class="sub-accounts-table">
+  <table>
+    <thead>
+      <tr>
+        <th class="wrap">ID<span class="column-key">ID</span></th>
+        <th class="wrap">補助科目NO<span class="column-key">SUB_ACCOUNT_NO</span></th>
+        <th class="wrap">補助科目名<span class="column-key">SUB_ACCOUNT_NAME</span></th>
+        <th class="wrap">勘定科目<span class="column-key">ACCOUNT_NO</span></th>
+        <th class="wrap">削除フラグ<span class="column-key">DELETE_FLG</span></th>
+      </tr>
+    </thead>
+    <tbody>
+      <% @sub_accounts.each do |sub_account| %>
+        <tr>
+          <td class="wrap"><%= sub_account.id %></td>
+          <td class="wrap"><%= sub_account.sub_account_no %></td>
+          <td class="wrap"><%= sub_account.sub_account_name %></td>
+          <td class="wrap"><%= display_reference(sub_account.account_no, sub_account.account&.account_name) %></td>
+          <td class="wrap flag"><%= sub_account.delete_flg ? "有" : "無" %></td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+</div>
