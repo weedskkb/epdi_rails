@@ -1,22 +1,105 @@
 <h1>取込区分マスタ</h1>
 
-<table>
-  <thead>
-    <tr>
-      <th>区分NO</th>
-      <th>区分名</th>
-      <th>摘要</th>
-      <th>支払条件</th>
-    </tr>
-  </thead>
-  <tbody>
-    <% @capture_categories.each do |category| %>
+<style>
+  .capture-categories-table {
+    overflow: auto;
+    max-height: calc(100vh - 220px);
+    padding: 8px;
+    background: #ffffff;
+    border-radius: 6px;
+    box-shadow: 0 1px 3px rgba(15, 23, 42, 0.08);
+  }
+
+  .capture-categories-table table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 12px;
+    white-space: nowrap;
+    table-layout: fixed;
+  }
+
+  .capture-categories-table th {
+    background: #f0f4f9;
+    font-weight: 600;
+    position: sticky;
+    top: 0;
+    z-index: 1;
+  }
+
+  .capture-categories-table th,
+  .capture-categories-table td {
+    padding: 6px 8px;
+    border-bottom: 1px solid #e4e9f2;
+    text-align: left;
+  }
+
+  .capture-categories-table tbody tr:nth-child(even) {
+    background: #f9fbff;
+  }
+
+  .capture-categories-table th.wrap,
+  .capture-categories-table td.wrap {
+    white-space: normal;
+    overflow-wrap: anywhere;
+    word-break: break-word;
+  }
+
+  .capture-categories-table .column-key {
+    display: block;
+    margin-top: 2px;
+    font-size: 10px;
+    color: #64748b;
+    letter-spacing: 0.02em;
+    overflow-wrap: anywhere;
+    word-break: break-all;
+  }
+</style>
+
+<div class="capture-categories-table">
+  <table>
+    <thead>
       <tr>
-        <td><%= category.capture_category_no %></td>
-        <td><%= category.capture_category_name %></td>
-        <td><%= category.abstract %></td>
-        <td><%= category.payment_terms %></td>
+        <th class="wrap">取込区分NO<span class="column-key">CAPTURE_CATEGORY_NO</span></th>
+        <th class="wrap">取込区分名<span class="column-key">CAPTURE_CATEGORY_NAME</span></th>
+        <th class="wrap">税区分<span class="column-key">TAX_CLASS_NO</span></th>
+        <th class="wrap">税率<span class="column-key">TAX_RATE</span></th>
+        <th class="wrap">仕入先<span class="column-key">SUPPLIER_NO</span></th>
+        <th class="wrap">仕入先会社<span class="column-key">SUPPLIER_COMPANY_NO</span></th>
+        <th class="wrap">借方部署<span class="column-key">DEBIT_DEPARTMENT_NO</span></th>
+        <th class="wrap">借方勘定科目<span class="column-key">DEBIT_ACCOUNT_NO</span></th>
+        <th class="wrap">借方補助科目<span class="column-key">DEBIT_SUB_ACCOUNT_NO</span></th>
+        <th class="wrap">貸方部署<span class="column-key">CREDIT_DEPARTMENT_NO</span></th>
+        <th class="wrap">貸方勘定科目<span class="column-key">CREDIT_ACCOUNT_NO</span></th>
+        <th class="wrap">貸方補助科目<span class="column-key">CREDIT_SUB_ACCOUNT_NO</span></th>
+        <th class="wrap">摘要<span class="column-key">ABSTRACT</span></th>
+        <th class="wrap">仕入先別摘要<span class="column-key">SUPPLIER_ABSTRACT</span></th>
+        <th class="wrap">仕訳パターングループ<span class="column-key">JOURNAL_ENTRY_PATTERN_GROUP_NO</span></th>
+        <th class="wrap">支払条件<span class="column-key">PAYMENT_TERMS</span></th>
+        <th class="wrap">削除フラグ<span class="column-key">DELETE_FLG</span></th>
       </tr>
-    <% end %>
-  </tbody>
-</table>
+    </thead>
+    <tbody>
+      <% @capture_categories.each do |category| %>
+        <tr>
+          <td class="wrap"><%= category.capture_category_no %></td>
+          <td class="wrap"><%= category.capture_category_name %></td>
+          <td class="wrap"><%= display_reference(category.tax_class_no, category.tax_class&.tax_class_name) %></td>
+          <td class="wrap"><%= category.tax_rate_value %></td>
+          <td class="wrap"><%= display_reference(category.supplier_no, category.supplier&.supplier_name) %></td>
+          <td class="wrap"><%= display_reference(category.supplier_company_no, category.supplier_company&.company_name) %></td>
+          <td class="wrap"><%= display_reference(category.debit_department_no, category.debit_department&.department_name) %></td>
+          <td class="wrap"><%= display_reference(category.debit_account_no, category.debit_account&.account_name) %></td>
+          <td class="wrap"><%= display_reference(category.debit_sub_account_no, category.debit_sub_account&.sub_account_name) %></td>
+          <td class="wrap"><%= display_reference(category.credit_department_no, category.credit_department&.department_name) %></td>
+          <td class="wrap"><%= display_reference(category.credit_account_no, category.credit_account&.account_name) %></td>
+          <td class="wrap"><%= display_reference(category.credit_sub_account_no, category.credit_sub_account&.sub_account_name) %></td>
+          <td class="wrap"><%= category.abstract %></td>
+          <td class="wrap"><%= category.supplier_abstract %></td>
+          <td class="wrap"><%= category.journal_entry_pattern_group_no %></td>
+          <td class="wrap"><%= category.payment_terms %></td>
+          <td class="wrap"><%= category.delete_flg ? "有" : "無" %></td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+</div>

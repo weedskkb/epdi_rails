@@ -21,10 +21,24 @@ class CaptureCategory < ApplicationRecord
   alias_attribute :supplier_abstract, "SUPPLIER_ABSTRACT"
   alias_attribute :payment_terms, "PAYMENT_TERMS"
   alias_attribute :tax_rate_value, "TAX_RATE"
+  alias_attribute :create_user_id, "CREATE_USER_ID"
+  alias_attribute :create_date, "CREATE_DATE"
+  alias_attribute :update_user_id, "UPDATE_USER_ID"
+  alias_attribute :update_date, "UPDATE_DATE"
 
   scope :active, -> { where(DELETE_FLG: false) }
 
   belongs_to :tax_class, class_name: "TaxClass", foreign_key: "TAX_CLASS_NO", optional: true
+  belongs_to :supplier, class_name: "Supplier", foreign_key: "SUPPLIER_NO", optional: true
+  belongs_to :supplier_company, class_name: "Company", foreign_key: "SUPPLIER_COMPANY_NO", optional: true
+  belongs_to :debit_department, class_name: "Department", foreign_key: "DEBIT_DEPARTMENT_NO", optional: true
+  belongs_to :debit_account, class_name: "Account", foreign_key: "DEBIT_ACCOUNT_NO", optional: true
+  belongs_to :debit_sub_account, class_name: "SubAccount", foreign_key: "DEBIT_SUB_ACCOUNT_NO",
+                                 primary_key: "SUB_ACCOUNT_NO", optional: true
+  belongs_to :credit_department, class_name: "Department", foreign_key: "CREDIT_DEPARTMENT_NO", optional: true
+  belongs_to :credit_account, class_name: "Account", foreign_key: "CREDIT_ACCOUNT_NO", optional: true
+  belongs_to :credit_sub_account, class_name: "SubAccount", foreign_key: "CREDIT_SUB_ACCOUNT_NO",
+                                  primary_key: "SUB_ACCOUNT_NO", optional: true
 
   def name_with_code
     capture_category_no.to_s + ' ' + capture_category_name
