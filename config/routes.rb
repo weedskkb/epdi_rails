@@ -21,6 +21,6 @@ Rails.application.routes.draw do
   resources :departments, only: [:index]
   resources :capture_categories, only: [:index, :edit, :update]
   resources :suppliers, only: [:index]
-  resources :journal_entry_patterns, only: [:index]
+  resources :journal_entry_patterns, only: [:index, :edit, :update]
   resources :users
 end

@@ -20,4 +20,18 @@ module ApplicationHelper
   def menu_path_for(controller_name)
     url_for(controller: controller_name, action: :index, only_path: true)
   end
+
+  def display_reference(identifier, name)
+    return "" if identifier.nil? && name.blank?
+    return name.to_s if identifier.nil?
+    return identifier.to_s if name.blank?
+
+    "#{name} (#{identifier})"
+  end
+
+  def display_timestamp(value)
+    return "" if value.nil?
+
+    value.strftime("%Y-%m-%d %H:%M")
+  end
 end

@@ -1,0 +1,330 @@
+<h1>仕訳パターンの編集</h1>
+
+<style>
+  .journal-entry-pattern-edit {
+    padding: 16px;
+    background: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(15, 23, 42, 0.08);
+    max-width: 1080px;
+  }
+
+  .journal-entry-pattern-edit .back-link {
+    display: inline-block;
+    margin-bottom: 12px;
+    font-size: 13px;
+    color: #2563eb;
+    text-decoration: none;
+  }
+
+  .journal-entry-pattern-edit .form-grid {
+    display: grid;
+    gap: 16px;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  }
+
+  .journal-entry-pattern-edit .form-group {
+    display: flex;
+    flex-direction: column;
+    font-size: 13px;
+  }
+
+  .journal-entry-pattern-edit label {
+    font-weight: 600;
+    margin-bottom: 4px;
+    color: #1f2937;
+  }
+
+  .journal-entry-pattern-edit .input-field,
+  .journal-entry-pattern-edit textarea,
+  .journal-entry-pattern-edit select {
+    padding: 8px 10px;
+    border: 1px solid #d1d5db;
+    border-radius: 4px;
+    font-size: 13px;
+  }
+
+  .journal-entry-pattern-edit textarea {
+    min-height: 80px;
+    resize: vertical;
+  }
+
+  .journal-entry-pattern-edit .readonly-field {
+    padding: 8px 10px;
+    border-radius: 4px;
+    background: #f3f4f6;
+    color: #4b5563;
+  }
+
+  .journal-entry-pattern-edit .checkbox-field {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 0;
+  }
+
+  .journal-entry-pattern-edit .form-actions {
+    margin-top: 24px;
+    display: flex;
+    gap: 12px;
+  }
+
+  .journal-entry-pattern-edit .form-actions .primary-button {
+    padding: 10px 18px;
+    border: none;
+    border-radius: 4px;
+    background: #2563eb;
+    color: #ffffff;
+    font-size: 14px;
+    cursor: pointer;
+  }
+
+  .journal-entry-pattern-edit .form-actions .secondary-link {
+    padding: 10px 18px;
+    border-radius: 4px;
+    background: #e5e7eb;
+    color: #1f2937;
+    text-decoration: none;
+    font-size: 14px;
+  }
+
+  .journal-entry-pattern-edit .error-messages {
+    margin-bottom: 16px;
+    padding: 12px;
+    border-radius: 6px;
+    background: #fee2e2;
+    color: #991b1b;
+    font-size: 13px;
+  }
+</style>
+
+<div class="journal-entry-pattern-edit">
+  <%= link_to "← 一覧へ戻る", journal_entry_patterns_path, class: "back-link" %>
+
+  <% if @pattern.errors.any? %>
+    <div class="error-messages">
+      <div><strong>エラーが発生しました:</strong></div>
+      <ul>
+        <% @pattern.errors.full_messages.each do |message| %>
+          <li><%= message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <%= form_with model: @pattern, local: true do |form| %>
+    <div class="form-grid">
+      <div class="form-group">
+        <label>パターンNO</label>
+        <div class="readonly-field"><%= @pattern.journal_entry_pattern_no %></div>
+      </div>
+
+      <div class="form-group">
+        <%= form.label :journal_entry_pattern_group_no, "グループNO" %>
+        <%= form.number_field :journal_entry_pattern_group_no, class: "input-field" %>
+      </div>
+
+      <div class="form-group">
+        <%= form.label :journal_entry_pattern_name, "パターン名" %>
+        <%= form.text_field :journal_entry_pattern_name, class: "input-field" %>
+      </div>
+
+      <div class="form-group">
+        <%= form.label :row_no, "行NO" %>
+        <%= form.number_field :row_no, class: "input-field" %>
+      </div>
+
+      <div class="form-group">
+        <%= form.label :date_pattern_no, "日付パターンNO" %>
+        <%= form.number_field :date_pattern_no, class: "input-field" %>
+      </div>
+
+      <div class="form-group">
+        <%= form.label :company_no, "会社" %>
+        <%= form.select :company_no,
+                        options_for_select(@company_options, @pattern.company_no),
+                        { include_blank: true },
+                        class: "input-field" %>
+      </div>
+
+      <div class="form-group">
+        <%= form.label :debit_department_no, "借方部署" %>
+        <%= form.select :debit_department_no,
+                        options_for_select(@department_options, @pattern.debit_department_no),
+                        { include_blank: true },
+                        class: "input-field" %>
+      </div>
+
+      <div class="form-group">
+        <%= form.label :debit_account_no, "借方勘定科目" %>
+        <%= form.select :debit_account_no,
+                        options_for_select(@account_options, @pattern.debit_account_no),
+                        { include_blank: true },
+                        class: "input-field" %>
+      </div>
+
+      <div class="form-group">
+        <%= form.label :debit_sub_account_no, "借方補助科目" %>
+        <%= form.select :debit_sub_account_no,
+                        options_for_select(@sub_account_options, @pattern.debit_sub_account_no),
+                        { include_blank: true },
+                        class: "input-field" %>
+      </div>
+
+      <div class="form-group">
+        <%= form.label :debit_supplier_no, "借方取引先" %>
+        <%= form.select :debit_supplier_no,
+                        options_for_select(@supplier_options, @pattern.debit_supplier_no),
+                        { include_blank: true },
+                        class: "input-field" %>
+      </div>
+
+      <div class="form-group">
+        <%= form.label :debit_tax_rate, "借方税率" %>
+        <%= form.number_field :debit_tax_rate, class: "input-field" %>
+      </div>
+
+      <div class="form-group">
+        <%= form.label :debit_tax_class_no, "借方税区分" %>
+        <%= form.select :debit_tax_class_no,
+                        options_for_select(@tax_class_options, @pattern.debit_tax_class_no),
+                        { include_blank: true },
+                        class: "input-field" %>
+      </div>
+
+      <div class="form-group">
+        <%= form.label :credit_department_no, "貸方部署" %>
+        <%= form.select :credit_department_no,
+                        options_for_select(@department_options, @pattern.credit_department_no),
+                        { include_blank: true },
+                        class: "input-field" %>
+      </div>
+
+      <div class="form-group">
+        <%= form.label :credit_account_no, "貸方勘定科目" %>
+        <%= form.select :credit_account_no,
+                        options_for_select(@account_options, @pattern.credit_account_no),
+                        { include_blank: true },
+                        class: "input-field" %>
+      </div>
+
+      <div class="form-group">
+        <%= form.label :credit_sub_account_no, "貸方補助科目" %>
+        <%= form.select :credit_sub_account_no,
+                        options_for_select(@sub_account_options, @pattern.credit_sub_account_no),
+                        { include_blank: true },
+                        class: "input-field" %>
+      </div>
+
+      <div class="form-group">
+        <%= form.label :credit_supplier_no, "貸方取引先" %>
+        <%= form.select :credit_supplier_no,
+                        options_for_select(@supplier_options, @pattern.credit_supplier_no),
+                        { include_blank: true },
+                        class: "input-field" %>
+      </div>
+
+      <div class="form-group">
+        <%= form.label :credit_tax_rate, "貸方税率" %>
+        <%= form.number_field :credit_tax_rate, class: "input-field" %>
+      </div>
+
+      <div class="form-group">
+        <%= form.label :credit_tax_class_no, "貸方税区分" %>
+        <%= form.select :credit_tax_class_no,
+                        options_for_select(@tax_class_options, @pattern.credit_tax_class_no),
+                        { include_blank: true },
+                        class: "input-field" %>
+      </div>
+
+      <div class="form-group">
+        <%= form.label :detail_division_no, "明細区分" %>
+        <%= form.select :detail_division_no,
+                        options_for_select(@detail_division_options, @pattern.detail_division_no),
+                        { include_blank: true },
+                        class: "input-field" %>
+      </div>
+
+      <div class="form-group">
+        <%= form.label :fixed_amount, "固定金額" %>
+        <%= form.number_field :fixed_amount, class: "input-field" %>
+      </div>
+
+      <div class="form-group">
+        <%= form.label :filter_ratio, "按分率" %>
+        <%= form.number_field :filter_ratio, class: "input-field" %>
+      </div>
+
+      <div class="form-group">
+        <%= form.label :filter_amount, "按分金額" %>
+        <%= form.number_field :filter_amount, class: "input-field" %>
+      </div>
+
+      <div class="form-group">
+        <%= form.label :abstract, "摘要" %>
+        <%= form.text_area :abstract %>
+      </div>
+
+      <div class="form-group">
+        <label for="journal_entry_pattern_fixed_amount_flag">固定金額フラグ</label>
+        <div class="checkbox-field">
+          <%= form.check_box :fixed_amount_flag %>
+          <span>固定金額を適用</span>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="journal_entry_pattern_filter_ratio_flag">按分率フラグ</label>
+        <div class="checkbox-field">
+          <%= form.check_box :filter_ratio_flag %>
+          <span>按分率を適用</span>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="journal_entry_pattern_filter_amount_flag">按分金額フラグ</label>
+        <div class="checkbox-field">
+          <%= form.check_box :filter_amount_flag %>
+          <span>按分金額を適用</span>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="journal_entry_pattern_include_tax_flag">税込フラグ</label>
+        <div class="checkbox-field">
+          <%= form.check_box :include_tax_flag %>
+          <span>税込みで計算する</span>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="journal_entry_pattern_tax_calc_flag">税計算フラグ</label>
+        <div class="checkbox-field">
+          <%= form.check_box :tax_calc_flag %>
+          <span>税計算を行う</span>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="journal_entry_pattern_accure_flag">発生計上フラグ</label>
+        <div class="checkbox-field">
+          <%= form.check_box :accure_flag %>
+          <span>発生計上を行う</span>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="journal_entry_pattern_delete_flg">削除フラグ</label>
+        <div class="checkbox-field">
+          <%= form.check_box :delete_flg %>
+          <span>削除済みとして扱う</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="form-actions">
+      <%= form.submit "更新する", class: "primary-button" %>
+      <%= link_to "キャンセル", journal_entry_patterns_path, class: "secondary-link" %>
+    </div>
+  <% end %>
+</div>
