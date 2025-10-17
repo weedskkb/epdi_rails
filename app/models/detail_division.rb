@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+# 未使用
 class DetailDivision < ApplicationRecord
   self.table_name = "MST_DETAIL_DIVISION"
   self.primary_key = "DETAIL_DIVISION_NO"

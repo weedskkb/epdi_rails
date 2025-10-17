@@ -46,6 +46,7 @@ module JournalEntryData
       @form = form
     end
 
+    # JournalEntryDataListApplication::CreateCsvFolder()/CreateZipFolder()
     def call
       rows = fetch_rows
       return failure("出力データはありませんでした。") if rows.empty?
@@ -78,6 +79,7 @@ module JournalEntryData
       ServiceResult.new(success: false, message: message)
     end
 
+    # JournalEntryDataListApplication::CreateCsvFolder()
     def fetch_rows
       scope = TrnJournalEntryData.joins(:journal_entry_history)
       if form.payment_month_date.present?
@@ -146,6 +148,7 @@ module JournalEntryData
       end
     end
 
+    # JournalEntryDataListApplication::CreateCsvFolder()
     def build_company_files(rows)
       grouped = rows.group_by(&:company_no)
       company_names = Company.where(COMPANY_NO: grouped.keys).pluck(:COMPANY_NO, :COMPANY_NAME).to_h
@@ -157,6 +160,7 @@ module JournalEntryData
       end
     end
 
+    # JournalEntryDataListApplication::CreateCsvFolder()
     def build_company_csv(rows)
       lines = [HEADER]
       section = "*"
@@ -227,6 +231,7 @@ module JournalEntryData
       UTF8_BOM + lines.join("\n") + "\n"
     end
 
+    # JournalEntryDataListApplication::CreateZipFolder()
     def build_zip(files)
       buffer = Zip::OutputStream.write_buffer do |zip|
         files.each do |filename, content|
@@ -238,6 +243,7 @@ module JournalEntryData
       buffer.read
     end
 
+    # JournalEntryDataListApplication::ExecuteFlg()
     def mark_histories_executed(history_numbers)
       return if history_numbers.blank?
 
@@ -245,10 +251,12 @@ module JournalEntryData
                              .update_all("EXECUTE_FLG" => true)
     end
 
+    # JournalEntryDataListApplication::CreateCsvFolder()
     def requires_additional_split?(row)
       [LOGISTICS_CATEGORY, LABOR_COST_CATEGORY].include?(row.capture_category_no.to_i)
     end
 
+    # JournalEntryDataListApplication::CreateCsvFolder()
     def format_date(value)
       return value.to_s unless value.respond_to?(:strftime)
 

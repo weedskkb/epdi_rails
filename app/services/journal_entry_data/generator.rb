@@ -6,6 +6,7 @@ module JournalEntryData
     PATTERN_GROUP_STORE = 4
     PATTERN_GROUP_LABOR = 9
 
+    # JournalEntryDataListApplication::Create()
     def self.call(form)
       new(form).call
     end
@@ -14,6 +15,7 @@ module JournalEntryData
       @form = form
     end
 
+    # JournalEntryDataListApplication::Create()
     def call
       missing_capture_numbers = capture_history_numbers_without_journal_entries
       return ServiceResult.new(success: true) if missing_capture_numbers.empty?
@@ -51,16 +53,19 @@ module JournalEntryData
 
     attr_reader :form
 
+    # JournalEntryDataListApplication::GetNoJournalEntryHistory()
     def payment_month
       form.payment_month_date
     end
 
+    # JournalEntryDataListApplication::GetNoJournalEntryHistory()
     def payment_month_range
       return nil unless payment_month
 
       payment_month.beginning_of_month..payment_month.end_of_month
     end
 
+    # JournalEntryDataListApplication::GetNoJournalEntryHistory()
     def capture_history_numbers_without_journal_entries
       scope = TrnCaptureHistory.all
       scope = scope.where(PAYMENT_MONTH: payment_month_range) if payment_month_range
@@ -72,6 +77,7 @@ module JournalEntryData
         .pluck(:CAPTURE_HISTORY_NO)
     end
 
+    # JournalEntryDataListApplication::RecordHistory()
     def record_histories(capture_history_numbers)
       capture_history_numbers.map do |history_no|
         capture_history = TrnCaptureHistory.find(history_no)
@@ -90,6 +96,7 @@ module JournalEntryData
       end
     end
 
+    # JournalEntryDataListApplication::Create()
     def create_journal_entry_data(history_ids)
       history_ids.each do |history_id|
         history = TrnJournalEntryHistory.find_by(journal_entry_history_no: history_id)
@@ -139,6 +146,7 @@ module JournalEntryData
       end
     end
 
+    # JournalEntryDataListApplication::Create() - grouped store aggregation
     def create_grouped_store_entries(grouping_rows, history)
       return if grouping_rows.blank?
 
@@ -188,6 +196,7 @@ module JournalEntryData
         end
     end
 
+    # JournalEntryDataListApplication::Create()
     def build_entry_hash(history:, pattern:, capture_category:, capture_row:, debit_account:, credit_account:, debit_amount:, credit_amount:)
       {
         journal_entry_history_no: history.journal_entry_history_no,
@@ -221,6 +230,7 @@ module JournalEntryData
       }
     end
 
+    # JournalEntryDataListApplication::Create()
     def create_entry(attributes)
       TrnJournalEntryData.create!(
         journal_entry_history_no: attributes[:journal_entry_history_no],
@@ -249,6 +259,7 @@ module JournalEntryData
       )
     end
 
+    # JournalEntryDataListApplication::Create() - expense summary skip
     def skip_expense_summary_row?(capture_category_no, capture_row)
       return false unless capture_category_no == CATEGORY_EXPENSE_SUMMARY
 
@@ -270,6 +281,7 @@ module JournalEntryData
       false
     end
 
+    # JournalEntryDataListApplication::Create() - store pattern skip
     def skip_store_pattern_row?(pattern, company_no)
       return false unless pattern["JOURNAL_ENTRY_PATTERN_GROUP_NO"] == PATTERN_GROUP_STORE
 
@@ -283,6 +295,7 @@ module JournalEntryData
       end
     end
 
+    # JournalEntryDataListApplication::GetAmmount()
     def amount_for(pattern, capture_row, side, account_no)
       base_amount = capture_row.amount.to_i
       pattern_group = pattern["JOURNAL_ENTRY_PATTERN_GROUP_NO"]
@@ -351,19 +364,23 @@ module JournalEntryData
       end
     end
 
+    # JournalEntryDataListApplication::GetAmmount()
     def amount_for_account(scope, account_no)
       record = scope.find_by(ACCOUNT_NO: account_no)
       record&.amount.to_i
     end
 
+    # JournalEntryDataListApplication::getSumAmmount()
     def grouped_amount(rows, key)
       rows.sum { |r| r[key].to_i }
     end
 
+    # JournalEntryDataListApplication::getSumAmmount()
     def sum_amount(value)
       value.positive? ? value : nil
     end
 
+    # JournalEntryDataListApplication::getDate()
     def date_for(pattern_no, accrual_month, payment_month, fund_transfer)
       case pattern_no
       when 0
@@ -381,6 +398,7 @@ module JournalEntryData
       end
     end
 
+    # JournalEntryDataListApplication::checkWeekend()
     def adjust_weekend(date)
       return date unless date.respond_to?(:friday?)
 
@@ -393,6 +411,7 @@ module JournalEntryData
       end
     end
 
+    # JournalEntryDataListApplication::getDate()
     def parse_fund_transfer_date(value)
       return nil if value.blank?
 
@@ -401,6 +420,7 @@ module JournalEntryData
       nil
     end
 
+    # JournalEntryDataListApplication::getCompanyNo()
     def company_for(pattern_company_no, data_company_no, capture_category_no)
       case pattern_company_no
       when 0
@@ -412,6 +432,7 @@ module JournalEntryData
       end
     end
 
+    # JournalEntryDataListApplication::getDepartmentNo()
     def department_for(pattern_department_no, department_no, company_no, capture_category_no, side)
       case pattern_department_no
       when 0
@@ -435,6 +456,7 @@ module JournalEntryData
       end
     end
 
+    # JournalEntryDataListApplication::getAccountNo()
     def account_for(pattern_account_no, capture_category_no, side)
       case pattern_account_no
       when 2
@@ -445,6 +467,7 @@ module JournalEntryData
       end
     end
 
+    # JournalEntryDataListApplication::getSubAccountNo()
     def sub_account_for(pattern_sub_account_no, capture_category_no, side)
       case pattern_sub_account_no
       when 999
@@ -455,6 +478,7 @@ module JournalEntryData
       end
     end
 
+    # JournalEntryDataListApplication::getSupplierNo()
     def supplier_for(pattern_supplier_no, company_no, supplier_no, capture_category_no)
       case pattern_supplier_no
       when 0
@@ -468,6 +492,7 @@ module JournalEntryData
       end
     end
 
+    # JournalEntryDataListApplication::getTaxClass()
     def tax_class_for(pattern_tax_class_no, capture_category_no)
       case pattern_tax_class_no
       when 2
@@ -477,6 +502,7 @@ module JournalEntryData
       end
     end
 
+    # JournalEntryDataListApplication::getTaxRate()
     def tax_rate_for(pattern_tax_rate_no, capture_category_no)
       case pattern_tax_rate_no
       when 2
@@ -486,6 +512,7 @@ module JournalEntryData
       end
     end
 
+    # JournalEntryDataListApplication::getAbstract()
     def abstract_for(pattern_abstract, accrual_month, payment_month, store_no, company_no, capture_category_no)
       abstract = pattern_abstract.to_s.dup
       category = capture_category(capture_category_no)
@@ -504,11 +531,13 @@ module JournalEntryData
       abstract
     end
 
+    # JournalEntryDataListApplication::getDate()
     def format_month(value)
       date = value.is_a?(Date) ? value : value.to_date
       date.strftime("%-m月")
     end
 
+    # JournalEntryDataListApplication::Create()
     def current_user_id
       return nil unless form.user.respond_to?(:user_id)
 

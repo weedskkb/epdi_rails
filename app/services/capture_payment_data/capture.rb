@@ -416,6 +416,7 @@ module CapturePaymentData
             supplier_no = cell_integer(sheet, 2, col_idx)
             list_cd = "--#{supplier_no}"
 
+            # 勘定科目はここでは設定しない
             create_capture_data(
               capture_history_no: history_no,
               row_no: row_idx + 1,

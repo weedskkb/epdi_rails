@@ -25,6 +25,7 @@ module JournalEntryData
       @form = form
     end
 
+    # JournalEntryDataListApplication::GenerateItemViewModel()
     def relation
       scope = TrnJournalEntryData.joins(:journal_entry_history)
       scope = scope.where("TRN_JOURNAL_ENTRY_HISTORY.PAYMENT_MONTH = ?", payment_month) if payment_month.present?
@@ -43,6 +44,7 @@ module JournalEntryData
       relation
     end
 
+    # JournalEntryDataListApplication::GenerateItemViewModel()
     def preview_items
       relation.includes(:journal_entry_history).map do |record|
         PreviewItem.new(
@@ -75,6 +77,7 @@ module JournalEntryData
       end
     end
 
+    # JournalEntryDataListApplication::GenerateItemViewModel()
     def supplier
       if form&.supplier_all? == false
         form.supplier
@@ -84,6 +87,7 @@ module JournalEntryData
       end
     end
 
+    # JournalEntryDataListApplication::GenerateItemViewModel()
     def except_already_output?
       if form
         form.except_already_output?
@@ -92,6 +96,7 @@ module JournalEntryData
       end
     end
 
+    # JournalEntryDataListApplication::GenerateItemViewModel()
     def parse_month(value)
       return if value.blank?
 
