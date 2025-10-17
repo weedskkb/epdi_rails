@@ -19,7 +19,7 @@ Rails.application.routes.draw do
   post "/journal_entry_data/export", to: "journal_entry_data#export", as: :journal_entry_data_export
   resources :companies, only: [:index]
   resources :departments, only: [:index]
-  resources :capture_categories, only: [:index]
+  resources :capture_categories, only: [:index, :edit, :update]
   resources :suppliers, only: [:index]
   resources :journal_entry_patterns, only: [:index]
   resources :users

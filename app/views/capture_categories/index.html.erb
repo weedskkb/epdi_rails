@@ -53,6 +53,21 @@
     overflow-wrap: anywhere;
     word-break: break-all;
   }
+
+  .capture-categories-table td.actions {
+    text-align: center;
+    white-space: nowrap;
+  }
+
+  .capture-categories-table .action-link {
+    display: inline-block;
+    padding: 4px 8px;
+    border-radius: 4px;
+    background: #2563eb;
+    color: #fff;
+    font-size: 11px;
+    text-decoration: none;
+  }
 </style>
 
 <div class="capture-categories-table">
@@ -76,6 +91,7 @@
         <th class="wrap">仕訳パターングループ<span class="column-key">JOURNAL_ENTRY_PATTERN_GROUP_NO</span></th>
         <th class="wrap">支払条件<span class="column-key">PAYMENT_TERMS</span></th>
         <th class="wrap">削除フラグ<span class="column-key">DELETE_FLG</span></th>
+        <th>操作</th>
       </tr>
     </thead>
     <tbody>
@@ -98,6 +114,7 @@
           <td class="wrap"><%= category.journal_entry_pattern_group_no %></td>
           <td class="wrap"><%= category.payment_terms %></td>
           <td class="wrap"><%= category.delete_flg ? "有" : "無" %></td>
+          <td class="actions"><%= link_to "編集", edit_capture_category_path(category), class: "action-link" %></td>
         </tr>
       <% end %>
     </tbody>

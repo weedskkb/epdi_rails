@@ -1,0 +1,241 @@
+<h1>取込区分の編集</h1>
+
+<style>
+  .capture-category-edit {
+    padding: 16px;
+    background: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(15, 23, 42, 0.08);
+    max-width: 960px;
+  }
+
+  .capture-category-edit .back-link {
+    display: inline-block;
+    margin-bottom: 12px;
+    font-size: 13px;
+    color: #2563eb;
+    text-decoration: none;
+  }
+
+  .capture-category-edit .form-grid {
+    display: grid;
+    gap: 16px;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  }
+
+  .capture-category-edit .form-group {
+    display: flex;
+    flex-direction: column;
+    font-size: 13px;
+  }
+
+  .capture-category-edit label {
+    font-weight: 600;
+    margin-bottom: 4px;
+    color: #1f2937;
+  }
+
+  .capture-category-edit .input-field,
+  .capture-category-edit textarea {
+    padding: 8px 10px;
+    border: 1px solid #d1d5db;
+    border-radius: 4px;
+    font-size: 13px;
+  }
+
+  .capture-category-edit textarea {
+    min-height: 80px;
+    resize: vertical;
+  }
+
+  .capture-category-edit .readonly-field {
+    padding: 8px 10px;
+    border-radius: 4px;
+    background: #f3f4f6;
+    color: #4b5563;
+  }
+
+  .capture-category-edit .checkbox-field {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 0;
+  }
+
+  .capture-category-edit .form-actions {
+    margin-top: 24px;
+    display: flex;
+    gap: 12px;
+  }
+
+  .capture-category-edit .form-actions .primary-button {
+    padding: 10px 18px;
+    border: none;
+    border-radius: 4px;
+    background: #2563eb;
+    color: #ffffff;
+    font-size: 14px;
+    cursor: pointer;
+  }
+
+  .capture-category-edit .form-actions .secondary-link {
+    padding: 10px 18px;
+    border-radius: 4px;
+    background: #e5e7eb;
+    color: #1f2937;
+    text-decoration: none;
+    font-size: 14px;
+  }
+
+  .capture-category-edit .error-messages {
+    margin-bottom: 16px;
+    padding: 12px;
+    border-radius: 6px;
+    background: #fee2e2;
+    color: #991b1b;
+    font-size: 13px;
+  }
+</style>
+
+<div class="capture-category-edit">
+  <%= link_to "← 一覧へ戻る", capture_categories_path, class: "back-link" %>
+
+  <% if @capture_category.errors.any? %>
+    <div class="error-messages">
+      <div><strong>エラーが発生しました:</strong></div>
+      <ul>
+        <% @capture_category.errors.full_messages.each do |message| %>
+          <li><%= message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <%= form_with model: @capture_category, local: true do |form| %>
+    <div class="form-grid">
+      <div class="form-group">
+        <label>取込区分NO</label>
+        <div class="readonly-field"><%= @capture_category.capture_category_no %></div>
+      </div>
+
+      <div class="form-group">
+        <%= form.label :capture_category_name, "取込区分名" %>
+        <%= form.text_field :capture_category_name, class: "input-field" %>
+      </div>
+
+      <div class="form-group">
+        <%= form.label :tax_class_no, "税区分番号" %>
+        <%= form.select :tax_class_no,
+                        options_for_select(@tax_class_options, @capture_category.tax_class_no),
+                        { include_blank: true },
+                        class: "input-field" %>
+      </div>
+
+      <div class="form-group">
+        <%= form.label :tax_rate_value, "税率" %>
+        <%= form.number_field :tax_rate_value, class: "input-field", step: 1 %>
+      </div>
+
+      <div class="form-group">
+        <%= form.label :supplier_no, "仕入先番号" %>
+        <%= form.select :supplier_no,
+                        options_for_select(@supplier_options, @capture_category.supplier_no),
+                        { include_blank: true },
+                        class: "input-field" %>
+      </div>
+
+      <div class="form-group">
+        <%= form.label :supplier_company_no, "仕入先会社番号" %>
+        <%= form.select :supplier_company_no,
+                        options_for_select(@company_options, @capture_category.supplier_company_no),
+                        { include_blank: true },
+                        class: "input-field" %>
+      </div>
+
+      <div class="form-group">
+        <%= form.label :debit_department_no, "借方部署番号" %>
+        <%= form.select :debit_department_no,
+                        options_for_select(@department_options, @capture_category.debit_department_no),
+                        { include_blank: true },
+                        class: "input-field" %>
+      </div>
+
+      <div class="form-group">
+        <%= form.label :debit_account_no, "借方勘定科目番号" %>
+        <%= form.select :debit_account_no,
+                        options_for_select(@account_options, @capture_category.debit_account_no),
+                        { include_blank: true },
+                        class: "input-field" %>
+      </div>
+
+      <div class="form-group">
+        <%= form.label :debit_sub_account_no, "借方補助科目番号" %>
+        <%= form.select :debit_sub_account_no,
+                        options_for_select(@sub_account_options, @capture_category.debit_sub_account_no),
+                        { include_blank: true },
+                        class: "input-field" %>
+      </div>
+
+      <div class="form-group">
+        <%= form.label :credit_department_no, "貸方部署番号" %>
+        <%= form.select :credit_department_no,
+                        options_for_select(@department_options, @capture_category.credit_department_no),
+                        { include_blank: true },
+                        class: "input-field" %>
+      </div>
+
+      <div class="form-group">
+        <%= form.label :credit_account_no, "貸方勘定科目番号" %>
+        <%= form.select :credit_account_no,
+                        options_for_select(@account_options, @capture_category.credit_account_no),
+                        { include_blank: true },
+                        class: "input-field" %>
+      </div>
+
+      <div class="form-group">
+        <%= form.label :credit_sub_account_no, "貸方補助科目番号" %>
+        <%= form.select :credit_sub_account_no,
+                        options_for_select(@sub_account_options, @capture_category.credit_sub_account_no),
+                        { include_blank: true },
+                        class: "input-field" %>
+      </div>
+
+      <div class="form-group">
+        <%= form.label :journal_entry_pattern_group_no, "仕訳パターングループ番号" %>
+        <%= form.select :journal_entry_pattern_group_no,
+                        options_for_select(@journal_entry_pattern_group_options,
+                                           @capture_category.journal_entry_pattern_group_no),
+                        { include_blank: true },
+                        class: "input-field" %>
+      </div>
+
+      <div class="form-group">
+        <%= form.label :payment_terms, "支払条件" %>
+        <%= form.number_field :payment_terms, class: "input-field" %>
+      </div>
+
+      <div class="form-group">
+        <%= form.label :abstract, "摘要" %>
+        <%= form.text_area :abstract %>
+      </div>
+
+      <div class="form-group">
+        <%= form.label :supplier_abstract, "仕入先別摘要" %>
+        <%= form.text_area :supplier_abstract %>
+      </div>
+
+      <div class="form-group">
+        <label for="capture_category_delete_flg">削除フラグ</label>
+        <div class="checkbox-field">
+          <%= form.check_box :delete_flg %>
+          <span>削除済みとして扱う</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="form-actions">
+      <%= form.submit "更新する", class: "primary-button" %>
+      <%= link_to "キャンセル", capture_categories_path, class: "secondary-link" %>
+    </div>
+  <% end %>
+</div>
