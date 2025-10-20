@@ -3,22 +3,44 @@
 <table>
   <thead>
     <tr>
+      <th>取込データNO</th>
+      <th>取込区分</th>
       <th>履歴NO</th>
       <th>行NO</th>
-      <th>会社</th>
-      <th>部門</th>
+      <th>会社NO</th>
+      <th>会社名</th>
+      <th>部門NO</th>
+      <th>部門名</th>
+      <th>仕入先NO</th>
+      <th>勘定科目NO</th>
+      <th>補助科目NO</th>
+      <th>リストCD</th>
       <th>金額</th>
+      <th>第二金額</th>
+      <th>税区分NO</th>
+      <th>税率NO</th>
       <th>摘要</th>
     </tr>
   </thead>
   <tbody>
     <% @payment_data.each do |row| %>
       <tr>
+        <td><%= row.capture_data_no %></td>
+        <td><%= row.capture_history&.capture_category&.capture_category_name %></td>
         <td><%= row.capture_history_no %></td>
         <td><%= row.row_no %></td>
+        <td><%= row.company_no %></td>
         <td><%= row.company&.company_name %></td>
+        <td><%= row.department_no %></td>
         <td><%= row.department&.department_name %></td>
+        <td><%= row.supplier_no %></td>
+        <td><%= row.account_no %></td>
+        <td><%= row.sub_account_no %></td>
+        <td><%= row.list_cd %></td>
         <td><%= number_to_currency(row.amount, unit: "¥", precision: 0) %></td>
+        <td><%= number_to_currency(row.second_amount, unit: "¥", precision: 0) %></td>
+        <td><%= row.tax_class_no %></td>
+        <td><%= row.tax_rate_no %></td>
         <td><%= row.summary %></td>
       </tr>
     <% end %>
