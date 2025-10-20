@@ -572,10 +572,10 @@ module CapturePaymentData
 
     def expense_summary_account_for(column_index)
       case column_index
-      when 2 then 832
-      when 3 then 836
-      when 4 then 866
-      when 5 then 854
+      when 2 then 832 # 給与手当
+      when 3 then 836 # 法定福利費
+      when 4 then 866 # 旅費交通費
+      when 5 then 854 # 福利厚生費
       else nil
       end
     end

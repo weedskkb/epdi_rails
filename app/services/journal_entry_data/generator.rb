@@ -266,6 +266,10 @@ module JournalEntryData
       account_no = capture_row.account_no
       row_number = capture_row.row_no
 
+      # 832: 給与手当
+      # 836: 法定福利費
+      # 866: 旅費交通費
+      # 854: 福利厚生費
       skip_accounts = [836, 866, 854]
       return false unless skip_accounts.include?(account_no)
 
@@ -274,9 +278,9 @@ module JournalEntryData
         ROW_NO: row_number
       )
 
-      return true if account_no == 836 && data_in_row.where(ACCOUNT_NO: 832).exists?
-      return true if account_no == 866 && data_in_row.where(ACCOUNT_NO: 836).exists?
+      return true if data_in_row.where(ACCOUNT_NO: 832).exists?
       return true if account_no == 854 && data_in_row.where(ACCOUNT_NO: [836, 866]).exists?
+      return true if account_no == 866 && data_in_row.where(ACCOUNT_NO: 836).exists?
 
       false
     end
@@ -288,7 +292,7 @@ module JournalEntryData
       row_no = pattern["ROW_NO"]
       debit_account = pattern["DEBIT_ACCOUNT_NO"]
 
-      if company_no == 1
+      if company_no == 1  # ウィーズ
         row_no == 8
       else
         (row_no == 4 && debit_account == 820) || row_no == 7
@@ -305,7 +309,7 @@ module JournalEntryData
         when 4
           return nil if account_no.nil?
 
-          return capture_row.amount.to_i if account_no == 823 && capture_row.company_no == 1
+          return capture_row.amount.to_i if account_no == 823 && capture_row.company_no == 1  # 医薬品仕入/ウィーズ
           return capture_row.amount.to_i + capture_row.second_amount.to_i if account_no == 823
           return capture_row.second_amount.to_i if account_no == 820
 
@@ -313,7 +317,7 @@ module JournalEntryData
         when 7, 8
           return nil if account_no.nil?
 
-          if account_no == 823
+          if account_no == 823  # 医薬品仕入
             capture_row.amount.to_i
           elsif [622, 620].include?(account_no)
             capture_row.second_amount.to_i
@@ -333,7 +337,7 @@ module JournalEntryData
         when 4
           return nil if account_no.nil?
 
-          return same_row_scope.sum(:AMMOUNT).to_i if account_no == 418
+          return same_row_scope.sum(:AMMOUNT).to_i if account_no == 418 # 関係会社未払金
           return amount_for_account(same_row_scope, 832) if account_no == 832
           return amount_for_account(same_row_scope, 866) if account_no == 866
           return amount_for_account(same_row_scope, 836) if account_no == 836
@@ -343,7 +347,7 @@ module JournalEntryData
         when 7
           return nil if account_no.nil?
 
-          return same_row_scope.sum(:AMMOUNT).to_i if account_no == 418
+          return same_row_scope.sum(:AMMOUNT).to_i if account_no == 418 # 関係会社未払金
 
           if pattern["ABSTRACT"].to_s.include?("給与")
             return amount_for_account(same_row_scope, 832)

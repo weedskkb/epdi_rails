@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+# 未使用
 class Store < ApplicationRecord
   self.table_name = "MST_STORE"
   self.primary_key = "STORE_NO"
