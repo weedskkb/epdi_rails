@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2024_06_07_010606) do
+ActiveRecord::Schema[8.0].define(version: 2024_06_07_010707) do
   create_table "MST_ACCOUNT", primary_key: "ACCOUNT_NO", id: :integer, charset: "utf8mb4", collation: "utf8mb4_general_ci", force: :cascade do |t|
     t.string "ACCOUNT_NAME", null: false
     t.boolean "DELETE_FLG", default: false, null: false
@@ -54,15 +54,6 @@ ActiveRecord::Schema[8.0].define(version: 2024_06_07_010606) do
     t.index ["company_id"], name: "index_mst_department_on_company_id"
   end
 
-  create_table "MST_DETAIL_DIVISION", primary_key: "DETAIL_DIVISION_NO", id: :integer, charset: "utf8mb4", collation: "utf8mb4_general_ci", force: :cascade do |t|
-    t.string "DETAIL_DIVISION_NAME", null: false
-    t.boolean "DELETE_FLG", default: false, null: false
-    t.integer "CREATE_USER_ID", null: false
-    t.datetime "CREATE_DATE", null: false
-    t.integer "UPDATE_USER_ID"
-    t.datetime "UPDATE_DATE"
-  end
-
   create_table "MST_JOURNAL_ENTRY_PATTERN", primary_key: "JOURNAL_ENTRY_PATTERN_NO", id: :integer, charset: "utf8mb4", collation: "utf8mb4_general_ci", force: :cascade do |t|
     t.integer "JOURNAL_ENTRY_PATTERN_GROUP_NO", null: false
     t.string "JOURNAL_ENTRY_PATTERN_NAME", null: false
@@ -97,16 +88,6 @@ ActiveRecord::Schema[8.0].define(version: 2024_06_07_010606) do
     t.integer "UPDATE_USER_ID"
     t.datetime "CREATE_DATE", null: false
     t.datetime "UPDATE_DATE"
-  end
-
-  create_table "MST_STORE", primary_key: "STORE_NO", id: :integer, charset: "utf8mb4", collation: "utf8mb4_general_ci", force: :cascade do |t|
-    t.string "STORE_NAME", null: false
-    t.boolean "DELETE_FLG", default: false, null: false
-    t.integer "CREATE_USER_ID", null: false
-    t.datetime "CREATE_DATE", null: false
-    t.integer "UPDATE_USER_ID"
-    t.datetime "UPDATE_DATE"
-    t.integer "company_id"
   end
 
   create_table "MST_SUB_ACCOUNT", primary_key: "ID", id: :integer, charset: "utf8mb4", collation: "utf8mb4_general_ci", force: :cascade do |t|

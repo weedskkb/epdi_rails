@@ -47,5 +47,4 @@ class JournalEntryPattern < ApplicationRecord
                                   primary_key: "SUB_ACCOUNT_NO", optional: true
   belongs_to :credit_supplier, class_name: "Supplier", foreign_key: :credit_supplier_id, optional: true
   belongs_to :credit_tax_class, class_name: "TaxClass", foreign_key: "CREDIT_TAX_CLASS", optional: true
-  belongs_to :detail_division, class_name: "DetailDivision", foreign_key: "DETAIL_DIVISION_NO", optional: true
 end

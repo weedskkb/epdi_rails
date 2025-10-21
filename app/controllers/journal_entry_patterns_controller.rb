@@ -35,7 +35,6 @@ class JournalEntryPatternsController < ApplicationController
       :credit_sub_account,
       :credit_supplier,
       :credit_tax_class,
-      :detail_division
     )
   end
 
@@ -102,8 +101,5 @@ class JournalEntryPatternsController < ApplicationController
       ["#{tax_class.tax_class_no} #{tax_class.tax_class_name}", tax_class.tax_class_no]
     end
 
-    @detail_division_options = DetailDivision.active.order(:detail_division_no).map do |division|
-      ["#{division.detail_division_no} #{division.detail_division_name}", division.detail_division_no]
-    end
   end
 end

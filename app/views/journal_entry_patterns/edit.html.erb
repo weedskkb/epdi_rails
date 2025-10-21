@@ -239,10 +239,7 @@
 
       <div class="form-group">
         <%= form.label :detail_division_no, "明細区分" %>
-        <%= form.select :detail_division_no,
-                        options_for_select(@detail_division_options, @pattern.detail_division_no),
-                        { include_blank: true },
-                        class: "input-field" %>
+        <%= form.number_field :detail_division_no, class: "input-field", step: 1 %>
       </div>
 
       <div class="form-group">
