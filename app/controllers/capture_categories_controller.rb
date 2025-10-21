@@ -43,7 +43,7 @@ class CaptureCategoriesController < ApplicationController
       :capture_category_name,
       :tax_class_no,
       :tax_rate_value,
-      :supplier_no,
+      :supplier_id,
       :supplier_company_no,
       :debit_department_no,
       :debit_account_no,
@@ -64,8 +64,8 @@ class CaptureCategoriesController < ApplicationController
       ["#{tax_class.tax_class_no} #{tax_class.tax_class_name}", tax_class.tax_class_no]
     end
 
-    @supplier_options = Supplier.active.order(:supplier_no).map do |supplier|
-      ["#{supplier.supplier_no} #{supplier.supplier_name}", supplier.supplier_no]
+    @supplier_options = Supplier.active.order(:id).map do |supplier|
+      ["#{supplier.id} #{supplier.name}", supplier.id]
     end
 
     @company_options = Company.active.order(:company_no).map do |company|

@@ -3,15 +3,15 @@
 <table>
   <thead>
     <tr>
-      <th>取引先NO</th>
+      <th>取引先ID</th>
       <th>取引先名</th>
     </tr>
   </thead>
   <tbody>
     <% @suppliers.each do |supplier| %>
       <tr>
-        <td><%= supplier.supplier_no %></td>
-        <td><%= supplier.supplier_name %></td>
+        <td><%= supplier.id %></td>
+        <td><%= supplier.name %></td>
       </tr>
     <% end %>
   </tbody>

@@ -331,8 +331,8 @@ module CapturePaymentData
           company_no = department_company_no(department_no)
           (3...last_column).each do |col_idx|
             amount = cell_integer(sheet, row_idx, col_idx)
-            supplier_no = cell_integer(sheet, 9, col_idx)
-            next unless amount && supplier_no
+            supplier_id = cell_integer(sheet, 9, col_idx)
+            next unless amount && supplier_id
 
             term = cell_integer(sheet, 4, col_idx) || 0
             payment_month = payment_month_from_term(target_month_value, term)
@@ -340,14 +340,14 @@ module CapturePaymentData
 
             account_no = cell_integer(sheet, 5, col_idx)
             sub_account_no = cell_integer(sheet, 7, col_idx)
-            list_cd = [account_no, sub_account_no, supplier_no].map { |v| v.to_i }.join('-')
+            list_cd = [account_no, sub_account_no, supplier_id].map { |v| v.to_i }.join('-')
 
             create_capture_data(
               capture_history_no: history.capture_history_no,
               row_no: row_idx + 1,
               company_no: company_no,
               department_no: department_no,
-              supplier_no: supplier_no,
+              supplier_id: supplier_id,
               account_no: account_no,
               sub_account_no: sub_account_no,
               list_cd: list_cd,
@@ -369,8 +369,8 @@ module CapturePaymentData
         last_column = last_column_index(sheet, 0) - 1
         (8..last_row).each do |row_idx|
           department_no = cell_integer(sheet, row_idx, 0)
-          supplier_no = cell_integer(sheet, row_idx, 3)
-          next unless department_no && supplier_no
+          supplier_id = cell_integer(sheet, row_idx, 3)
+          next unless department_no && supplier_id
 
           company_no = department_company_no(department_no)
           (5...last_column).each do |col_idx|
@@ -379,14 +379,14 @@ module CapturePaymentData
 
             account_no = cell_integer(sheet, 3, col_idx)
             sub_account_no = cell_integer(sheet, 5, col_idx)
-            list_cd = [account_no, sub_account_no, supplier_no].map { |v| v.to_i }.join('-')
+            list_cd = [account_no, sub_account_no, supplier_id].map { |v| v.to_i }.join('-')
 
             create_capture_data(
               capture_history_no: history_no,
               row_no: row_idx + 1,
               company_no: company_no,
               department_no: department_no,
-              supplier_no: supplier_no,
+              supplier_id: supplier_id,
               account_no: account_no,
               sub_account_no: sub_account_no,
               list_cd: list_cd,
@@ -413,8 +413,8 @@ module CapturePaymentData
             amount = cell_integer(sheet, row_idx, col_idx)
             next unless amount
 
-            supplier_no = cell_integer(sheet, 2, col_idx)
-            list_cd = "--#{supplier_no}"
+            supplier_id = cell_integer(sheet, 2, col_idx)
+            list_cd = "--#{supplier_id}"
 
             # 勘定科目はここでは設定しない
             create_capture_data(
@@ -422,7 +422,7 @@ module CapturePaymentData
               row_no: row_idx + 1,
               company_no: company_no,
               department_no: department_no,
-              supplier_no: supplier_no,
+              supplier_id: supplier_id,
               list_cd: list_cd,
               amount: amount,
               second_amount: 0
@@ -484,7 +484,7 @@ module CapturePaymentData
             row_no: row_idx + 1,
             company_no: department_company_no(department_no),
             department_no: department_no,
-            supplier_no: category.supplier_no,
+            supplier_id: category.supplier_id,
             account_no: category.debit_account_no,
             sub_account_no: category.debit_sub_account_no,
             list_cd: capture_category.to_s,
@@ -519,7 +519,7 @@ module CapturePaymentData
         row_no: attrs[:row_no],
         company_no: attrs[:company_no],
         department_no: attrs[:department_no],
-        supplier_no: attrs[:supplier_no],
+        supplier_id: attrs[:supplier_id],
         account_no: attrs[:account_no],
         sub_account_no: attrs[:sub_account_no],
         list_cd: attrs[:list_cd],

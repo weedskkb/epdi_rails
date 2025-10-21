@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2024_06_01_000000) do
+ActiveRecord::Schema[8.0].define(version: 2024_06_07_010202) do
   create_table "MST_ACCOUNT", primary_key: "ACCOUNT_NO", id: :integer, charset: "utf8mb4", collation: "utf8mb4_general_ci", force: :cascade do |t|
     t.string "ACCOUNT_NAME", null: false
     t.boolean "DELETE_FLG", default: false, null: false
@@ -29,7 +29,7 @@ ActiveRecord::Schema[8.0].define(version: 2024_06_01_000000) do
     t.string "CAPTURE_CATEGORY_NAME", null: false
     t.integer "TAX_CLASS_NO"
     t.integer "TAX_RATE"
-    t.integer "SUPPLIER_NO"
+    t.integer "supplier_id"
     t.integer "SUPPLIER_COMPANY_NO"
     t.integer "DEBIT_DEPARTMENT_NO"
     t.integer "DEBIT_ACCOUNT_NO"
@@ -50,7 +50,7 @@ ActiveRecord::Schema[8.0].define(version: 2024_06_01_000000) do
 
   create_table "MST_COMPANY", primary_key: "COMPANY_NO", id: :integer, charset: "utf8mb4", collation: "utf8mb4_general_ci", force: :cascade do |t|
     t.string "COMPANY_NAME", null: false
-    t.integer "SUPPLIER_NO"
+    t.integer "supplier_id"
     t.boolean "DELETE_FLG", default: false, null: false
     t.integer "CREATE_USER_ID", null: false
     t.datetime "CREATE_DATE", null: false
@@ -87,13 +87,13 @@ ActiveRecord::Schema[8.0].define(version: 2024_06_01_000000) do
     t.integer "DEBIT_DEPARTMENT_NO"
     t.integer "DEBIT_ACCOUNT_NO"
     t.integer "DEBIT_SUB_ACCOUNT_NO"
-    t.integer "DEBIT_SUPPLIER_NO"
+    t.integer "debit_supplier_id"
     t.integer "DEBIT_TAX_RATE"
     t.integer "DEBIT_TAX_CLASS"
     t.integer "CREDIT_DEPARTMENT_NO"
     t.integer "CREDIT_ACCOUNT_NO"
     t.integer "CREDIT_SUB_ACCOUNT_NO"
-    t.integer "CREDIT_SUPPLIER_NO"
+    t.integer "credit_supplier_id"
     t.integer "CREDIT_TAX_RATE"
     t.integer "CREDIT_TAX_CLASS"
     t.boolean "FIXED_AMOUNT_FLG", default: false, null: false
@@ -136,15 +136,6 @@ ActiveRecord::Schema[8.0].define(version: 2024_06_01_000000) do
     t.index ["ACCOUNT_NO", "SUB_ACCOUNT_NO"], name: "IX_MST_SUB_ACCOUNT_ACCOUNT_NO", unique: true
   end
 
-  create_table "MST_SUPPLIER", primary_key: "SUPPLIER_NO", id: :integer, charset: "utf8mb4", collation: "utf8mb4_general_ci", force: :cascade do |t|
-    t.string "SUPPLIER_NAME", null: false
-    t.boolean "DELETE_FLG", default: false, null: false
-    t.integer "CREATE_USER_ID", null: false
-    t.datetime "CREATE_DATE", null: false
-    t.integer "UPDATE_USER_ID"
-    t.datetime "UPDATE_DATE"
-  end
-
   create_table "MST_TAX_CLASS", primary_key: "TAX_CLASS_NO", id: :integer, charset: "utf8mb4", collation: "utf8mb4_general_ci", force: :cascade do |t|
     t.string "TAX_CLASS_NAME", null: false
     t.boolean "DELETE_FLG", default: false, null: false
@@ -173,7 +164,7 @@ ActiveRecord::Schema[8.0].define(version: 2024_06_01_000000) do
     t.integer "ROW_NO", null: false
     t.integer "COMPANY_NO", null: false
     t.integer "DEPARTMENT_NO", null: false
-    t.integer "SUPPLIER_NO"
+    t.integer "supplier_id"
     t.integer "ACCOUNT_NO"
     t.integer "SUB_ACCOUNT_NO"
     t.integer "AMMOUNT", null: false
@@ -206,17 +197,17 @@ ActiveRecord::Schema[8.0].define(version: 2024_06_01_000000) do
     t.integer "DEBIT_DEPARTMENT_NO"
     t.integer "DEBIT_ACCOUNT_NO"
     t.integer "DEBIT_SUB_ACCOUNT_NO"
-    t.integer "DEBIT_AMMOUNT", null: false
+    t.integer "DEBIT_AMMOUNT"
     t.integer "DEBIT_TAX_CLASS_NO"
     t.integer "DEBIT_TAX_RATE_NO"
-    t.integer "DEBIT_SUPPLIER_NO"
+    t.integer "debit_supplier_id"
     t.integer "CREDIT_DEPARTMENT_NO"
     t.integer "CREDIT_ACCOUNT_NO"
     t.integer "CREDIT_SUB_ACCOUNT_NO"
-    t.integer "CREDIT_AMMOUNT", null: false
+    t.integer "CREDIT_AMMOUNT"
     t.integer "CREDIT_TAX_CLASS_NO"
     t.integer "CREDIT_TAX_RATE_NO"
-    t.integer "CREDIT_SUPPLIER_NO"
+    t.integer "credit_supplier_id"
     t.string "ABSTRACT"
     t.datetime "CREATE_DATE", null: false
     t.integer "CREATE_USER_ID", null: false
@@ -246,14 +237,29 @@ ActiveRecord::Schema[8.0].define(version: 2024_06_01_000000) do
     t.datetime "UPDATE_DATE"
     t.boolean "DELETE_FLG", default: false, null: false
     t.index ["AUTHOLITY_NO"], name: "fk_rails_380375b7f7"
+    t.index ["CREATE_USER_ID"], name: "FK_TRN_USER_TRN_USER_CREATE_USER_ID"
     t.index ["STATUS_NO"], name: "fk_rails_25251f7098"
+    t.index ["UPDATE_USER_ID"], name: "FK_TRN_USER_TRN_USER_UPDATE_USER_ID"
+  end
+
+  create_table "suppliers", id: :integer, charset: "utf8mb4", collation: "utf8mb4_general_ci", force: :cascade do |t|
+    t.string "name", null: false
+    t.boolean "delete_flg", default: false, null: false
+    t.integer "created_by_id", null: false
+    t.datetime "created_at", null: false
+    t.integer "updated_by_id"
+    t.datetime "updated_at"
   end
 
   add_foreign_key "MST_DEPARTMENT", "MST_COMPANY", column: "COMPANY_NO", primary_key: "COMPANY_NO"
+  add_foreign_key "MST_DEPARTMENT", "MST_COMPANY", column: "COMPANY_NO", primary_key: "COMPANY_NO", name: "FK_MST_DEPARTMENT_MST_COMPANY_COMPANY_NO", on_delete: :cascade
   add_foreign_key "MST_SUB_ACCOUNT", "MST_ACCOUNT", column: "ACCOUNT_NO", primary_key: "ACCOUNT_NO"
+  add_foreign_key "MST_SUB_ACCOUNT", "MST_ACCOUNT", column: "ACCOUNT_NO", primary_key: "ACCOUNT_NO", name: "FK_MST_SUB_ACCOUNT_MST_ACCOUNT_ACCOUNT_NO", on_delete: :cascade
   add_foreign_key "TRN_CAPTURE_DATA", "MST_DEPARTMENT", column: "DEPARTMENT_NO", primary_key: "DEPARTMENT_NO"
   add_foreign_key "TRN_CAPTURE_DATA", "TRN_CAPTURE_HISTORY", column: "CAPTURE_HISTORY_NO", primary_key: "CAPTURE_HISTORY_NO"
   add_foreign_key "TRN_JOURNAL_ENTRY_HISTORY", "MST_CAPTURE_CATEGORY", column: "CAPTURE_CATEGORY_NO", primary_key: "CAPTURE_CATEGORY_NO"
   add_foreign_key "TRN_USER", "MST_AUTHOLITY", column: "AUTHOLITY_NO", primary_key: "AUTHOLITY_NO"
   add_foreign_key "TRN_USER", "MST_USER_STATUS", column: "STATUS_NO", primary_key: "STATUS_NO"
+  add_foreign_key "TRN_USER", "TRN_USER", column: "CREATE_USER_ID", primary_key: "USER_ID", name: "FK_TRN_USER_TRN_USER_CREATE_USER_ID"
+  add_foreign_key "TRN_USER", "TRN_USER", column: "UPDATE_USER_ID", primary_key: "USER_ID", name: "FK_TRN_USER_TRN_USER_UPDATE_USER_ID"
 end

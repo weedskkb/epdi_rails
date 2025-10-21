@@ -18,7 +18,7 @@ class CreateEPDICoreTables < ActiveRecord::Migration[7.1]
 
     create_table :"MST_COMPANY", primary_key: "COMPANY_NO", id: :integer do |t|
       t.string  "COMPANY_NAME", limit: 255, null: false
-      t.integer "SUPPLIER_NO"
+      t.integer :supplier_id
       t.boolean "DELETE_FLG", default: false, null: false
       t.integer "CREATE_USER_ID", null: false
       t.datetime "CREATE_DATE", null: false
@@ -92,7 +92,7 @@ class CreateEPDICoreTables < ActiveRecord::Migration[7.1]
       t.string  "CAPTURE_CATEGORY_NAME", limit: 255, null: false
       t.integer "TAX_CLASS_NO"
       t.integer "TAX_RATE"
-      t.integer "SUPPLIER_NO"
+      t.integer :supplier_id
       t.integer "SUPPLIER_COMPANY_NO"
       t.integer "DEBIT_DEPARTMENT_NO"
       t.integer "DEBIT_ACCOUNT_NO"
@@ -130,13 +130,13 @@ class CreateEPDICoreTables < ActiveRecord::Migration[7.1]
       t.integer "DEBIT_DEPARTMENT_NO"
       t.integer "DEBIT_ACCOUNT_NO"
       t.integer "DEBIT_SUB_ACCOUNT_NO"
-      t.integer "DEBIT_SUPPLIER_NO"
+      t.integer :debit_supplier_id
       t.integer "DEBIT_TAX_RATE"
       t.integer "DEBIT_TAX_CLASS"
       t.integer "CREDIT_DEPARTMENT_NO"
       t.integer "CREDIT_ACCOUNT_NO"
       t.integer "CREDIT_SUB_ACCOUNT_NO"
-      t.integer "CREDIT_SUPPLIER_NO"
+      t.integer :credit_supplier_id
       t.integer "CREDIT_TAX_RATE"
       t.integer "CREDIT_TAX_CLASS"
       t.boolean "FIXED_AMOUNT_FLG", default: false, null: false
@@ -171,7 +171,7 @@ class CreateEPDICoreTables < ActiveRecord::Migration[7.1]
       t.integer  "ROW_NO", null: false
       t.integer  "COMPANY_NO", null: false
       t.integer  "DEPARTMENT_NO", null: false
-      t.integer  "SUPPLIER_NO"
+      t.integer  :supplier_id
       t.integer  "ACCOUNT_NO"
       t.integer  "SUB_ACCOUNT_NO"
       t.integer  "AMMOUNT", null: false
@@ -196,14 +196,14 @@ class CreateEPDICoreTables < ActiveRecord::Migration[7.1]
       t.integer  "DEBIT_AMMOUNT"
       t.integer  "DEBIT_TAX_CLASS_NO"
       t.integer  "DEBIT_TAX_RATE_NO"
-      t.integer  "DEBIT_SUPPLIER_NO"
+      t.integer  :debit_supplier_id
       t.integer  "CREDIT_DEPARTMENT_NO"
       t.integer  "CREDIT_ACCOUNT_NO"
       t.integer  "CREDIT_SUB_ACCOUNT_NO"
       t.integer  "CREDIT_AMMOUNT"
       t.integer  "CREDIT_TAX_CLASS_NO"
       t.integer  "CREDIT_TAX_RATE_NO"
-      t.integer  "CREDIT_SUPPLIER_NO"
+      t.integer  :credit_supplier_id
       t.string  "ABSTRACT"
       t.datetime "CREATE_DATE", null: false
       t.integer  "CREATE_USER_ID", null: false

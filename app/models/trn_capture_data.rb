@@ -9,7 +9,6 @@ class TrnCaptureData < ApplicationRecord
   alias_attribute :row_no, "ROW_NO"
   alias_attribute :company_no, "COMPANY_NO"
   alias_attribute :department_no, "DEPARTMENT_NO"
-  alias_attribute :supplier_no, "SUPPLIER_NO"
   alias_attribute :account_no, "ACCOUNT_NO"
   alias_attribute :sub_account_no, "SUB_ACCOUNT_NO"
   alias_attribute :list_cd, "LIST_CD"

@@ -83,13 +83,13 @@
         <th class="wrap">借方部署<span class="column-key">DEBIT_DEPARTMENT_NO</span></th>
         <th class="wrap">借方勘定科目<span class="column-key">DEBIT_ACCOUNT_NO</span></th>
         <th class="wrap">借方補助科目<span class="column-key">DEBIT_SUB_ACCOUNT_NO</span></th>
-        <th class="wrap">借方取引先<span class="column-key">DEBIT_SUPPLIER_NO</span></th>
+        <th class="wrap">借方取引先<span class="column-key">DEBIT_SUPPLIER_ID</span></th>
         <th class="wrap">借方税率<span class="column-key">DEBIT_TAX_RATE</span></th>
         <th class="wrap">借方税区分<span class="column-key">DEBIT_TAX_CLASS</span></th>
         <th class="wrap">貸方部署<span class="column-key">CREDIT_DEPARTMENT_NO</span></th>
         <th class="wrap">貸方勘定科目<span class="column-key">CREDIT_ACCOUNT_NO</span></th>
         <th class="wrap">貸方補助科目<span class="column-key">CREDIT_SUB_ACCOUNT_NO</span></th>
-        <th class="wrap">貸方取引先<span class="column-key">CREDIT_SUPPLIER_NO</span></th>
+        <th class="wrap">貸方取引先<span class="column-key">CREDIT_SUPPLIER_ID</span></th>
         <th class="wrap">貸方税率<span class="column-key">CREDIT_TAX_RATE</span></th>
         <th class="wrap">貸方税区分<span class="column-key">CREDIT_TAX_CLASS</span></th>
         <th class="wrap">固定金額フラグ<span class="column-key">FIXED_AMOUNT_FLG</span></th>
@@ -119,13 +119,12 @@
           <td class="wrap"><%= display_reference(pattern.debit_department_no, pattern.debit_department&.department_name) %></td>
           <td class="wrap"><%= display_reference(pattern.debit_account_no, pattern.debit_account&.account_name) %></td>
           <td class="wrap"><%= display_reference(pattern.debit_sub_account_no, pattern.debit_sub_account&.sub_account_name) %></td>
-          <td class="wrap"><%= display_reference(pattern.debit_supplier_no, pattern.debit_supplier&.supplier_name) %></td>
           <td class="wrap"><%= pattern.debit_tax_rate %></td>
           <td class="wrap"><%= display_reference(pattern.debit_tax_class_no, pattern.debit_tax_class&.tax_class_name) %></td>
           <td class="wrap"><%= display_reference(pattern.credit_department_no, pattern.credit_department&.department_name) %></td>
           <td class="wrap"><%= display_reference(pattern.credit_account_no, pattern.credit_account&.account_name) %></td>
           <td class="wrap"><%= display_reference(pattern.credit_sub_account_no, pattern.credit_sub_account&.sub_account_name) %></td>
-          <td class="wrap"><%= display_reference(pattern.credit_supplier_no, pattern.credit_supplier&.supplier_name) %></td>
+          <td class="wrap"><%= display_reference(pattern.debit_supplier_id, pattern.debit_supplier&.name) %></td>
           <td class="wrap"><%= pattern.credit_tax_rate %></td>
           <td class="wrap"><%= display_reference(pattern.credit_tax_class_no, pattern.credit_tax_class&.tax_class_name) %></td>
           <td class="wrap"><%= pattern.fixed_amount_flag ? "有" : "無" %></td>
@@ -146,3 +145,4 @@
     </tbody>
   </table>
 </div>
+          <td class="wrap"><%= display_reference(pattern.credit_supplier_id, pattern.credit_supplier&.name) %></td>

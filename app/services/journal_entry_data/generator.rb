@@ -158,11 +158,11 @@ module JournalEntryData
             row[:debit_department_no],
             row[:debit_account_no],
             row[:debit_sub_account_no],
-            row[:debit_supplier_no],
+            row[:debit_supplier_id],
             row[:credit_department_no],
             row[:credit_account_no],
             row[:credit_sub_account_no],
-            row[:credit_supplier_no],
+            row[:credit_supplier_id],
             row[:abstract]
           ]
         end
@@ -175,17 +175,17 @@ module JournalEntryData
             row_no: key[0],
             excel_row_no: 0,
             date: key[1],
-            company_no: 1,
+            company_no: 1,  # ウィーズ
             department_no: 201,
             debit_department_no: key[2],
             debit_account_no: key[3],
             debit_sub_account_no: key[4],
-            debit_supplier_no: key[5],
+            debit_supplier_id: key[5],
             debit_amount: sum_amount(debit_sum),
             credit_department_no: key[6],
             credit_account_no: key[7],
             credit_sub_account_no: key[8],
-            credit_supplier_no: key[9],
+            credit_supplier_id: key[9],
             credit_amount: sum_amount(credit_sum),
             abstract: key[10],
             debit_tax_class_no: nil,
@@ -208,14 +208,14 @@ module JournalEntryData
         debit_department_no: department_for(pattern["DEBIT_DEPARTMENT_NO"], capture_row.department_no, capture_row.company_no, capture_category.capture_category_no, "debit"),
         debit_account_no: debit_account,
         debit_sub_account_no: sub_account_for(pattern["DEBIT_SUB_ACCOUNT_NO"], capture_category.capture_category_no, "debit"),
-        debit_supplier_no: supplier_for(pattern["DEBIT_SUPPLIER_NO"], capture_row.company_no, capture_row.supplier_no, capture_category.capture_category_no),
+        debit_supplier_id: supplier_for(pattern.debit_supplier_id, capture_row.company_no, capture_row.supplier_id, capture_category.capture_category_no),
         debit_amount: debit_amount,
         debit_tax_class_no: tax_class_for(pattern["DEBIT_TAX_CLASS"], capture_category.capture_category_no),
         debit_tax_rate_no: tax_rate_for(pattern["DEBIT_TAX_RATE"], capture_category.capture_category_no),
         credit_department_no: department_for(pattern["CREDIT_DEPARTMENT_NO"], capture_row.department_no, capture_row.company_no, capture_category.capture_category_no, "credit"),
         credit_account_no: credit_account,
         credit_sub_account_no: sub_account_for(pattern["CREDIT_SUB_ACCOUNT_NO"], capture_category.capture_category_no, "credit"),
-        credit_supplier_no: supplier_for(pattern["CREDIT_SUPPLIER_NO"], capture_row.company_no, capture_row.supplier_no, capture_category.capture_category_no),
+        credit_supplier_id: supplier_for(pattern.credit_supplier_id, capture_row.company_no, capture_row.supplier_id, capture_category.capture_category_no),
         credit_amount: credit_amount,
         credit_tax_class_no: tax_class_for(pattern["CREDIT_TAX_CLASS"], capture_category.capture_category_no),
         credit_tax_rate_no: tax_rate_for(pattern["CREDIT_TAX_RATE"], capture_category.capture_category_no),
@@ -242,14 +242,14 @@ module JournalEntryData
         debit_department_no: attributes[:debit_department_no],
         debit_account_no: attributes[:debit_account_no],
         debit_sub_account_no: attributes[:debit_sub_account_no],
-        debit_supplier_no: attributes[:debit_supplier_no],
+        debit_supplier_id: attributes[:debit_supplier_id],
         debit_amount: attributes[:debit_amount],
         debit_tax_class_no: attributes[:debit_tax_class_no],
         debit_tax_rate_no: attributes[:debit_tax_rate_no],
         credit_department_no: attributes[:credit_department_no],
         credit_account_no: attributes[:credit_account_no],
         credit_sub_account_no: attributes[:credit_sub_account_no],
-        credit_supplier_no: attributes[:credit_supplier_no],
+        credit_supplier_id: attributes[:credit_supplier_id],
         credit_amount: attributes[:credit_amount],
         credit_tax_class_no: attributes[:credit_tax_class_no],
         credit_tax_rate_no: attributes[:credit_tax_rate_no],
@@ -483,16 +483,16 @@ module JournalEntryData
     end
 
     # JournalEntryDataListApplication::getSupplierNo()
-    def supplier_for(pattern_supplier_no, company_no, supplier_no, capture_category_no)
-      case pattern_supplier_no
+    def supplier_for(pattern_supplier_id, company_no, supplier_id, capture_category_no)
+      case pattern_supplier_id
       when 0
-        supplier_no
+        supplier_id
       when 1
-        company(company_no)&.supplier_no
+        company(company_no)&.supplier_id
       when 2
-        capture_category(capture_category_no).supplier_no
+        capture_category(capture_category_no).supplier_id
       else
-        pattern_supplier_no
+        pattern_supplier_id
       end
     end
 

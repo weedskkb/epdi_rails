@@ -4,6 +4,6 @@ class SuppliersController < ApplicationController
   before_action :require_login!
 
   def index
-    @suppliers = Supplier.order(:supplier_no)
+    @suppliers = Supplier.order(:id)
   end
 end

@@ -53,13 +53,13 @@ class JournalEntryPatternsController < ApplicationController
       :debit_department_no,
       :debit_account_no,
       :debit_sub_account_no,
-      :debit_supplier_no,
+      :debit_supplier_id,
       :debit_tax_rate,
       :debit_tax_class_no,
       :credit_department_no,
       :credit_account_no,
       :credit_sub_account_no,
-      :credit_supplier_no,
+      :credit_supplier_id,
       :credit_tax_rate,
       :credit_tax_class_no,
       :fixed_amount_flag,
@@ -94,8 +94,8 @@ class JournalEntryPatternsController < ApplicationController
       ["#{sub_account.sub_account_no} #{sub_account.sub_account_name}", sub_account.sub_account_no]
     end
 
-    @supplier_options = Supplier.active.order(:supplier_no).map do |supplier|
-      ["#{supplier.supplier_no} #{supplier.supplier_name}", supplier.supplier_no]
+    @supplier_options = Supplier.active.order(:id).map do |supplier|
+      ["#{supplier.id} #{supplier.name}", supplier.id]
     end
 
     @tax_class_options = TaxClass.active.order(:tax_class_no).map do |tax_class|
