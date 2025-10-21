@@ -490,7 +490,7 @@ module CapturePaymentData
             list_cd: capture_category.to_s,
             amount: amount,
             second_amount: second_amount
-          ) if amount != 0
+          ) # if amount != 0
         end
       end
     end
