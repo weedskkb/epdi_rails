@@ -1,10 +1,8 @@
 <h1>ユーザー詳細</h1>
 
 <ul>
-  <li>ID: <%= @user.user_id %></li>
+  <li>ID: <%= @user.id %></li>
   <li>ログインID: <%= @user.login_id %></li>
-  <li>権限: <%= @user.authority&.autholity_name %></li>
-  <li>状態: <%= @user.status&.status_name %></li>
 </ul>
 
 <%= link_to "編集", edit_user_path(@user) %>

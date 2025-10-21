@@ -48,7 +48,7 @@ module CapturePaymentData
     rescue StandardError => e
       Rails.logger.error("Capture failed: #{e.class} #{e.message}\n#{e.backtrace.join("\n")}")
       view_model.errors.add(:base, '取込に失敗しました。')
-      failure('取込に失敗しました。')
+      failure("取込に失敗しました。#{e.message}")
     end
 
     private
@@ -64,7 +64,7 @@ module CapturePaymentData
     end
 
     def user_id
-      view_model.user.user_id
+      view_model.user&.id
     end
 
     def capture_category

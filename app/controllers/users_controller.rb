@@ -5,19 +5,19 @@ class UsersController < ApplicationController
   before_action :set_user, only: %i[show edit update destroy]
 
   def index
-    @users = TrnUser.includes(:authority).order(:user_id)
+    @users = User.order(:id)
   end
 
   def show; end
 
   def new
-    @user = TrnUser.new
+    @user = User.new
   end
 
   def edit; end
 
   def create
-    @user = TrnUser.new(user_params)
+    @user = User.new(user_params)
     if @user.save
       redirect_to users_path, success: "ユーザーを登録しました。"
     else
@@ -46,10 +46,10 @@ class UsersController < ApplicationController
   private
 
   def set_user
-    @user = TrnUser.find(params[:id])
+    @user = User.find(params[:id])
   end
 
   def user_params
-    params.require(:trn_user).permit(:login_id, :password, :autholity_no, :status_no, :delete_flg)
+    params.require(:user).permit(:login_id, :password, :delete_flg)
   end
 end

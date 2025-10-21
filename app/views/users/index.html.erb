@@ -7,18 +7,14 @@
     <tr>
       <th>ID</th>
       <th>ログインID</th>
-      <th>権限</th>
-      <th>状態</th>
       <th></th>
     </tr>
   </thead>
   <tbody>
     <% @users.each do |user| %>
       <tr>
-        <td><%= user.user_id %></td>
+        <td><%= user.id %></td>
         <td><%= user.login_id %></td>
-        <td><%= user.authority&.autholity_name %></td>
-        <td><%= user.status&.status_name %></td>
         <td>
           <%= link_to "詳細", user_path(user) %>
           <%= link_to "編集", edit_user_path(user) %>

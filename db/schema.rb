@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2024_06_07_010202) do
+ActiveRecord::Schema[8.0].define(version: 2024_06_07_010505) do
   create_table "MST_ACCOUNT", primary_key: "ACCOUNT_NO", id: :integer, charset: "utf8mb4", collation: "utf8mb4_general_ci", force: :cascade do |t|
     t.string "ACCOUNT_NAME", null: false
     t.boolean "DELETE_FLG", default: false, null: false
@@ -18,11 +18,6 @@ ActiveRecord::Schema[8.0].define(version: 2024_06_07_010202) do
     t.datetime "CREATE_DATE", null: false
     t.integer "UPDATE_USER_ID"
     t.datetime "UPDATE_DATE"
-  end
-
-  create_table "MST_AUTHOLITY", primary_key: "AUTHOLITY_NO", id: :integer, charset: "utf8mb4", collation: "utf8mb4_general_ci", force: :cascade do |t|
-    t.string "AUTHOLITY_NAME", null: false
-    t.boolean "DELETE_FLG", default: false, null: false
   end
 
   create_table "MST_CAPTURE_CATEGORY", primary_key: "CAPTURE_CATEGORY_NO", id: :integer, charset: "utf8mb4", collation: "utf8mb4_general_ci", force: :cascade do |t|
@@ -154,11 +149,6 @@ ActiveRecord::Schema[8.0].define(version: 2024_06_07_010202) do
     t.datetime "UPDATE_DATE"
   end
 
-  create_table "MST_USER_STATUS", primary_key: "STATUS_NO", id: :integer, charset: "utf8mb4", collation: "utf8mb4_general_ci", force: :cascade do |t|
-    t.string "STATUS_NAME", null: false
-    t.boolean "DELETE_FLG", default: false, null: false
-  end
-
   create_table "TRN_CAPTURE_DATA", primary_key: "CAPTURE_DATA_NO", id: :integer, charset: "utf8mb4", collation: "utf8mb4_general_ci", force: :cascade do |t|
     t.integer "CAPTURE_HISTORY_NO", null: false
     t.integer "ROW_NO", null: false
@@ -224,24 +214,6 @@ ActiveRecord::Schema[8.0].define(version: 2024_06_07_010202) do
     t.index ["CAPTURE_CATEGORY_NO"], name: "fk_rails_98e1ec1471"
   end
 
-  create_table "TRN_USER", primary_key: "USER_ID", id: :integer, charset: "utf8mb4", collation: "utf8mb4_general_ci", force: :cascade do |t|
-    t.string "USER_NAME", limit: 12
-    t.string "LOGIN_ID", limit: 15
-    t.string "PASS_WORD"
-    t.binary "SALT"
-    t.integer "AUTHOLITY_NO", null: false
-    t.integer "STATUS_NO", null: false
-    t.integer "CREATE_USER_ID"
-    t.datetime "CREATE_DATE", null: false
-    t.integer "UPDATE_USER_ID"
-    t.datetime "UPDATE_DATE"
-    t.boolean "DELETE_FLG", default: false, null: false
-    t.index ["AUTHOLITY_NO"], name: "fk_rails_380375b7f7"
-    t.index ["CREATE_USER_ID"], name: "FK_TRN_USER_TRN_USER_CREATE_USER_ID"
-    t.index ["STATUS_NO"], name: "fk_rails_25251f7098"
-    t.index ["UPDATE_USER_ID"], name: "FK_TRN_USER_TRN_USER_UPDATE_USER_ID"
-  end
-
   create_table "suppliers", id: :integer, charset: "utf8mb4", collation: "utf8mb4_general_ci", force: :cascade do |t|
     t.string "name", null: false
     t.boolean "delete_flg", default: false, null: false
@@ -251,6 +223,20 @@ ActiveRecord::Schema[8.0].define(version: 2024_06_07_010202) do
     t.datetime "updated_at"
   end
 
+  create_table "users", id: :integer, charset: "utf8mb4", collation: "utf8mb4_general_ci", force: :cascade do |t|
+    t.string "user_name", limit: 12
+    t.string "login_id", limit: 15
+    t.string "password_digest"
+    t.binary "salt"
+    t.integer "created_by_id"
+    t.datetime "created_at", null: false
+    t.integer "updated_by_id"
+    t.datetime "updated_at"
+    t.boolean "delete_flg", default: false, null: false
+    t.index ["created_by_id"], name: "index_users_on_created_by_id"
+    t.index ["updated_by_id"], name: "index_users_on_updated_by_id"
+  end
+
   add_foreign_key "MST_DEPARTMENT", "MST_COMPANY", column: "COMPANY_NO", primary_key: "COMPANY_NO"
   add_foreign_key "MST_DEPARTMENT", "MST_COMPANY", column: "COMPANY_NO", primary_key: "COMPANY_NO", name: "FK_MST_DEPARTMENT_MST_COMPANY_COMPANY_NO", on_delete: :cascade
   add_foreign_key "MST_SUB_ACCOUNT", "MST_ACCOUNT", column: "ACCOUNT_NO", primary_key: "ACCOUNT_NO"
@@ -258,8 +244,6 @@ ActiveRecord::Schema[8.0].define(version: 2024_06_07_010202) do
   add_foreign_key "TRN_CAPTURE_DATA", "MST_DEPARTMENT", column: "DEPARTMENT_NO", primary_key: "DEPARTMENT_NO"
   add_foreign_key "TRN_CAPTURE_DATA", "TRN_CAPTURE_HISTORY", column: "CAPTURE_HISTORY_NO", primary_key: "CAPTURE_HISTORY_NO"
   add_foreign_key "TRN_JOURNAL_ENTRY_HISTORY", "MST_CAPTURE_CATEGORY", column: "CAPTURE_CATEGORY_NO", primary_key: "CAPTURE_CATEGORY_NO"
-  add_foreign_key "TRN_USER", "MST_AUTHOLITY", column: "AUTHOLITY_NO", primary_key: "AUTHOLITY_NO"
-  add_foreign_key "TRN_USER", "MST_USER_STATUS", column: "STATUS_NO", primary_key: "STATUS_NO"
-  add_foreign_key "TRN_USER", "TRN_USER", column: "CREATE_USER_ID", primary_key: "USER_ID", name: "FK_TRN_USER_TRN_USER_CREATE_USER_ID"
-  add_foreign_key "TRN_USER", "TRN_USER", column: "UPDATE_USER_ID", primary_key: "USER_ID", name: "FK_TRN_USER_TRN_USER_UPDATE_USER_ID"
+  add_foreign_key "users", "users", column: "created_by_id", name: "fk_users_created_by"
+  add_foreign_key "users", "users", column: "updated_by_id", name: "fk_users_updated_by"
 end

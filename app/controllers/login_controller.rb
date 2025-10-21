@@ -14,8 +14,7 @@ class LoginController < ApplicationController
       user = Authentication::Login.call(@form.login_id, @form.password)
       if user
         reset_session
-        session[:user_id] = user.user_id
-        session[:role_no] = user.autholity_no
+        session[:user_id] = user.id
         session[:last_seen_at] = Time.current
         redirect_to capture_payment_data_path, success: "ログインしました。"
       else

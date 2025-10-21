@@ -16,16 +16,6 @@
   </div>
 
   <div>
-    <%= form.label :autholity_no, "権限" %>
-    <%= form.select :autholity_no, @authority_options, include_blank: "選択してください" %>
-  </div>
-
-  <div>
-    <%= form.label :status_no, "ステータス" %>
-    <%= form.select :status_no, @status_options, include_blank: "選択してください" %>
-  </div>
-
-  <div>
     <label>
       <%= form.check_box :delete_flg %>
       削除フラグ

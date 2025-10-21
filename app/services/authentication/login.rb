@@ -12,7 +12,7 @@ module Authentication
     end
 
     def call
-      TrnUser.authenticate(login_id, raw_password)
+      User.authenticate(login_id, raw_password)
     end
 
     private

@@ -543,9 +543,9 @@ module JournalEntryData
 
     # JournalEntryDataListApplication::Create()
     def current_user_id
-      return nil unless form.user.respond_to?(:user_id)
+      return nil unless form.user.respond_to?(:id)
 
-      form.user.user_id
+      form.user.id
     end
 
     def capture_category_cache
