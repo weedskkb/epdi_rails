@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2024_06_07_010505) do
+ActiveRecord::Schema[8.0].define(version: 2024_06_07_010606) do
   create_table "MST_ACCOUNT", primary_key: "ACCOUNT_NO", id: :integer, charset: "utf8mb4", collation: "utf8mb4_general_ci", force: :cascade do |t|
     t.string "ACCOUNT_NAME", null: false
     t.boolean "DELETE_FLG", default: false, null: false
@@ -25,7 +25,7 @@ ActiveRecord::Schema[8.0].define(version: 2024_06_07_010505) do
     t.integer "TAX_CLASS_NO"
     t.integer "TAX_RATE"
     t.integer "supplier_id"
-    t.integer "SUPPLIER_COMPANY_NO"
+    t.integer "supplier_company_id"
     t.integer "DEBIT_DEPARTMENT_NO"
     t.integer "DEBIT_ACCOUNT_NO"
     t.integer "DEBIT_SUB_ACCOUNT_NO"
@@ -43,25 +43,15 @@ ActiveRecord::Schema[8.0].define(version: 2024_06_07_010505) do
     t.datetime "UPDATE_DATE"
   end
 
-  create_table "MST_COMPANY", primary_key: "COMPANY_NO", id: :integer, charset: "utf8mb4", collation: "utf8mb4_general_ci", force: :cascade do |t|
-    t.string "COMPANY_NAME", null: false
-    t.integer "supplier_id"
-    t.boolean "DELETE_FLG", default: false, null: false
-    t.integer "CREATE_USER_ID", null: false
-    t.datetime "CREATE_DATE", null: false
-    t.integer "UPDATE_USER_ID"
-    t.datetime "UPDATE_DATE"
-  end
-
   create_table "MST_DEPARTMENT", primary_key: "DEPARTMENT_NO", id: :integer, charset: "utf8mb4", collation: "utf8mb4_general_ci", force: :cascade do |t|
     t.string "DEPARTMENT_NAME", null: false
-    t.integer "COMPANY_NO", null: false
+    t.integer "company_id", null: false
     t.boolean "DELETE_FLG", default: false, null: false
     t.integer "CREATE_USER_ID", null: false
     t.datetime "CREATE_DATE", null: false
     t.integer "UPDATE_USER_ID"
     t.datetime "UPDATE_DATE"
-    t.index ["COMPANY_NO"], name: "IX_MST_DEPARTMENT_COMPANY_NO"
+    t.index ["company_id"], name: "index_mst_department_on_company_id"
   end
 
   create_table "MST_DETAIL_DIVISION", primary_key: "DETAIL_DIVISION_NO", id: :integer, charset: "utf8mb4", collation: "utf8mb4_general_ci", force: :cascade do |t|
@@ -78,7 +68,7 @@ ActiveRecord::Schema[8.0].define(version: 2024_06_07_010505) do
     t.string "JOURNAL_ENTRY_PATTERN_NAME", null: false
     t.integer "ROW_NO", null: false
     t.integer "DATE_PATTERN_NO", null: false
-    t.integer "COMPANY_NO"
+    t.integer "company_id"
     t.integer "DEBIT_DEPARTMENT_NO"
     t.integer "DEBIT_ACCOUNT_NO"
     t.integer "DEBIT_SUB_ACCOUNT_NO"
@@ -116,7 +106,7 @@ ActiveRecord::Schema[8.0].define(version: 2024_06_07_010505) do
     t.datetime "CREATE_DATE", null: false
     t.integer "UPDATE_USER_ID"
     t.datetime "UPDATE_DATE"
-    t.integer "COMPANY_NO"
+    t.integer "company_id"
   end
 
   create_table "MST_SUB_ACCOUNT", primary_key: "ID", id: :integer, charset: "utf8mb4", collation: "utf8mb4_general_ci", force: :cascade do |t|
@@ -152,7 +142,7 @@ ActiveRecord::Schema[8.0].define(version: 2024_06_07_010505) do
   create_table "TRN_CAPTURE_DATA", primary_key: "CAPTURE_DATA_NO", id: :integer, charset: "utf8mb4", collation: "utf8mb4_general_ci", force: :cascade do |t|
     t.integer "CAPTURE_HISTORY_NO", null: false
     t.integer "ROW_NO", null: false
-    t.integer "COMPANY_NO", null: false
+    t.integer "company_id", null: false
     t.integer "DEPARTMENT_NO", null: false
     t.integer "supplier_id"
     t.integer "ACCOUNT_NO"
@@ -182,7 +172,7 @@ ActiveRecord::Schema[8.0].define(version: 2024_06_07_010505) do
     t.integer "EXCEL_ROW_NO", null: false
     t.integer "ROW_NO", null: false
     t.date "DATE", null: false
-    t.integer "COMPANY_NO", null: false
+    t.integer "company_id", null: false
     t.integer "DEPARTMENT_NO"
     t.integer "DEBIT_DEPARTMENT_NO"
     t.integer "DEBIT_ACCOUNT_NO"
@@ -214,6 +204,16 @@ ActiveRecord::Schema[8.0].define(version: 2024_06_07_010505) do
     t.index ["CAPTURE_CATEGORY_NO"], name: "fk_rails_98e1ec1471"
   end
 
+  create_table "companies", id: :integer, charset: "utf8mb4", collation: "utf8mb4_general_ci", force: :cascade do |t|
+    t.string "name", null: false
+    t.integer "supplier_id"
+    t.boolean "delete_flg", default: false, null: false
+    t.integer "created_by_id", null: false
+    t.datetime "created_at", null: false
+    t.integer "updated_by_id"
+    t.datetime "updated_at"
+  end
+
   create_table "suppliers", id: :integer, charset: "utf8mb4", collation: "utf8mb4_general_ci", force: :cascade do |t|
     t.string "name", null: false
     t.boolean "delete_flg", default: false, null: false
@@ -237,8 +237,7 @@ ActiveRecord::Schema[8.0].define(version: 2024_06_07_010505) do
     t.index ["updated_by_id"], name: "index_users_on_updated_by_id"
   end
 
-  add_foreign_key "MST_DEPARTMENT", "MST_COMPANY", column: "COMPANY_NO", primary_key: "COMPANY_NO"
-  add_foreign_key "MST_DEPARTMENT", "MST_COMPANY", column: "COMPANY_NO", primary_key: "COMPANY_NO", name: "FK_MST_DEPARTMENT_MST_COMPANY_COMPANY_NO", on_delete: :cascade
+  add_foreign_key "MST_DEPARTMENT", "companies", name: "fk_mst_department_company", on_delete: :cascade
   add_foreign_key "MST_SUB_ACCOUNT", "MST_ACCOUNT", column: "ACCOUNT_NO", primary_key: "ACCOUNT_NO"
   add_foreign_key "MST_SUB_ACCOUNT", "MST_ACCOUNT", column: "ACCOUNT_NO", primary_key: "ACCOUNT_NO", name: "FK_MST_SUB_ACCOUNT_MST_ACCOUNT_ACCOUNT_NO", on_delete: :cascade
   add_foreign_key "TRN_CAPTURE_DATA", "MST_DEPARTMENT", column: "DEPARTMENT_NO", primary_key: "DEPARTMENT_NO"

@@ -9,7 +9,8 @@ module PaymentData
 
     def all
       scope = TrnCaptureData.includes(:department, :company, capture_history: :capture_category)
-      scope = scope.where(COMPANY_NO: params[:company_no]) if params[:company_no].present?
+      company_filter = params[:company_id].presence || params[:company_no].presence
+      scope = scope.where(company_id: company_filter) if company_filter.present?
       scope.order(:CAPTURE_HISTORY_NO, :ROW_NO)
     end
 

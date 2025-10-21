@@ -328,7 +328,7 @@ module CapturePaymentData
           department_no = cell_integer(sheet, row_idx, 0)
           next unless department_no
 
-          company_no = department_company_no(department_no)
+          company_id = department_company_id(department_no)
           (3...last_column).each do |col_idx|
             amount = cell_integer(sheet, row_idx, col_idx)
             supplier_id = cell_integer(sheet, 9, col_idx)
@@ -345,7 +345,7 @@ module CapturePaymentData
             create_capture_data(
               capture_history_no: history.capture_history_no,
               row_no: row_idx + 1,
-              company_no: company_no,
+              company_id: company_id,
               department_no: department_no,
               supplier_id: supplier_id,
               account_no: account_no,
@@ -372,7 +372,7 @@ module CapturePaymentData
           supplier_id = cell_integer(sheet, row_idx, 3)
           next unless department_no && supplier_id
 
-          company_no = department_company_no(department_no)
+          company_id = department_company_id(department_no)
           (5...last_column).each do |col_idx|
             amount = cell_integer(sheet, row_idx, col_idx)
             next unless amount
@@ -384,7 +384,7 @@ module CapturePaymentData
             create_capture_data(
               capture_history_no: history_no,
               row_no: row_idx + 1,
-              company_no: company_no,
+              company_id: company_id,
               department_no: department_no,
               supplier_id: supplier_id,
               account_no: account_no,
@@ -408,7 +408,7 @@ module CapturePaymentData
           department_no = cell_integer(sheet, row_idx, 0)
           next unless department_no
 
-          company_no = department_company_no(department_no)
+          company_id = department_company_id(department_no)
           (2...last_column).each do |col_idx|
             amount = cell_integer(sheet, row_idx, col_idx)
             next unless amount
@@ -420,7 +420,7 @@ module CapturePaymentData
             create_capture_data(
               capture_history_no: history_no,
               row_no: row_idx + 1,
-              company_no: company_no,
+              company_id: company_id,
               department_no: department_no,
               supplier_id: supplier_id,
               list_cd: list_cd,
@@ -441,7 +441,7 @@ module CapturePaymentData
           department_no = cell_integer(sheet, row_idx, 0)
           next unless department_no
 
-          company_no = department_company_no(department_no)
+          company_id = department_company_id(department_no)
           (2..5).each do |col_idx|
             amount = cell_integer(sheet, row_idx, col_idx)
             next unless amount
@@ -450,7 +450,7 @@ module CapturePaymentData
             create_capture_data(
               capture_history_no: history_no,
               row_no: row_idx + 1,
-              company_no: company_no,
+              company_id: company_id,
               department_no: department_no,
               account_no: account_no,
               list_cd: capture_category.to_s,
@@ -482,7 +482,7 @@ module CapturePaymentData
           create_capture_data(
             capture_history_no: history_no,
             row_no: row_idx + 1,
-            company_no: department_company_no(department_no),
+            company_id: department_company_id(department_no),
             department_no: department_no,
             supplier_id: category.supplier_id,
             account_no: category.debit_account_no,
@@ -517,7 +517,7 @@ module CapturePaymentData
       TrnCaptureData.create!(
         capture_history_no: attrs[:capture_history_no],
         row_no: attrs[:row_no],
-        company_no: attrs[:company_no],
+        company_id: attrs[:company_id],
         department_no: attrs[:department_no],
         supplier_id: attrs[:supplier_id],
         account_no: attrs[:account_no],
@@ -532,8 +532,8 @@ module CapturePaymentData
       )
     end
 
-    def department_company_no(department_no)
-      Department.find_by!(DEPARTMENT_NO: department_no).company_no
+    def department_company_id(department_no)
+      Department.find_by!(DEPARTMENT_NO: department_no).company_id
     end
 
     # CapturePaymentDataApplication::getPaymentMonth()

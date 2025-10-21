@@ -7,7 +7,6 @@ class TrnJournalEntryData < ApplicationRecord
   alias_attribute :journal_entry_data_no, "JOURNAL_ENTRY_DATA_NO"
   alias_attribute :journal_entry_history_no, "JOURNAL_ENTRY_HISTORY_NO"
   alias_attribute :row_no, "ROW_NO"
-  alias_attribute :company_no, "COMPANY_NO"
   alias_attribute :date, "DATE"
   alias_attribute :excel_row_no, "EXCEL_ROW_NO"
   alias_attribute :debit_department_no, "DEBIT_DEPARTMENT_NO"
@@ -28,4 +27,5 @@ class TrnJournalEntryData < ApplicationRecord
   alias_attribute :abstract, "ABSTRACT"
 
   belongs_to :journal_entry_history, class_name: "TrnJournalEntryHistory", foreign_key: "JOURNAL_ENTRY_HISTORY_NO", optional: true
+  belongs_to :company, class_name: "Company", foreign_key: :company_id, optional: true
 end

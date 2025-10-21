@@ -1,18 +1,11 @@
 # frozen_string_literal: true
 
 class Company < ApplicationRecord
-  self.table_name = "MST_COMPANY"
-  self.primary_key = "COMPANY_NO"
+  scope :active, -> { where(delete_flg: false) }
 
-  alias_attribute :company_no, "COMPANY_NO"
-  alias_attribute :company_name, "COMPANY_NAME"
-  alias_attribute :delete_flg, "DELETE_FLG"
-  alias_attribute :create_user_id, "CREATE_USER_ID"
-  alias_attribute :create_date, "CREATE_DATE"
-  alias_attribute :update_user_id, "UPDATE_USER_ID"
-  alias_attribute :update_date, "UPDATE_DATE"
-
-  scope :active, -> { where(DELETE_FLG: false) }
-
-  belongs_to :supplier, class_name: "Supplier", foreign_key: :supplier_id, optional: true
+  belongs_to :supplier, optional: true
+  has_many :departments, foreign_key: :company_id, inverse_of: :company
+  has_many :capture_data, class_name: "TrnCaptureData", foreign_key: :company_id, inverse_of: :company
+  has_many :journal_entry_patterns, class_name: "JournalEntryPattern", foreign_key: :company_id, inverse_of: :company
+  has_many :journal_entry_data, class_name: "TrnJournalEntryData", foreign_key: :company_id, inverse_of: :company
 end

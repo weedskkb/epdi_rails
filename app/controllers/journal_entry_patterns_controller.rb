@@ -49,7 +49,7 @@ class JournalEntryPatternsController < ApplicationController
       :journal_entry_pattern_group_no,
       :row_no,
       :date_pattern_no,
-      :company_no,
+      :company_id,
       :debit_department_no,
       :debit_account_no,
       :debit_sub_account_no,
@@ -78,8 +78,8 @@ class JournalEntryPatternsController < ApplicationController
   end
 
   def set_reference_options
-    @company_options = Company.active.order(:company_no).map do |company|
-      ["#{company.company_no} #{company.company_name}", company.company_no]
+    @company_options = Company.active.order(:id).map do |company|
+      ["#{company.id} #{company.name}", company.id]
     end
 
     @department_options = Department.active.order(:department_no).map do |department|

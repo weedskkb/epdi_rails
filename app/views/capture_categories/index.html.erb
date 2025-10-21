@@ -79,7 +79,7 @@
         <th class="wrap">税区分<span class="column-key">TAX_CLASS_NO</span></th>
         <th class="wrap">税率<span class="column-key">TAX_RATE</span></th>
         <th class="wrap">仕入先<span class="column-key">SUPPLIER_ID</span></th>
-        <th class="wrap">仕入先会社<span class="column-key">SUPPLIER_COMPANY_NO</span></th>
+        <th class="wrap">仕入先会社<span class="column-key">SUPPLIER_COMPANY_ID</span></th>
         <th class="wrap">借方部署<span class="column-key">DEBIT_DEPARTMENT_NO</span></th>
         <th class="wrap">借方勘定科目<span class="column-key">DEBIT_ACCOUNT_NO</span></th>
         <th class="wrap">借方補助科目<span class="column-key">DEBIT_SUB_ACCOUNT_NO</span></th>
@@ -102,7 +102,7 @@
           <td class="wrap"><%= display_reference(category.tax_class_no, category.tax_class&.tax_class_name) %></td>
           <td class="wrap"><%= category.tax_rate_value %></td>
           <td class="wrap"><%= display_reference(category.supplier_id, category.supplier&.name) %></td>
-          <td class="wrap"><%= display_reference(category.supplier_company_no, category.supplier_company&.company_name) %></td>
+          <td class="wrap"><%= display_reference(category.supplier_company_id, category.supplier_company&.name) %></td>
           <td class="wrap"><%= display_reference(category.debit_department_no, category.debit_department&.department_name) %></td>
           <td class="wrap"><%= display_reference(category.debit_account_no, category.debit_account&.account_name) %></td>
           <td class="wrap"><%= display_reference(category.debit_sub_account_no, category.debit_sub_account&.sub_account_name) %></td>

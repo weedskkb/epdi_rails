@@ -145,9 +145,9 @@
       </div>
 
       <div class="form-group">
-        <%= form.label :supplier_company_no, "仕入先会社番号" %>
-        <%= form.select :supplier_company_no,
-                        options_for_select(@company_options, @capture_category.supplier_company_no),
+        <%= form.label :supplier_company_id, "仕入先会社番号" %>
+        <%= form.select :supplier_company_id,
+                        options_for_select(@company_options, @capture_category.supplier_company_id),
                         { include_blank: true },
                         class: "input-field" %>
       </div>

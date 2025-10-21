@@ -7,7 +7,6 @@ class TrnCaptureData < ApplicationRecord
   alias_attribute :capture_data_no, "CAPTURE_DATA_NO"
   alias_attribute :capture_history_no, "CAPTURE_HISTORY_NO"
   alias_attribute :row_no, "ROW_NO"
-  alias_attribute :company_no, "COMPANY_NO"
   alias_attribute :department_no, "DEPARTMENT_NO"
   alias_attribute :account_no, "ACCOUNT_NO"
   alias_attribute :sub_account_no, "SUB_ACCOUNT_NO"
@@ -21,7 +20,7 @@ class TrnCaptureData < ApplicationRecord
 
   belongs_to :capture_history, class_name: "TrnCaptureHistory", foreign_key: "CAPTURE_HISTORY_NO"
   belongs_to :department, class_name: "Department", foreign_key: "DEPARTMENT_NO"
-  belongs_to :company, class_name: "Company", foreign_key: "COMPANY_NO"
+  belongs_to :company, class_name: "Company", foreign_key: :company_id, optional: true
 
   delegate :capture_category, to: :capture_history, allow_nil: true
 
@@ -33,7 +32,7 @@ class TrnCaptureData < ApplicationRecord
     text.gsub!("発生月", formatted_month(capture_history&.accrual_month || capture_history&.payment_month)) if text.include?("発生月")
     text.gsub!("支払月", formatted_month(capture_history&.payment_month)) if text.include?("支払月")
     text.gsub!("店舗名", department&.department_name.to_s) if text.include?("店舗名")
-    text.gsub!("会社名", company&.company_name.to_s) if text.include?("会社名")
+    text.gsub!("会社名", company&.name.to_s) if text.include?("会社名")
     text.gsub!("仕入先別", capture_category&.supplier_abstract.to_s) if text.include?("仕入先別")
     text
   end
