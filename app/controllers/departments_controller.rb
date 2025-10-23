@@ -4,6 +4,6 @@ class DepartmentsController < ApplicationController
   before_action :require_login!
 
   def index
-    @departments = Department.order(:department_no)
+    @departments = Department.order(:id)
   end
 end

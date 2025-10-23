@@ -5,12 +5,12 @@ module JournalEntryData
     PreviewItem = Struct.new(
       :company_id,
       :date,
-      :debit_department_no,
+      :debit_department_id,
       :debit_account_no,
       :debit_sub_account_no,
       :debit_supplier_id,
       :debit_amount,
-      :credit_department_no,
+      :credit_department_id,
       :credit_account_no,
       :credit_sub_account_no,
       :credit_supplier_id,
@@ -35,7 +35,7 @@ module JournalEntryData
       scope.order(<<~SQL.squish)
         TRN_JOURNAL_ENTRY_HISTORY.JOURNAL_ENTRY_HISTORY_NO ASC,
         TRN_JOURNAL_ENTRY_DATA.ROW_NO ASC,
-        TRN_JOURNAL_ENTRY_DATA.DEPARTMENT_NO ASC,
+        TRN_JOURNAL_ENTRY_DATA.department_id ASC,
         TRN_JOURNAL_ENTRY_DATA.CREATE_DATE ASC
       SQL
     end
@@ -50,12 +50,12 @@ module JournalEntryData
         PreviewItem.new(
           company_id: record.company_id,
           date: record.date,
-          debit_department_no: record.debit_department_no,
+          debit_department_id: record.debit_department_id,
           debit_account_no: record.debit_account_no,
           debit_sub_account_no: record.debit_sub_account_no,
           debit_supplier_id: record.debit_supplier_id,
           debit_amount: record.debit_amount,
-          credit_department_no: record.credit_department_no,
+          credit_department_id: record.credit_department_id,
           credit_account_no: record.credit_account_no,
           credit_sub_account_no: record.credit_sub_account_no,
           credit_supplier_id: record.credit_supplier_id,
@@ -104,5 +104,6 @@ module JournalEntryData
     rescue ArgumentError
       nil
     end
+
   end
 end

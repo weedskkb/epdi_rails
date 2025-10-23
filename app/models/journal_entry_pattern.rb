@@ -9,10 +9,8 @@ class JournalEntryPattern < ApplicationRecord
   alias_attribute :journal_entry_pattern_name, "JOURNAL_ENTRY_PATTERN_NAME"
   alias_attribute :row_no, "ROW_NO"
   alias_attribute :date_pattern_no, "DATE_PATTERN_NO"
-  alias_attribute :debit_department_no, "DEBIT_DEPARTMENT_NO"
   alias_attribute :debit_account_no, "DEBIT_ACCOUNT_NO"
   alias_attribute :debit_sub_account_no, "DEBIT_SUB_ACCOUNT_NO"
-  alias_attribute :credit_department_no, "CREDIT_DEPARTMENT_NO"
   alias_attribute :credit_account_no, "CREDIT_ACCOUNT_NO"
   alias_attribute :credit_sub_account_no, "CREDIT_SUB_ACCOUNT_NO"
   alias_attribute :fixed_amount_flag, "FIXED_AMOUNT_FLG"
@@ -31,8 +29,8 @@ class JournalEntryPattern < ApplicationRecord
   scope :ordered, -> { order(:journal_entry_pattern_group_no, :row_no) }
 
   belongs_to :company, class_name: "Company", foreign_key: :company_id, optional: true
-  belongs_to :debit_department, class_name: "Department", foreign_key: "DEBIT_DEPARTMENT_NO", optional: true
-  belongs_to :credit_department, class_name: "Department", foreign_key: "CREDIT_DEPARTMENT_NO", optional: true
+  belongs_to :debit_department, class_name: "Department", foreign_key: :debit_department_id, optional: true
+  belongs_to :credit_department, class_name: "Department", foreign_key: :credit_department_id, optional: true
   belongs_to :debit_account, class_name: "Account", foreign_key: "DEBIT_ACCOUNT_NO", optional: true
   belongs_to :debit_sub_account, class_name: "SubAccount", foreign_key: "DEBIT_SUB_ACCOUNT_NO",
                                  primary_key: "SUB_ACCOUNT_NO", optional: true

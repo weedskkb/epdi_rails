@@ -148,9 +148,9 @@
       </div>
 
       <div class="form-group">
-        <%= form.label :debit_department_no, "借方部署" %>
-        <%= form.select :debit_department_no,
-                        options_for_select(@department_options, @pattern.debit_department_no),
+        <%= form.label :debit_department_id, "借方部署" %>
+        <%= form.select :debit_department_id,
+                        options_for_select(@department_options, @pattern.debit_department_id),
                         { include_blank: true },
                         class: "input-field" %>
       </div>
@@ -196,9 +196,9 @@
       </div>
 
       <div class="form-group">
-        <%= form.label :credit_department_no, "貸方部署" %>
-        <%= form.select :credit_department_no,
-                        options_for_select(@department_options, @pattern.credit_department_no),
+        <%= form.label :credit_department_id, "貸方部署" %>
+        <%= form.select :credit_department_id,
+                        options_for_select(@department_options, @pattern.credit_department_id),
                         { include_blank: true },
                         class: "input-field" %>
       </div>

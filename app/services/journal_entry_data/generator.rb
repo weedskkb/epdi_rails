@@ -108,7 +108,7 @@ module JournalEntryData
 
         capture_rows = TrnCaptureData
                        .where(CAPTURE_HISTORY_NO: history.capture_history_no)
-                       .order(:DEPARTMENT_NO, :ROW_NO)
+                       .order(:department_id, :ROW_NO)
 
         grouping_rows = []
         capture_rows.each do |row|
@@ -155,11 +155,11 @@ module JournalEntryData
           [
             row[:row_no],
             row[:date],
-            row[:debit_department_no],
+            row[:debit_department_id],
             row[:debit_account_no],
             row[:debit_sub_account_no],
             row[:debit_supplier_id],
-            row[:credit_department_no],
+            row[:credit_department_id],
             row[:credit_account_no],
             row[:credit_sub_account_no],
             row[:credit_supplier_id],
@@ -176,13 +176,13 @@ module JournalEntryData
             excel_row_no: 0,
             date: key[1],
             company_id: 1,  # ウィーズ
-            department_no: 201,
-            debit_department_no: key[2],
+            department_id: 201,
+            debit_department_id: key[2],
             debit_account_no: key[3],
             debit_sub_account_no: key[4],
             debit_supplier_id: key[5],
             debit_amount: sum_amount(debit_sum),
-            credit_department_no: key[6],
+            credit_department_id: key[6],
             credit_account_no: key[7],
             credit_sub_account_no: key[8],
             credit_supplier_id: key[9],
@@ -204,15 +204,15 @@ module JournalEntryData
         excel_row_no: capture_row.row_no,
         date: date_for(pattern["DATE_PATTERN_NO"], history.accrual_month, history.payment_month, form.fund_transfer_date),
         company_id: company_for(pattern.company_id, capture_row.company_id, capture_category.capture_category_no),
-        department_no: capture_row.department_no,
-        debit_department_no: department_for(pattern["DEBIT_DEPARTMENT_NO"], capture_row.department_no, capture_row.company_id, capture_category.capture_category_no, "debit"),
+        department_id: capture_row.department_id,
+        debit_department_id: department_for(pattern.debit_department_id, capture_row.department_id, capture_row.company_id, capture_category.capture_category_no, "debit"),
         debit_account_no: debit_account,
         debit_sub_account_no: sub_account_for(pattern["DEBIT_SUB_ACCOUNT_NO"], capture_category.capture_category_no, "debit"),
         debit_supplier_id: supplier_for(pattern.debit_supplier_id, capture_row.company_id, capture_row.supplier_id, capture_category.capture_category_no),
         debit_amount: debit_amount,
         debit_tax_class_id: tax_class_for(pattern.debit_tax_class_id, capture_category.capture_category_no),
         debit_tax_rate_id: tax_rate_for(pattern.debit_tax_rate_id, capture_category.capture_category_no),
-        credit_department_no: department_for(pattern["CREDIT_DEPARTMENT_NO"], capture_row.department_no, capture_row.company_id, capture_category.capture_category_no, "credit"),
+        credit_department_id: department_for(pattern.credit_department_id, capture_row.department_id, capture_row.company_id, capture_category.capture_category_no, "credit"),
         credit_account_no: credit_account,
         credit_sub_account_no: sub_account_for(pattern["CREDIT_SUB_ACCOUNT_NO"], capture_category.capture_category_no, "credit"),
         credit_supplier_id: supplier_for(pattern.credit_supplier_id, capture_row.company_id, capture_row.supplier_id, capture_category.capture_category_no),
@@ -223,7 +223,7 @@ module JournalEntryData
           pattern["ABSTRACT"].to_s,
           history.accrual_month,
           history.payment_month,
-          capture_row.department_no,
+          capture_row.department_id,
           capture_row.company_id,
           capture_category.capture_category_no
         )
@@ -238,15 +238,15 @@ module JournalEntryData
         excel_row_no: attributes[:excel_row_no],
         date: attributes[:date],
         company_id: attributes[:company_id],
-        department_no: attributes[:department_no],
-        debit_department_no: attributes[:debit_department_no],
+        department_id: attributes[:department_id],
+        debit_department_id: attributes[:debit_department_id],
         debit_account_no: attributes[:debit_account_no],
         debit_sub_account_no: attributes[:debit_sub_account_no],
         debit_supplier_id: attributes[:debit_supplier_id],
         debit_amount: attributes[:debit_amount],
         debit_tax_class_id: attributes[:debit_tax_class_id],
         debit_tax_rate_id: attributes[:debit_tax_rate_id],
-        credit_department_no: attributes[:credit_department_no],
+        credit_department_id: attributes[:credit_department_id],
         credit_account_no: attributes[:credit_account_no],
         credit_sub_account_no: attributes[:credit_sub_account_no],
         credit_supplier_id: attributes[:credit_supplier_id],
@@ -437,10 +437,10 @@ module JournalEntryData
     end
 
     # JournalEntryDataListApplication::getDepartmentNo()
-    def department_for(pattern_department_no, department_no, company_id, capture_category_no, side)
-      case pattern_department_no
+    def department_for(pattern_department_id, department_id, company_id, capture_category_no, side)
+      case pattern_department_id
       when 0
-        department_no
+        department_id
       when 1
         case company_id
         when 1
@@ -454,9 +454,9 @@ module JournalEntryData
         end
       when 2
         category = capture_category(capture_category_no)
-        side == "debit" ? category.debit_department_no : category.credit_department_no
+        side == "debit" ? category.debit_department_id : category.credit_department_id
       else
-        pattern_department_no
+        pattern_department_id
       end
     end
 
@@ -577,7 +577,7 @@ module JournalEntryData
     def department(number)
       return nil if number.nil?
 
-      department_cache[number] ||= Department.find_by(department_no: number)
+      department_cache[number] ||= Department.find_by(id: number)
     end
   end
 end

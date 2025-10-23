@@ -1,14 +1,9 @@
 # frozen_string_literal: true
 
 class Department < ApplicationRecord
-  self.table_name = "MST_DEPARTMENT"
-  self.primary_key = "DEPARTMENT_NO"
+  scope :active, -> { where(delete_flg: false) }
 
-  alias_attribute :department_no, "DEPARTMENT_NO"
-  alias_attribute :department_name, "DEPARTMENT_NAME"
-  alias_attribute :delete_flg, "DELETE_FLG"
-
-  scope :active, -> { where(DELETE_FLG: false) }
+  alias_attribute :department_name, :name
 
   belongs_to :company, class_name: "Company", foreign_key: :company_id, optional: true
 end

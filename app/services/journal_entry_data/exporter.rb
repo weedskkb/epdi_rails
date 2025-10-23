@@ -15,15 +15,15 @@ module JournalEntryData
       :journal_entry_history_no,
       :company_id,
       :date,
-      :department_no,
-      :debit_department_no,
+      :department_id,
+      :debit_department_id,
       :debit_account_no,
       :debit_sub_account_no,
       :debit_supplier_id,
       :debit_amount,
       :debit_tax_class_id,
       :debit_tax_rate_id,
-      :credit_department_no,
+      :credit_department_id,
       :credit_account_no,
       :credit_sub_account_no,
       :credit_supplier_id,
@@ -91,7 +91,7 @@ module JournalEntryData
       scope = scope.order(<<~SQL.squish)
         TRN_JOURNAL_ENTRY_HISTORY.JOURNAL_ENTRY_HISTORY_NO ASC,
         TRN_JOURNAL_ENTRY_DATA.ROW_NO ASC,
-        TRN_JOURNAL_ENTRY_DATA.DEPARTMENT_NO ASC,
+        TRN_JOURNAL_ENTRY_DATA.department_id ASC,
         TRN_JOURNAL_ENTRY_DATA.CREATE_DATE ASC
       SQL
 
@@ -99,15 +99,15 @@ module JournalEntryData
         "TRN_JOURNAL_ENTRY_DATA.JOURNAL_ENTRY_HISTORY_NO",
         "TRN_JOURNAL_ENTRY_DATA.company_id",
         "TRN_JOURNAL_ENTRY_DATA.DATE",
-        "TRN_JOURNAL_ENTRY_DATA.DEPARTMENT_NO",
-        "TRN_JOURNAL_ENTRY_DATA.DEBIT_DEPARTMENT_NO",
+        "TRN_JOURNAL_ENTRY_DATA.department_id",
+        "TRN_JOURNAL_ENTRY_DATA.debit_department_id",
         "TRN_JOURNAL_ENTRY_DATA.DEBIT_ACCOUNT_NO",
         "TRN_JOURNAL_ENTRY_DATA.DEBIT_SUB_ACCOUNT_NO",
         "TRN_JOURNAL_ENTRY_DATA.DEBIT_SUPPLIER_ID",
         "TRN_JOURNAL_ENTRY_DATA.DEBIT_AMMOUNT",
         "TRN_JOURNAL_ENTRY_DATA.debit_tax_class_id",
         "TRN_JOURNAL_ENTRY_DATA.debit_tax_rate_id",
-        "TRN_JOURNAL_ENTRY_DATA.CREDIT_DEPARTMENT_NO",
+        "TRN_JOURNAL_ENTRY_DATA.credit_department_id",
         "TRN_JOURNAL_ENTRY_DATA.CREDIT_ACCOUNT_NO",
         "TRN_JOURNAL_ENTRY_DATA.CREDIT_SUB_ACCOUNT_NO",
         "TRN_JOURNAL_ENTRY_DATA.CREDIT_SUPPLIER_ID",
@@ -124,15 +124,15 @@ module JournalEntryData
           journal_entry_history_no: values[0],
           company_id: values[1],
           date: values[2],
-          department_no: values[3],
-          debit_department_no: values[4],
+          department_id: values[3],
+          debit_department_id: values[4],
           debit_account_no: values[5],
           debit_sub_account_no: values[6],
           debit_supplier_id: values[7],
           debit_amount: values[8],
           debit_tax_class_id: values[9],
           debit_tax_rate_id: values[10],
-          credit_department_no: values[11],
+          credit_department_id: values[11],
           credit_account_no: values[12],
           credit_sub_account_no: values[13],
           credit_supplier_id: values[14],
@@ -201,7 +201,7 @@ module JournalEntryData
         end
 
         debit_text = [
-          row.debit_department_no,
+          row.debit_department_id,
           row.debit_account_no,
           row.debit_sub_account_no,
           2,
@@ -212,7 +212,7 @@ module JournalEntryData
         ].map { |value| value.to_s }
 
         credit_text = [
-          row.credit_department_no,
+          row.credit_department_id,
           row.credit_account_no,
           row.credit_sub_account_no,
           2,

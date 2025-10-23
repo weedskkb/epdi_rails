@@ -9,17 +9,14 @@ class TrnJournalEntryData < ApplicationRecord
   alias_attribute :row_no, "ROW_NO"
   alias_attribute :date, "DATE"
   alias_attribute :excel_row_no, "EXCEL_ROW_NO"
-  alias_attribute :debit_department_no, "DEBIT_DEPARTMENT_NO"
   alias_attribute :debit_account_no, "DEBIT_ACCOUNT_NO"
   alias_attribute :debit_sub_account_no, "DEBIT_SUB_ACCOUNT_NO"
   alias_attribute :debit_amount, "DEBIT_AMMOUNT"
-  alias_attribute :credit_department_no, "CREDIT_DEPARTMENT_NO"
   alias_attribute :credit_account_no, "CREDIT_ACCOUNT_NO"
   alias_attribute :credit_sub_account_no, "CREDIT_SUB_ACCOUNT_NO"
   alias_attribute :credit_amount, "CREDIT_AMMOUNT"
   alias_attribute :create_date, "CREATE_DATE"
   alias_attribute :create_user_id, "CREATE_USER_ID"
-  alias_attribute :department_no, "DEPARTMENT_NO"
   alias_attribute :abstract, "ABSTRACT"
 
   belongs_to :journal_entry_history, class_name: "TrnJournalEntryHistory", foreign_key: "JOURNAL_ENTRY_HISTORY_NO", optional: true

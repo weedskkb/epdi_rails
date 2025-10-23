@@ -7,7 +7,6 @@ class TrnCaptureData < ApplicationRecord
   alias_attribute :capture_data_no, "CAPTURE_DATA_NO"
   alias_attribute :capture_history_no, "CAPTURE_HISTORY_NO"
   alias_attribute :row_no, "ROW_NO"
-  alias_attribute :department_no, "DEPARTMENT_NO"
   alias_attribute :account_no, "ACCOUNT_NO"
   alias_attribute :sub_account_no, "SUB_ACCOUNT_NO"
   alias_attribute :list_cd, "LIST_CD"
@@ -17,7 +16,7 @@ class TrnCaptureData < ApplicationRecord
   alias_attribute :create_user_id, "CREATE_USER_ID"
 
   belongs_to :capture_history, class_name: "TrnCaptureHistory", foreign_key: "CAPTURE_HISTORY_NO"
-  belongs_to :department, class_name: "Department", foreign_key: "DEPARTMENT_NO"
+  belongs_to :department, class_name: "Department", foreign_key: :department_id
   belongs_to :tax_class, class_name: "TaxClass", foreign_key: :tax_class_id, optional: true
   belongs_to :tax_rate, class_name: "TaxRate", foreign_key: :tax_rate_id, optional: true
   belongs_to :company, class_name: "Company", foreign_key: :company_id, optional: true

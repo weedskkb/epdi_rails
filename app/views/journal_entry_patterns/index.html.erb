@@ -80,13 +80,13 @@
         <th class="wrap">行NO<span class="column-key">ROW_NO</span></th>
         <th class="wrap">日付パターンNO<span class="column-key">DATE_PATTERN_NO</span></th>
         <th class="wrap">会社<span class="column-key">COMPANY_ID</span></th>
-        <th class="wrap">借方部署<span class="column-key">DEBIT_DEPARTMENT_NO</span></th>
+        <th class="wrap">借方部署<span class="column-key">DEBIT_DEPARTMENT_ID</span></th>
         <th class="wrap">借方勘定科目<span class="column-key">DEBIT_ACCOUNT_NO</span></th>
         <th class="wrap">借方補助科目<span class="column-key">DEBIT_SUB_ACCOUNT_NO</span></th>
         <th class="wrap">借方取引先<span class="column-key">DEBIT_SUPPLIER_ID</span></th>
         <th class="wrap">借方税率<span class="column-key">DEBIT_TAX_RATE_ID</span></th>
         <th class="wrap">借方税区分<span class="column-key">DEBIT_TAX_CLASS_ID</span></th>
-        <th class="wrap">貸方部署<span class="column-key">CREDIT_DEPARTMENT_NO</span></th>
+        <th class="wrap">貸方部署<span class="column-key">CREDIT_DEPARTMENT_ID</span></th>
         <th class="wrap">貸方勘定科目<span class="column-key">CREDIT_ACCOUNT_NO</span></th>
         <th class="wrap">貸方補助科目<span class="column-key">CREDIT_SUB_ACCOUNT_NO</span></th>
         <th class="wrap">貸方取引先<span class="column-key">CREDIT_SUPPLIER_ID</span></th>
@@ -116,12 +116,12 @@
           <td class="wrap"><%= pattern.row_no %></td>
           <td class="wrap"><%= pattern.date_pattern_no %></td>
           <td class="wrap"><%= display_reference(pattern.company_id, pattern.company&.name) %></td>
-          <td class="wrap"><%= display_reference(pattern.debit_department_no, pattern.debit_department&.department_name) %></td>
+          <td class="wrap"><%= display_reference(pattern.debit_department_id, pattern.debit_department&.department_name) %></td>
           <td class="wrap"><%= display_reference(pattern.debit_account_no, pattern.debit_account&.account_name) %></td>
           <td class="wrap"><%= display_reference(pattern.debit_sub_account_no, pattern.debit_sub_account&.sub_account_name) %></td>
           <td class="wrap"><%= display_reference(pattern.debit_tax_rate_id, pattern.debit_tax_rate&.rate) %></td>
           <td class="wrap"><%= display_reference(pattern.debit_tax_class_id, pattern.debit_tax_class&.name) %></td>
-          <td class="wrap"><%= display_reference(pattern.credit_department_no, pattern.credit_department&.department_name) %></td>
+          <td class="wrap"><%= display_reference(pattern.credit_department_id, pattern.credit_department&.department_name) %></td>
           <td class="wrap"><%= display_reference(pattern.credit_account_no, pattern.credit_account&.account_name) %></td>
           <td class="wrap"><%= display_reference(pattern.credit_sub_account_no, pattern.credit_sub_account&.sub_account_name) %></td>
           <td class="wrap"><%= display_reference(pattern.debit_supplier_id, pattern.debit_supplier&.name) %></td>

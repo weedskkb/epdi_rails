@@ -51,13 +51,13 @@ class JournalEntryPatternsController < ApplicationController
       :row_no,
       :date_pattern_no,
       :company_id,
-      :debit_department_no,
+      :debit_department_id,
       :debit_account_no,
       :debit_sub_account_no,
       :debit_supplier_id,
       :debit_tax_rate_id,
       :debit_tax_class_id,
-      :credit_department_no,
+      :credit_department_id,
       :credit_account_no,
       :credit_sub_account_no,
       :credit_supplier_id,
@@ -83,8 +83,8 @@ class JournalEntryPatternsController < ApplicationController
       ["#{company.id} #{company.name}", company.id]
     end
 
-    @department_options = Department.active.order(:department_no).map do |department|
-      ["#{department.department_no} #{department.department_name}", department.department_no]
+    @department_options = Department.active.order(:id).map do |department|
+      ["#{department.id} #{department.department_name}", department.id]
     end
 
     @account_options = Account.active.order(:account_no).map do |account|
@@ -104,7 +104,7 @@ class JournalEntryPatternsController < ApplicationController
     end
 
     @tax_rate_options = TaxRate.active.order(:id).map do |tax_rate|
-      ["#{tax_rate.rate}%", tax_rate.id]
+      ["#{tax_rate.id} => #{tax_rate.rate}%", tax_rate.id]
     end
   end
 end
