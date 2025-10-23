@@ -9,6 +9,7 @@ class CaptureCategoriesController < ApplicationController
     @capture_categories = CaptureCategory
                             .includes(
                               :tax_class,
+                              :tax_rate,
                               :supplier,
                               :supplier_company,
                               :debit_department,
@@ -41,8 +42,8 @@ class CaptureCategoriesController < ApplicationController
   def capture_category_params
     params.require(:capture_category).permit(
       :capture_category_name,
-      :tax_class_no,
-      :tax_rate_value,
+      :tax_class_id,
+      :tax_rate_id,
       :supplier_id,
       :supplier_company_id,
       :debit_department_no,
@@ -60,8 +61,12 @@ class CaptureCategoriesController < ApplicationController
   end
 
   def set_reference_options
-    @tax_class_options = TaxClass.active.order(:tax_class_no).map do |tax_class|
-      ["#{tax_class.tax_class_no} #{tax_class.tax_class_name}", tax_class.tax_class_no]
+    @tax_class_options = TaxClass.active.order(:id).map do |tax_class|
+      ["#{tax_class.id} #{tax_class.name}", tax_class.id]
+    end
+
+    @tax_rate_options = TaxRate.active.order(:id).map do |tax_rate|
+      ["#{tax_rate.rate}%", tax_rate.id]
     end
 
     @supplier_options = Supplier.active.order(:id).map do |supplier|

@@ -180,14 +180,17 @@
       </div>
 
       <div class="form-group">
-        <%= form.label :debit_tax_rate, "借方税率" %>
-        <%= form.number_field :debit_tax_rate, class: "input-field" %>
+        <%= form.label :debit_tax_rate_id, "借方税率" %>
+        <%= form.select :debit_tax_rate_id,
+                        options_for_select(@tax_rate_options, @pattern.debit_tax_rate_id),
+                        { include_blank: true },
+                        class: "input-field" %>
       </div>
 
       <div class="form-group">
-        <%= form.label :debit_tax_class_no, "借方税区分" %>
-        <%= form.select :debit_tax_class_no,
-                        options_for_select(@tax_class_options, @pattern.debit_tax_class_no),
+        <%= form.label :debit_tax_class_id, "借方税区分" %>
+        <%= form.select :debit_tax_class_id,
+                        options_for_select(@tax_class_options, @pattern.debit_tax_class_id),
                         { include_blank: true },
                         class: "input-field" %>
       </div>
@@ -225,14 +228,17 @@
       </div>
 
       <div class="form-group">
-        <%= form.label :credit_tax_rate, "貸方税率" %>
-        <%= form.number_field :credit_tax_rate, class: "input-field" %>
+        <%= form.label :credit_tax_rate_id, "貸方税率" %>
+        <%= form.select :credit_tax_rate_id,
+                        options_for_select(@tax_rate_options, @pattern.credit_tax_rate_id),
+                        { include_blank: true },
+                        class: "input-field" %>
       </div>
 
       <div class="form-group">
-        <%= form.label :credit_tax_class_no, "貸方税区分" %>
-        <%= form.select :credit_tax_class_no,
-                        options_for_select(@tax_class_options, @pattern.credit_tax_class_no),
+        <%= form.label :credit_tax_class_id, "貸方税区分" %>
+        <%= form.select :credit_tax_class_id,
+                        options_for_select(@tax_class_options, @pattern.credit_tax_class_id),
                         { include_blank: true },
                         class: "input-field" %>
       </div>

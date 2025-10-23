@@ -17,8 +17,8 @@
       <th>リストCD</th>
       <th>金額</th>
       <th>第二金額</th>
-      <th>税区分NO</th>
-      <th>税率NO</th>
+      <th>税区分</th>
+      <th>税率</th>
       <th>摘要</th>
     </tr>
   </thead>
@@ -39,8 +39,8 @@
         <td><%= row.list_cd %></td>
         <td><%= number_to_currency(row.amount, unit: "¥", precision: 0) %></td>
         <td><%= number_to_currency(row.second_amount, unit: "¥", precision: 0) %></td>
-        <td><%= row.tax_class_no %></td>
-        <td><%= row.tax_rate_no %></td>
+        <td><%= display_reference(row.tax_class_id, row.tax_class&.name) %></td>
+        <td><%= display_reference(row.tax_rate_id, row.tax_rate&.rate) %></td>
         <td><%= row.summary %></td>
       </tr>
     <% end %>

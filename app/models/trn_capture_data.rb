@@ -13,13 +13,13 @@ class TrnCaptureData < ApplicationRecord
   alias_attribute :list_cd, "LIST_CD"
   alias_attribute :amount, "AMMOUNT"
   alias_attribute :second_amount, "SECOND_AMMOUNT"
-  alias_attribute :tax_class_no, "TAX_CLASS_NO"
-  alias_attribute :tax_rate_no, "TAX_RATE_NO"
   alias_attribute :create_date, "CREATE_DATE"
   alias_attribute :create_user_id, "CREATE_USER_ID"
 
   belongs_to :capture_history, class_name: "TrnCaptureHistory", foreign_key: "CAPTURE_HISTORY_NO"
   belongs_to :department, class_name: "Department", foreign_key: "DEPARTMENT_NO"
+  belongs_to :tax_class, class_name: "TaxClass", foreign_key: :tax_class_id, optional: true
+  belongs_to :tax_rate, class_name: "TaxRate", foreign_key: :tax_rate_id, optional: true
   belongs_to :company, class_name: "Company", foreign_key: :company_id, optional: true
 
   delegate :capture_category, to: :capture_history, allow_nil: true

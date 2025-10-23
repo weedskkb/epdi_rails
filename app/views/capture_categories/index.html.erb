@@ -76,8 +76,8 @@
       <tr>
         <th class="wrap">取込区分NO<span class="column-key">CAPTURE_CATEGORY_NO</span></th>
         <th class="wrap">取込区分名<span class="column-key">CAPTURE_CATEGORY_NAME</span></th>
-        <th class="wrap">税区分<span class="column-key">TAX_CLASS_NO</span></th>
-        <th class="wrap">税率<span class="column-key">TAX_RATE</span></th>
+        <th class="wrap">税区分<span class="column-key">TAX_CLASS_ID</span></th>
+        <th class="wrap">税率<span class="column-key">TAX_RATE_ID</span></th>
         <th class="wrap">仕入先<span class="column-key">SUPPLIER_ID</span></th>
         <th class="wrap">仕入先会社<span class="column-key">SUPPLIER_COMPANY_ID</span></th>
         <th class="wrap">借方部署<span class="column-key">DEBIT_DEPARTMENT_NO</span></th>
@@ -99,8 +99,8 @@
         <tr>
           <td class="wrap"><%= category.capture_category_no %></td>
           <td class="wrap"><%= category.capture_category_name %></td>
-          <td class="wrap"><%= display_reference(category.tax_class_no, category.tax_class&.tax_class_name) %></td>
-          <td class="wrap"><%= category.tax_rate_value %></td>
+          <td class="wrap"><%= display_reference(category.tax_class_id, category.tax_class&.name) %></td>
+          <td class="wrap"><%= display_reference(category.tax_rate_id, category.tax_rate&.rate) %></td>
           <td class="wrap"><%= display_reference(category.supplier_id, category.supplier&.name) %></td>
           <td class="wrap"><%= display_reference(category.supplier_company_id, category.supplier_company&.name) %></td>
           <td class="wrap"><%= display_reference(category.debit_department_no, category.debit_department&.department_name) %></td>

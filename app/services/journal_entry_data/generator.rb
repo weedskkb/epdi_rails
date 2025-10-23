@@ -188,10 +188,10 @@ module JournalEntryData
             credit_supplier_id: key[9],
             credit_amount: sum_amount(credit_sum),
             abstract: key[10],
-            debit_tax_class_no: nil,
-            debit_tax_rate_no: nil,
-            credit_tax_class_no: nil,
-            credit_tax_rate_no: nil
+            debit_tax_class_id: nil,
+            debit_tax_rate_id: nil,
+            credit_tax_class_id: nil,
+            credit_tax_rate_id: nil
           )
         end
     end
@@ -210,15 +210,15 @@ module JournalEntryData
         debit_sub_account_no: sub_account_for(pattern["DEBIT_SUB_ACCOUNT_NO"], capture_category.capture_category_no, "debit"),
         debit_supplier_id: supplier_for(pattern.debit_supplier_id, capture_row.company_id, capture_row.supplier_id, capture_category.capture_category_no),
         debit_amount: debit_amount,
-        debit_tax_class_no: tax_class_for(pattern["DEBIT_TAX_CLASS"], capture_category.capture_category_no),
-        debit_tax_rate_no: tax_rate_for(pattern["DEBIT_TAX_RATE"], capture_category.capture_category_no),
+        debit_tax_class_id: tax_class_for(pattern.debit_tax_class_id, capture_category.capture_category_no),
+        debit_tax_rate_id: tax_rate_for(pattern.debit_tax_rate_id, capture_category.capture_category_no),
         credit_department_no: department_for(pattern["CREDIT_DEPARTMENT_NO"], capture_row.department_no, capture_row.company_id, capture_category.capture_category_no, "credit"),
         credit_account_no: credit_account,
         credit_sub_account_no: sub_account_for(pattern["CREDIT_SUB_ACCOUNT_NO"], capture_category.capture_category_no, "credit"),
         credit_supplier_id: supplier_for(pattern.credit_supplier_id, capture_row.company_id, capture_row.supplier_id, capture_category.capture_category_no),
         credit_amount: credit_amount,
-        credit_tax_class_no: tax_class_for(pattern["CREDIT_TAX_CLASS"], capture_category.capture_category_no),
-        credit_tax_rate_no: tax_rate_for(pattern["CREDIT_TAX_RATE"], capture_category.capture_category_no),
+        credit_tax_class_id: tax_class_for(pattern.credit_tax_class_id, capture_category.capture_category_no),
+        credit_tax_rate_id: tax_rate_for(pattern.credit_tax_rate_id, capture_category.capture_category_no),
         abstract: abstract_for(
           pattern["ABSTRACT"].to_s,
           history.accrual_month,
@@ -244,15 +244,15 @@ module JournalEntryData
         debit_sub_account_no: attributes[:debit_sub_account_no],
         debit_supplier_id: attributes[:debit_supplier_id],
         debit_amount: attributes[:debit_amount],
-        debit_tax_class_no: attributes[:debit_tax_class_no],
-        debit_tax_rate_no: attributes[:debit_tax_rate_no],
+        debit_tax_class_id: attributes[:debit_tax_class_id],
+        debit_tax_rate_id: attributes[:debit_tax_rate_id],
         credit_department_no: attributes[:credit_department_no],
         credit_account_no: attributes[:credit_account_no],
         credit_sub_account_no: attributes[:credit_sub_account_no],
         credit_supplier_id: attributes[:credit_supplier_id],
         credit_amount: attributes[:credit_amount],
-        credit_tax_class_no: attributes[:credit_tax_class_no],
-        credit_tax_rate_no: attributes[:credit_tax_rate_no],
+        credit_tax_class_id: attributes[:credit_tax_class_id],
+        credit_tax_rate_id: attributes[:credit_tax_rate_id],
         abstract: attributes[:abstract],
         create_user_id: current_user_id,
         create_date: Time.zone.now
@@ -497,22 +497,26 @@ module JournalEntryData
     end
 
     # JournalEntryDataListApplication::getTaxClass()
-    def tax_class_for(pattern_tax_class_no, capture_category_no)
-      case pattern_tax_class_no
+    def tax_class_for(pattern_tax_class_id, capture_category_no)
+      case pattern_tax_class_id
       when 2
-        capture_category(capture_category_no).tax_class_no
+        capture_category(capture_category_no).tax_class_id
       else
-        pattern_tax_class_no
+        pattern_tax_class_id
       end
     end
 
     # JournalEntryDataListApplication::getTaxRate()
-    def tax_rate_for(pattern_tax_rate_no, capture_category_no)
-      case pattern_tax_rate_no
-      when 2
-        capture_category(capture_category_no).tax_rate_value
+    PATTERN_TAX_RATE_USE_CAPTURE_CATEGORY = 2
+
+    def tax_rate_for(pattern_tax_rate_id, capture_category_no)
+      return nil if pattern_tax_rate_id.blank?
+
+      rate_id = pattern_tax_rate_id.to_i
+      if rate_id == PATTERN_TAX_RATE_USE_CAPTURE_CATEGORY
+        capture_category(capture_category_no).tax_rate_id
       else
-        pattern_tax_rate_no
+        rate_id
       end
     end
 

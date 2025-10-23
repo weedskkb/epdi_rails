@@ -21,15 +21,15 @@ module JournalEntryData
       :debit_sub_account_no,
       :debit_supplier_id,
       :debit_amount,
-      :debit_tax_class_no,
-      :debit_tax_rate_no,
+      :debit_tax_class_id,
+      :debit_tax_rate_id,
       :credit_department_no,
       :credit_account_no,
       :credit_sub_account_no,
       :credit_supplier_id,
       :credit_amount,
-      :credit_tax_class_no,
-      :credit_tax_rate_no,
+      :credit_tax_class_id,
+      :credit_tax_rate_id,
       :abstract,
       :row_no,
       :excel_row_no,
@@ -105,15 +105,15 @@ module JournalEntryData
         "TRN_JOURNAL_ENTRY_DATA.DEBIT_SUB_ACCOUNT_NO",
         "TRN_JOURNAL_ENTRY_DATA.DEBIT_SUPPLIER_ID",
         "TRN_JOURNAL_ENTRY_DATA.DEBIT_AMMOUNT",
-        "TRN_JOURNAL_ENTRY_DATA.DEBIT_TAX_CLASS_NO",
-        "TRN_JOURNAL_ENTRY_DATA.DEBIT_TAX_RATE_NO",
+        "TRN_JOURNAL_ENTRY_DATA.debit_tax_class_id",
+        "TRN_JOURNAL_ENTRY_DATA.debit_tax_rate_id",
         "TRN_JOURNAL_ENTRY_DATA.CREDIT_DEPARTMENT_NO",
         "TRN_JOURNAL_ENTRY_DATA.CREDIT_ACCOUNT_NO",
         "TRN_JOURNAL_ENTRY_DATA.CREDIT_SUB_ACCOUNT_NO",
         "TRN_JOURNAL_ENTRY_DATA.CREDIT_SUPPLIER_ID",
         "TRN_JOURNAL_ENTRY_DATA.CREDIT_AMMOUNT",
-        "TRN_JOURNAL_ENTRY_DATA.CREDIT_TAX_CLASS_NO",
-        "TRN_JOURNAL_ENTRY_DATA.CREDIT_TAX_RATE_NO",
+        "TRN_JOURNAL_ENTRY_DATA.credit_tax_class_id",
+        "TRN_JOURNAL_ENTRY_DATA.credit_tax_rate_id",
         "TRN_JOURNAL_ENTRY_DATA.ABSTRACT",
         "TRN_JOURNAL_ENTRY_DATA.ROW_NO",
         "TRN_JOURNAL_ENTRY_DATA.EXCEL_ROW_NO",
@@ -130,15 +130,15 @@ module JournalEntryData
           debit_sub_account_no: values[6],
           debit_supplier_id: values[7],
           debit_amount: values[8],
-          debit_tax_class_no: values[9],
-          debit_tax_rate_no: values[10],
+          debit_tax_class_id: values[9],
+          debit_tax_rate_id: values[10],
           credit_department_no: values[11],
           credit_account_no: values[12],
           credit_sub_account_no: values[13],
           credit_supplier_id: values[14],
           credit_amount: values[15],
-          credit_tax_class_no: values[16],
-          credit_tax_rate_no: values[17],
+          credit_tax_class_id: values[16],
+          credit_tax_rate_id: values[17],
           abstract: values[18],
           row_no: values[19],
           excel_row_no: values[20],
@@ -207,8 +207,8 @@ module JournalEntryData
           2,
           row.debit_supplier_id,
           row.debit_amount,
-          row.debit_tax_class_no,
-          row.debit_tax_rate_no
+          row.debit_tax_class_id,
+          rate_value_for(row.debit_tax_rate_id)
         ].map { |value| value.to_s }
 
         credit_text = [
@@ -218,8 +218,8 @@ module JournalEntryData
           2,
           row.credit_supplier_id,
           row.credit_amount,
-          row.credit_tax_class_no,
-          row.credit_tax_rate_no
+          row.credit_tax_class_id,
+          rate_value_for(row.credit_tax_rate_id)
         ].map { |value| value.to_s }
 
         line = ([section, formatted_date] + debit_text + credit_text + [row.abstract.to_s]).join(",")
@@ -241,6 +241,16 @@ module JournalEntryData
       end
       buffer.rewind
       buffer.read
+    end
+
+    def rate_value_for(tax_rate_id)
+      return nil if tax_rate_id.blank?
+
+      tax_rate_cache[tax_rate_id] ||= TaxRate.find_by(id: tax_rate_id)&.rate
+    end
+
+    def tax_rate_cache
+      @tax_rate_cache ||= {}
     end
 
     # JournalEntryDataListApplication::ExecuteFlg()

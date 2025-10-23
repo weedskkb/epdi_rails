@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2024_06_07_010707) do
+ActiveRecord::Schema[8.0].define(version: 2024_06_07_010808) do
   create_table "MST_ACCOUNT", primary_key: "ACCOUNT_NO", id: :integer, charset: "utf8mb4", collation: "utf8mb4_general_ci", force: :cascade do |t|
     t.string "ACCOUNT_NAME", null: false
     t.boolean "DELETE_FLG", default: false, null: false
@@ -22,8 +22,8 @@ ActiveRecord::Schema[8.0].define(version: 2024_06_07_010707) do
 
   create_table "MST_CAPTURE_CATEGORY", primary_key: "CAPTURE_CATEGORY_NO", id: :integer, charset: "utf8mb4", collation: "utf8mb4_general_ci", force: :cascade do |t|
     t.string "CAPTURE_CATEGORY_NAME", null: false
-    t.integer "TAX_CLASS_NO"
-    t.integer "TAX_RATE"
+    t.integer "tax_class_id"
+    t.integer "tax_rate_id"
     t.integer "supplier_id"
     t.integer "supplier_company_id"
     t.integer "DEBIT_DEPARTMENT_NO"
@@ -64,14 +64,14 @@ ActiveRecord::Schema[8.0].define(version: 2024_06_07_010707) do
     t.integer "DEBIT_ACCOUNT_NO"
     t.integer "DEBIT_SUB_ACCOUNT_NO"
     t.integer "debit_supplier_id"
-    t.integer "DEBIT_TAX_RATE"
-    t.integer "DEBIT_TAX_CLASS"
+    t.integer "debit_tax_rate_id"
+    t.integer "debit_tax_class_id"
     t.integer "CREDIT_DEPARTMENT_NO"
     t.integer "CREDIT_ACCOUNT_NO"
     t.integer "CREDIT_SUB_ACCOUNT_NO"
     t.integer "credit_supplier_id"
-    t.integer "CREDIT_TAX_RATE"
-    t.integer "CREDIT_TAX_CLASS"
+    t.integer "credit_tax_rate_id"
+    t.integer "credit_tax_class_id"
     t.boolean "FIXED_AMOUNT_FLG", default: false, null: false
     t.integer "FIXED_AMOUNT"
     t.boolean "FILTER_RATIO_FLG", default: false, null: false
@@ -102,24 +102,6 @@ ActiveRecord::Schema[8.0].define(version: 2024_06_07_010707) do
     t.index ["ACCOUNT_NO", "SUB_ACCOUNT_NO"], name: "IX_MST_SUB_ACCOUNT_ACCOUNT_NO", unique: true
   end
 
-  create_table "MST_TAX_CLASS", primary_key: "TAX_CLASS_NO", id: :integer, charset: "utf8mb4", collation: "utf8mb4_general_ci", force: :cascade do |t|
-    t.string "TAX_CLASS_NAME", null: false
-    t.boolean "DELETE_FLG", default: false, null: false
-    t.integer "CREATE_USER_ID", null: false
-    t.datetime "CREATE_DATE", null: false
-    t.integer "UPDATE_USER_ID"
-    t.datetime "UPDATE_DATE"
-  end
-
-  create_table "MST_TAX_RATE", primary_key: "TAX_RATE_NO", id: :integer, charset: "utf8mb4", collation: "utf8mb4_general_ci", force: :cascade do |t|
-    t.integer "TAX_RATE", null: false
-    t.boolean "DELETE_FLG", default: false, null: false
-    t.integer "CREATE_USER_ID", null: false
-    t.datetime "CREATE_DATE", null: false
-    t.integer "UPDATE_USER_ID"
-    t.datetime "UPDATE_DATE"
-  end
-
   create_table "TRN_CAPTURE_DATA", primary_key: "CAPTURE_DATA_NO", id: :integer, charset: "utf8mb4", collation: "utf8mb4_general_ci", force: :cascade do |t|
     t.integer "CAPTURE_HISTORY_NO", null: false
     t.integer "ROW_NO", null: false
@@ -130,8 +112,8 @@ ActiveRecord::Schema[8.0].define(version: 2024_06_07_010707) do
     t.integer "SUB_ACCOUNT_NO"
     t.integer "AMMOUNT", null: false
     t.integer "SECOND_AMMOUNT", null: false
-    t.integer "TAX_CLASS_NO"
-    t.integer "TAX_RATE_NO"
+    t.integer "tax_class_id"
+    t.integer "tax_rate_id"
     t.datetime "CREATE_DATE", null: false
     t.integer "CREATE_USER_ID", null: false
     t.string "LIST_CD"
@@ -159,15 +141,15 @@ ActiveRecord::Schema[8.0].define(version: 2024_06_07_010707) do
     t.integer "DEBIT_ACCOUNT_NO"
     t.integer "DEBIT_SUB_ACCOUNT_NO"
     t.integer "DEBIT_AMMOUNT"
-    t.integer "DEBIT_TAX_CLASS_NO"
-    t.integer "DEBIT_TAX_RATE_NO"
+    t.integer "debit_tax_class_id"
+    t.integer "debit_tax_rate_id"
     t.integer "debit_supplier_id"
     t.integer "CREDIT_DEPARTMENT_NO"
     t.integer "CREDIT_ACCOUNT_NO"
     t.integer "CREDIT_SUB_ACCOUNT_NO"
     t.integer "CREDIT_AMMOUNT"
-    t.integer "CREDIT_TAX_CLASS_NO"
-    t.integer "CREDIT_TAX_RATE_NO"
+    t.integer "credit_tax_class_id"
+    t.integer "credit_tax_rate_id"
     t.integer "credit_supplier_id"
     t.string "ABSTRACT"
     t.datetime "CREATE_DATE", null: false
@@ -197,6 +179,24 @@ ActiveRecord::Schema[8.0].define(version: 2024_06_07_010707) do
 
   create_table "suppliers", id: :integer, charset: "utf8mb4", collation: "utf8mb4_general_ci", force: :cascade do |t|
     t.string "name", null: false
+    t.boolean "delete_flg", default: false, null: false
+    t.integer "created_by_id", null: false
+    t.datetime "created_at", null: false
+    t.integer "updated_by_id"
+    t.datetime "updated_at"
+  end
+
+  create_table "tax_classes", id: :integer, charset: "utf8mb4", collation: "utf8mb4_general_ci", force: :cascade do |t|
+    t.string "name", null: false
+    t.boolean "delete_flg", default: false, null: false
+    t.integer "created_by_id", null: false
+    t.datetime "created_at", null: false
+    t.integer "updated_by_id"
+    t.datetime "updated_at"
+  end
+
+  create_table "tax_rates", id: :integer, charset: "utf8mb4", collation: "utf8mb4_general_ci", force: :cascade do |t|
+    t.integer "rate", null: false
     t.boolean "delete_flg", default: false, null: false
     t.integer "created_by_id", null: false
     t.datetime "created_at", null: false

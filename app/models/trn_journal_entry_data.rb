@@ -12,14 +12,10 @@ class TrnJournalEntryData < ApplicationRecord
   alias_attribute :debit_department_no, "DEBIT_DEPARTMENT_NO"
   alias_attribute :debit_account_no, "DEBIT_ACCOUNT_NO"
   alias_attribute :debit_sub_account_no, "DEBIT_SUB_ACCOUNT_NO"
-  alias_attribute :debit_tax_rate_no, "DEBIT_TAX_RATE_NO"
-  alias_attribute :debit_tax_class_no, "DEBIT_TAX_CLASS_NO"
   alias_attribute :debit_amount, "DEBIT_AMMOUNT"
   alias_attribute :credit_department_no, "CREDIT_DEPARTMENT_NO"
   alias_attribute :credit_account_no, "CREDIT_ACCOUNT_NO"
   alias_attribute :credit_sub_account_no, "CREDIT_SUB_ACCOUNT_NO"
-  alias_attribute :credit_tax_rate_no, "CREDIT_TAX_RATE_NO"
-  alias_attribute :credit_tax_class_no, "CREDIT_TAX_CLASS_NO"
   alias_attribute :credit_amount, "CREDIT_AMMOUNT"
   alias_attribute :create_date, "CREATE_DATE"
   alias_attribute :create_user_id, "CREATE_USER_ID"
@@ -28,4 +24,8 @@ class TrnJournalEntryData < ApplicationRecord
 
   belongs_to :journal_entry_history, class_name: "TrnJournalEntryHistory", foreign_key: "JOURNAL_ENTRY_HISTORY_NO", optional: true
   belongs_to :company, class_name: "Company", foreign_key: :company_id, optional: true
+  belongs_to :debit_tax_rate, class_name: "TaxRate", foreign_key: :debit_tax_rate_id, optional: true
+  belongs_to :debit_tax_class, class_name: "TaxClass", foreign_key: :debit_tax_class_id, optional: true
+  belongs_to :credit_tax_rate, class_name: "TaxRate", foreign_key: :credit_tax_rate_id, optional: true
+  belongs_to :credit_tax_class, class_name: "TaxClass", foreign_key: :credit_tax_class_id, optional: true
 end

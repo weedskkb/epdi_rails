@@ -29,11 +29,13 @@ class JournalEntryPatternsController < ApplicationController
       :debit_account,
       :debit_sub_account,
       :debit_supplier,
+      :debit_tax_rate,
       :debit_tax_class,
       :credit_department,
       :credit_account,
       :credit_sub_account,
       :credit_supplier,
+      :credit_tax_rate,
       :credit_tax_class,
     )
   end
@@ -53,14 +55,14 @@ class JournalEntryPatternsController < ApplicationController
       :debit_account_no,
       :debit_sub_account_no,
       :debit_supplier_id,
-      :debit_tax_rate,
-      :debit_tax_class_no,
+      :debit_tax_rate_id,
+      :debit_tax_class_id,
       :credit_department_no,
       :credit_account_no,
       :credit_sub_account_no,
       :credit_supplier_id,
-      :credit_tax_rate,
-      :credit_tax_class_no,
+      :credit_tax_rate_id,
+      :credit_tax_class_id,
       :fixed_amount_flag,
       :fixed_amount,
       :filter_ratio_flag,
@@ -97,9 +99,12 @@ class JournalEntryPatternsController < ApplicationController
       ["#{supplier.id} #{supplier.name}", supplier.id]
     end
 
-    @tax_class_options = TaxClass.active.order(:tax_class_no).map do |tax_class|
-      ["#{tax_class.tax_class_no} #{tax_class.tax_class_name}", tax_class.tax_class_no]
+    @tax_class_options = TaxClass.active.order(:id).map do |tax_class|
+      ["#{tax_class.id} #{tax_class.name}", tax_class.id]
     end
 
+    @tax_rate_options = TaxRate.active.order(:id).map do |tax_rate|
+      ["#{tax_rate.rate}%", tax_rate.id]
+    end
   end
 end
