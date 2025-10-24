@@ -338,9 +338,9 @@ module CapturePaymentData
             payment_month = payment_month_from_term(target_month_value, term)
             history = find_or_create_store_history(payment_month)
 
-            account_no = cell_integer(sheet, 5, col_idx)
-            sub_account_no = cell_integer(sheet, 7, col_idx)
-            list_cd = [account_no, sub_account_no, supplier_id].map { |v| v.to_i }.join('-')
+            account_code = cell_integer(sheet, 5, col_idx)
+            account_sub_code = cell_integer(sheet, 7, col_idx)
+            list_cd = [account_code, account_sub_code, supplier_id].map { |v| v.to_i }.join('-')
 
             create_capture_data(
               capture_history_no: history.capture_history_no,
@@ -348,8 +348,8 @@ module CapturePaymentData
               company_id: company_id,
               department_id: department_id,
               supplier_id: supplier_id,
-              account_no: account_no,
-              sub_account_no: sub_account_no,
+              account_code: account_code,
+              account_sub_code: account_sub_code,
               list_cd: list_cd,
               amount: amount,
               second_amount: 0,
@@ -377,9 +377,9 @@ module CapturePaymentData
             amount = cell_integer(sheet, row_idx, col_idx)
             next unless amount
 
-            account_no = cell_integer(sheet, 3, col_idx)
-            sub_account_no = cell_integer(sheet, 5, col_idx)
-            list_cd = [account_no, sub_account_no, supplier_id].map { |v| v.to_i }.join('-')
+            account_code = cell_integer(sheet, 3, col_idx)
+            account_sub_code = cell_integer(sheet, 5, col_idx)
+            list_cd = [account_code, account_sub_code, supplier_id].map { |v| v.to_i }.join('-')
 
             create_capture_data(
               capture_history_no: history_no,
@@ -387,8 +387,8 @@ module CapturePaymentData
               company_id: company_id,
               department_id: department_id,
               supplier_id: supplier_id,
-              account_no: account_no,
-              sub_account_no: sub_account_no,
+              account_code: account_code,
+              account_sub_code: account_sub_code,
               list_cd: list_cd,
               amount: amount,
               second_amount: 0
@@ -446,13 +446,13 @@ module CapturePaymentData
             amount = cell_integer(sheet, row_idx, col_idx)
             next unless amount
 
-            account_no = expense_summary_account_for(col_idx)
+            account_code = expense_summary_account_for(col_idx)
             create_capture_data(
               capture_history_no: history_no,
               row_no: row_idx + 1,
               company_id: company_id,
               department_id: department_id,
-              account_no: account_no,
+              account_code: account_code,
               list_cd: capture_category.to_s,
               amount: amount,
               second_amount: 0
@@ -485,8 +485,8 @@ module CapturePaymentData
             company_id: department_company_id(department_id),
             department_id: department_id,
             supplier_id: category.supplier_id,
-            account_no: category.debit_account_no,
-            sub_account_no: category.debit_sub_account_no,
+            account_code: category.debit_account_code,
+            account_sub_code: category.debit_account_sub_code,
             list_cd: capture_category.to_s,
             amount: amount,
             second_amount: second_amount
@@ -520,8 +520,8 @@ module CapturePaymentData
         company_id: attrs[:company_id],
         department_id: attrs[:department_id],
         supplier_id: attrs[:supplier_id],
-        account_no: attrs[:account_no],
-        sub_account_no: attrs[:sub_account_no],
+        account_code: attrs[:account_code],
+        account_sub_code: attrs[:account_sub_code],
         list_cd: attrs[:list_cd],
         amount: attrs[:amount],
         second_amount: attrs[:second_amount] || 0,

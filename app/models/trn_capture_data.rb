@@ -7,8 +7,6 @@ class TrnCaptureData < ApplicationRecord
   alias_attribute :capture_data_no, "CAPTURE_DATA_NO"
   alias_attribute :capture_history_no, "CAPTURE_HISTORY_NO"
   alias_attribute :row_no, "ROW_NO"
-  alias_attribute :account_no, "ACCOUNT_NO"
-  alias_attribute :sub_account_no, "SUB_ACCOUNT_NO"
   alias_attribute :list_cd, "LIST_CD"
   alias_attribute :amount, "AMMOUNT"
   alias_attribute :second_amount, "SECOND_AMMOUNT"

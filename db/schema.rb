@@ -10,16 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2024_07_04_090000) do
-  create_table "MST_ACCOUNT", primary_key: "ACCOUNT_NO", id: :integer, charset: "utf8mb4", collation: "utf8mb4_general_ci", force: :cascade do |t|
-    t.string "ACCOUNT_NAME", null: false
-    t.boolean "DELETE_FLG", default: false, null: false
-    t.integer "CREATE_USER_ID", null: false
-    t.datetime "CREATE_DATE", null: false
-    t.integer "UPDATE_USER_ID"
-    t.datetime "UPDATE_DATE"
-  end
-
+ActiveRecord::Schema[8.0].define(version: 2024_07_05_101000) do
   create_table "MST_CAPTURE_CATEGORY", primary_key: "CAPTURE_CATEGORY_NO", id: :integer, charset: "utf8mb4", collation: "utf8mb4_general_ci", force: :cascade do |t|
     t.string "CAPTURE_CATEGORY_NAME", null: false
     t.integer "tax_class_id"
@@ -27,11 +18,11 @@ ActiveRecord::Schema[8.0].define(version: 2024_07_04_090000) do
     t.integer "supplier_id"
     t.integer "supplier_company_id"
     t.integer "debit_department_id"
-    t.integer "DEBIT_ACCOUNT_NO"
-    t.integer "DEBIT_SUB_ACCOUNT_NO"
+    t.integer "debit_account_code"
+    t.integer "debit_account_sub_code"
     t.integer "credit_department_id"
-    t.integer "CREDIT_ACCOUNT_NO"
-    t.integer "CREDIT_SUB_ACCOUNT_NO"
+    t.integer "credit_account_code"
+    t.integer "credit_account_sub_code"
     t.string "ABSTRACT"
     t.string "SUPPLIER_ABSTRACT"
     t.integer "JOURNAL_ENTRY_PATTERN_GROUP_NO", null: false
@@ -50,14 +41,14 @@ ActiveRecord::Schema[8.0].define(version: 2024_07_04_090000) do
     t.integer "DATE_PATTERN_NO", null: false
     t.integer "company_id"
     t.integer "debit_department_id"
-    t.integer "DEBIT_ACCOUNT_NO"
-    t.integer "DEBIT_SUB_ACCOUNT_NO"
+    t.integer "debit_account_code"
+    t.integer "debit_account_sub_code"
     t.integer "debit_supplier_id"
     t.integer "debit_tax_rate_id"
     t.integer "debit_tax_class_id"
     t.integer "credit_department_id"
-    t.integer "CREDIT_ACCOUNT_NO"
-    t.integer "CREDIT_SUB_ACCOUNT_NO"
+    t.integer "credit_account_code"
+    t.integer "credit_account_sub_code"
     t.integer "credit_supplier_id"
     t.integer "credit_tax_rate_id"
     t.integer "credit_tax_class_id"
@@ -79,26 +70,14 @@ ActiveRecord::Schema[8.0].define(version: 2024_07_04_090000) do
     t.datetime "UPDATE_DATE"
   end
 
-  create_table "MST_SUB_ACCOUNT", primary_key: "ID", id: :integer, charset: "utf8mb4", collation: "utf8mb4_general_ci", force: :cascade do |t|
-    t.integer "SUB_ACCOUNT_NO", null: false
-    t.string "SUB_ACCOUNT_NAME", null: false
-    t.integer "ACCOUNT_NO", null: false
-    t.boolean "DELETE_FLG", default: false, null: false
-    t.integer "CREATE_USER_ID", null: false
-    t.datetime "CREATE_DATE", null: false
-    t.integer "UPDATE_USER_ID"
-    t.datetime "UPDATE_DATE"
-    t.index ["ACCOUNT_NO", "SUB_ACCOUNT_NO"], name: "IX_MST_SUB_ACCOUNT_ACCOUNT_NO", unique: true
-  end
-
   create_table "TRN_CAPTURE_DATA", primary_key: "CAPTURE_DATA_NO", id: :integer, charset: "utf8mb4", collation: "utf8mb4_general_ci", force: :cascade do |t|
     t.integer "CAPTURE_HISTORY_NO", null: false
     t.integer "ROW_NO", null: false
     t.integer "company_id", null: false
     t.integer "department_id", null: false
     t.integer "supplier_id"
-    t.integer "ACCOUNT_NO"
-    t.integer "SUB_ACCOUNT_NO"
+    t.integer "account_code"
+    t.integer "account_sub_code"
     t.integer "AMMOUNT", null: false
     t.integer "SECOND_AMMOUNT", null: false
     t.integer "tax_class_id"
@@ -127,15 +106,15 @@ ActiveRecord::Schema[8.0].define(version: 2024_07_04_090000) do
     t.integer "company_id", null: false
     t.integer "department_id"
     t.integer "debit_department_id"
-    t.integer "DEBIT_ACCOUNT_NO"
-    t.integer "DEBIT_SUB_ACCOUNT_NO"
+    t.integer "debit_account_code"
+    t.integer "debit_account_sub_code"
     t.integer "DEBIT_AMMOUNT"
     t.integer "debit_tax_class_id"
     t.integer "debit_tax_rate_id"
     t.integer "debit_supplier_id"
     t.integer "credit_department_id"
-    t.integer "CREDIT_ACCOUNT_NO"
-    t.integer "CREDIT_SUB_ACCOUNT_NO"
+    t.integer "credit_account_code"
+    t.integer "credit_account_sub_code"
     t.integer "CREDIT_AMMOUNT"
     t.integer "credit_tax_class_id"
     t.integer "credit_tax_rate_id"
@@ -154,6 +133,16 @@ ActiveRecord::Schema[8.0].define(version: 2024_07_04_090000) do
     t.integer "CREATE_USER_ID", null: false
     t.datetime "CREATE_DATE", null: false
     t.index ["CAPTURE_CATEGORY_NO"], name: "fk_rails_98e1ec1471"
+  end
+
+  create_table "accounts", id: :integer, charset: "utf8mb4", collation: "utf8mb4_general_ci", force: :cascade do |t|
+    t.string "name", null: false
+    t.boolean "delete_flg", default: false, null: false
+    t.integer "created_by_id", null: false
+    t.datetime "created_at", null: false
+    t.integer "updated_by_id"
+    t.datetime "updated_at"
+    t.integer "code"
   end
 
   create_table "companies", id: :integer, charset: "utf8mb4", collation: "utf8mb4_general_ci", force: :cascade do |t|
@@ -175,6 +164,18 @@ ActiveRecord::Schema[8.0].define(version: 2024_07_04_090000) do
     t.integer "updated_by_id"
     t.datetime "updated_at"
     t.index ["company_id"], name: "index_departments_on_company_id"
+  end
+
+  create_table "sub_accounts", id: :integer, charset: "utf8mb4", collation: "utf8mb4_general_ci", force: :cascade do |t|
+    t.integer "sub_code", null: false
+    t.string "name", null: false
+    t.integer "code", null: false
+    t.boolean "delete_flg", default: false, null: false
+    t.integer "created_by_id", null: false
+    t.datetime "created_at", null: false
+    t.integer "updated_by_id"
+    t.datetime "updated_at"
+    t.index ["code", "sub_code"], name: "index_sub_accounts_on_code_and_sub_code", unique: true
   end
 
   create_table "suppliers", id: :integer, charset: "utf8mb4", collation: "utf8mb4_general_ci", force: :cascade do |t|
@@ -218,12 +219,12 @@ ActiveRecord::Schema[8.0].define(version: 2024_07_04_090000) do
     t.index ["updated_by_id"], name: "index_users_on_updated_by_id"
   end
 
-  add_foreign_key "MST_SUB_ACCOUNT", "MST_ACCOUNT", column: "ACCOUNT_NO", primary_key: "ACCOUNT_NO"
-  add_foreign_key "MST_SUB_ACCOUNT", "MST_ACCOUNT", column: "ACCOUNT_NO", primary_key: "ACCOUNT_NO", name: "FK_MST_SUB_ACCOUNT_MST_ACCOUNT_ACCOUNT_NO", on_delete: :cascade
   add_foreign_key "TRN_CAPTURE_DATA", "TRN_CAPTURE_HISTORY", column: "CAPTURE_HISTORY_NO", primary_key: "CAPTURE_HISTORY_NO"
   add_foreign_key "TRN_CAPTURE_DATA", "departments"
   add_foreign_key "TRN_JOURNAL_ENTRY_HISTORY", "MST_CAPTURE_CATEGORY", column: "CAPTURE_CATEGORY_NO", primary_key: "CAPTURE_CATEGORY_NO"
   add_foreign_key "departments", "companies", name: "fk_departments_company", on_delete: :cascade
+  add_foreign_key "sub_accounts", "accounts", column: "code"
+  add_foreign_key "sub_accounts", "accounts", column: "code"
   add_foreign_key "users", "users", column: "created_by_id", name: "fk_users_created_by"
   add_foreign_key "users", "users", column: "updated_by_id", name: "fk_users_updated_by"
 end

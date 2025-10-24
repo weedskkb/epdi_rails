@@ -4,6 +4,6 @@ class AccountStructuresController < ApplicationController
   before_action :require_login!
 
   def index
-    @accounts = Account.includes(:sub_accounts).order(:account_no)
+    @accounts = Account.includes(:sub_accounts).order(:code)
   end
 end

@@ -69,9 +69,9 @@
   <table>
     <thead>
       <tr>
-        <th class="wrap">勘定科目NO<span class="column-key">ACCOUNT_NO</span></th>
-        <th class="wrap">勘定科目名<span class="column-key">ACCOUNT_NAME</span></th>
-        <th class="wrap">削除フラグ<span class="column-key">DELETE_FLG</span></th>
+        <th class="wrap">勘定科目コード<span class="column-key">code</span></th>
+        <th class="wrap">勘定科目名<span class="column-key">name</span></th>
+        <th class="wrap">削除フラグ<span class="column-key">delete_flg</span></th>
         <th class="wrap">補助科目数</th>
         <th class="wrap">補助科目一覧</th>
       </tr>
@@ -79,16 +79,16 @@
     <tbody>
       <% @accounts.each do |account| %>
         <tr>
-          <td class="wrap"><%= account.account_no %></td>
-          <td class="wrap"><%= account.account_name %></td>
+          <td class="wrap"><%= account.code %></td>
+          <td class="wrap"><%= account.name %></td>
           <td class="wrap flag"><%= account.delete_flg ? "有" : "無" %></td>
           <td class="wrap"><%= account.sub_accounts.size %></td>
           <td class="wrap">
             <% if account.sub_accounts.any? %>
               <span class="sub-account-list">
                 <%= safe_join(
-                      account.sub_accounts.sort_by(&:sub_account_no).map do |sub_account|
-                        "#{sub_account.sub_account_no} #{sub_account.sub_account_name}"
+                      account.sub_accounts.sort_by(&:sub_code).map do |sub_account|
+                        "#{sub_account.sub_code} #{sub_account.name}"
                       end,
                       tag.br
                     ) %>

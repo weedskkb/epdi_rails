@@ -76,13 +76,13 @@
           <td class="number"><%= entry.company_id %></td>
           <td><%= entry.date&.respond_to?(:strftime) ? entry.date.strftime("%Y/%m/%d") : entry.date %></td>
           <td class="number"><%= entry.debit_department_id %></td>
-          <td class="number"><%= entry.debit_account_no %></td>
-          <td class="number"><%= entry.debit_sub_account_no %></td>
+          <td class="number"><%= entry.debit_account_code %></td>
+          <td class="number"><%= entry.debit_account_sub_code %></td>
           <td class="number"><%= entry.debit_supplier_id %></td>
           <td class="number"><%= entry.debit_amount %></td>
           <td class="number"><%= entry.credit_department_id %></td>
-          <td class="number"><%= entry.credit_account_no %></td>
-          <td class="number"><%= entry.credit_sub_account_no %></td>
+          <td class="number"><%= entry.credit_account_code %></td>
+          <td class="number"><%= entry.credit_account_sub_code %></td>
           <td class="number"><%= entry.credit_supplier_id %></td>
           <td class="number"><%= entry.credit_amount %></td>
           <td><%= entry.abstract %></td>

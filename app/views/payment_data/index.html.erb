@@ -12,8 +12,8 @@
       <th>部門NO</th>
       <th>部門名</th>
       <th>仕入先ID</th>
-      <th>勘定科目NO</th>
-      <th>補助科目NO</th>
+      <th>勘定科目コード</th>
+      <th>補助科目コード</th>
       <th>リストCD</th>
       <th>金額</th>
       <th>第二金額</th>
@@ -34,8 +34,8 @@
         <td><%= row.department_id %></td>
         <td><%= row.department&.department_name %></td>
         <td><%= row.supplier_id %></td>
-        <td><%= row.account_no %></td>
-        <td><%= row.sub_account_no %></td>
+        <td><%= row.account_code %></td>
+        <td><%= row.account_sub_code %></td>
         <td><%= row.list_cd %></td>
         <td><%= number_to_currency(row.amount, unit: "¥", precision: 0) %></td>
         <td><%= number_to_currency(row.second_amount, unit: "¥", precision: 0) %></td>

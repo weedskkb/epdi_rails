@@ -63,20 +63,20 @@
   <table>
     <thead>
       <tr>
-        <th class="wrap">ID<span class="column-key">ID</span></th>
-        <th class="wrap">補助科目NO<span class="column-key">SUB_ACCOUNT_NO</span></th>
-        <th class="wrap">補助科目名<span class="column-key">SUB_ACCOUNT_NAME</span></th>
-        <th class="wrap">勘定科目<span class="column-key">ACCOUNT_NO</span></th>
-        <th class="wrap">削除フラグ<span class="column-key">DELETE_FLG</span></th>
+        <th class="wrap">ID<span class="column-key">id</span></th>
+        <th class="wrap">補助科目コード<span class="column-key">sub_code</span></th>
+        <th class="wrap">補助科目名<span class="column-key">name</span></th>
+        <th class="wrap">勘定科目コード<span class="column-key">code</span></th>
+        <th class="wrap">削除フラグ<span class="column-key">delete_flg</span></th>
       </tr>
     </thead>
     <tbody>
       <% @sub_accounts.each do |sub_account| %>
         <tr>
           <td class="wrap"><%= sub_account.id %></td>
-          <td class="wrap"><%= sub_account.sub_account_no %></td>
-          <td class="wrap"><%= sub_account.sub_account_name %></td>
-          <td class="wrap"><%= display_reference(sub_account.account_no, sub_account.account&.account_name) %></td>
+          <td class="wrap"><%= sub_account.sub_code %></td>
+          <td class="wrap"><%= sub_account.name %></td>
+          <td class="wrap"><%= display_reference(sub_account.code, sub_account.account&.name) %></td>
           <td class="wrap flag"><%= sub_account.delete_flg ? "有" : "無" %></td>
         </tr>
       <% end %>

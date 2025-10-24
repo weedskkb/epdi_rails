@@ -26,14 +26,10 @@ class JournalEntryPatternsController < ApplicationController
     JournalEntryPattern.includes(
       :company,
       :debit_department,
-      :debit_account,
-      :debit_sub_account,
       :debit_supplier,
       :debit_tax_rate,
       :debit_tax_class,
       :credit_department,
-      :credit_account,
-      :credit_sub_account,
       :credit_supplier,
       :credit_tax_rate,
       :credit_tax_class,
@@ -52,14 +48,14 @@ class JournalEntryPatternsController < ApplicationController
       :date_pattern_no,
       :company_id,
       :debit_department_id,
-      :debit_account_no,
-      :debit_sub_account_no,
+      :debit_account_code,
+      :debit_account_sub_code,
       :debit_supplier_id,
       :debit_tax_rate_id,
       :debit_tax_class_id,
       :credit_department_id,
-      :credit_account_no,
-      :credit_sub_account_no,
+      :credit_account_code,
+      :credit_account_sub_code,
       :credit_supplier_id,
       :credit_tax_rate_id,
       :credit_tax_class_id,
@@ -87,12 +83,8 @@ class JournalEntryPatternsController < ApplicationController
       ["#{department.id} #{department.department_name}", department.id]
     end
 
-    @account_options = Account.active.order(:account_no).map do |account|
-      ["#{account.account_no} #{account.account_name}", account.account_no]
-    end
-
-    @sub_account_options = SubAccount.active.order(:account_no, :sub_account_no).map do |sub_account|
-      ["#{sub_account.sub_account_no} #{sub_account.sub_account_name}", sub_account.sub_account_no]
+    @account_options = Account.active.order(:code).map do |account|
+      ["#{account.code} #{account.name}", account.code]
     end
 
     @supplier_options = Supplier.active.order(:id).map do |supplier|

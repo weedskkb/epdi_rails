@@ -117,19 +117,19 @@ module JournalEntryData
           patterns.each do |pattern|
             next if skip_store_pattern_row?(pattern, row.company_id)
 
-            debit_account = account_for(pattern["DEBIT_ACCOUNT_NO"], capture_category.capture_category_no, "debit")
-            credit_account = account_for(pattern["CREDIT_ACCOUNT_NO"], capture_category.capture_category_no, "credit")
+            debit_account_code = account_for(pattern.debit_account_code, capture_category.capture_category_no, "debit")
+            credit_account_code = account_for(pattern.credit_account_code, capture_category.capture_category_no, "credit")
 
-            debit_amount = amount_for(pattern, row, "debit", debit_account)
-            credit_amount = amount_for(pattern, row, "credit", credit_account)
+            debit_amount = amount_for(pattern, row, "debit", debit_account_code)
+            credit_amount = amount_for(pattern, row, "credit", credit_account_code)
 
             entry_hash = build_entry_hash(
               history: history,
               pattern: pattern,
               capture_category: capture_category,
               capture_row: row,
-              debit_account: debit_account,
-              credit_account: credit_account,
+              debit_account_code: debit_account_code,
+              credit_account_code: credit_account_code,
               debit_amount: debit_amount,
               credit_amount: credit_amount
             )
@@ -156,12 +156,12 @@ module JournalEntryData
             row[:row_no],
             row[:date],
             row[:debit_department_id],
-            row[:debit_account_no],
-            row[:debit_sub_account_no],
+            row[:debit_account_code],
+            row[:debit_account_sub_code],
             row[:debit_supplier_id],
             row[:credit_department_id],
-            row[:credit_account_no],
-            row[:credit_sub_account_no],
+            row[:credit_account_code],
+            row[:credit_account_sub_code],
             row[:credit_supplier_id],
             row[:abstract]
           ]
@@ -178,13 +178,13 @@ module JournalEntryData
             company_id: 1,  # ウィーズ
             department_id: 201,
             debit_department_id: key[2],
-            debit_account_no: key[3],
-            debit_sub_account_no: key[4],
+            debit_account_code: key[3],
+            debit_account_sub_code: key[4],
             debit_supplier_id: key[5],
             debit_amount: sum_amount(debit_sum),
             credit_department_id: key[6],
-            credit_account_no: key[7],
-            credit_sub_account_no: key[8],
+            credit_account_code: key[7],
+            credit_account_sub_code: key[8],
             credit_supplier_id: key[9],
             credit_amount: sum_amount(credit_sum),
             abstract: key[10],
@@ -197,7 +197,7 @@ module JournalEntryData
     end
 
     # JournalEntryDataListApplication::Create()
-    def build_entry_hash(history:, pattern:, capture_category:, capture_row:, debit_account:, credit_account:, debit_amount:, credit_amount:)
+    def build_entry_hash(history:, pattern:, capture_category:, capture_row:, debit_account_code:, credit_account_code:, debit_amount:, credit_amount:)
       {
         journal_entry_history_no: history.journal_entry_history_no,
         row_no: pattern["ROW_NO"],
@@ -206,15 +206,17 @@ module JournalEntryData
         company_id: company_for(pattern.company_id, capture_row.company_id, capture_category.capture_category_no),
         department_id: capture_row.department_id,
         debit_department_id: department_for(pattern.debit_department_id, capture_row.department_id, capture_row.company_id, capture_category.capture_category_no, "debit"),
-        debit_account_no: debit_account,
-        debit_sub_account_no: sub_account_for(pattern["DEBIT_SUB_ACCOUNT_NO"], capture_category.capture_category_no, "debit"),
+        debit_account_code: debit_account_code,
+        debit_account_sub_code: sub_account_for(pattern.debit_account_sub_code,
+                                               capture_category.capture_category_no, "debit"),
         debit_supplier_id: supplier_for(pattern.debit_supplier_id, capture_row.company_id, capture_row.supplier_id, capture_category.capture_category_no),
         debit_amount: debit_amount,
         debit_tax_class_id: tax_class_for(pattern.debit_tax_class_id, capture_category.capture_category_no),
         debit_tax_rate_id: tax_rate_for(pattern.debit_tax_rate_id, capture_category.capture_category_no),
         credit_department_id: department_for(pattern.credit_department_id, capture_row.department_id, capture_row.company_id, capture_category.capture_category_no, "credit"),
-        credit_account_no: credit_account,
-        credit_sub_account_no: sub_account_for(pattern["CREDIT_SUB_ACCOUNT_NO"], capture_category.capture_category_no, "credit"),
+        credit_account_code: credit_account_code,
+        credit_account_sub_code: sub_account_for(pattern.credit_account_sub_code,
+                                                 capture_category.capture_category_no, "credit"),
         credit_supplier_id: supplier_for(pattern.credit_supplier_id, capture_row.company_id, capture_row.supplier_id, capture_category.capture_category_no),
         credit_amount: credit_amount,
         credit_tax_class_id: tax_class_for(pattern.credit_tax_class_id, capture_category.capture_category_no),
@@ -240,15 +242,15 @@ module JournalEntryData
         company_id: attributes[:company_id],
         department_id: attributes[:department_id],
         debit_department_id: attributes[:debit_department_id],
-        debit_account_no: attributes[:debit_account_no],
-        debit_sub_account_no: attributes[:debit_sub_account_no],
+        debit_account_code: attributes[:debit_account_code],
+        debit_account_sub_code: attributes[:debit_account_sub_code],
         debit_supplier_id: attributes[:debit_supplier_id],
         debit_amount: attributes[:debit_amount],
         debit_tax_class_id: attributes[:debit_tax_class_id],
         debit_tax_rate_id: attributes[:debit_tax_rate_id],
         credit_department_id: attributes[:credit_department_id],
-        credit_account_no: attributes[:credit_account_no],
-        credit_sub_account_no: attributes[:credit_sub_account_no],
+        credit_account_code: attributes[:credit_account_code],
+        credit_account_sub_code: attributes[:credit_account_sub_code],
         credit_supplier_id: attributes[:credit_supplier_id],
         credit_amount: attributes[:credit_amount],
         credit_tax_class_id: attributes[:credit_tax_class_id],
@@ -263,7 +265,7 @@ module JournalEntryData
     def skip_expense_summary_row?(capture_category_no, capture_row)
       return false unless capture_category_no == CATEGORY_EXPENSE_SUMMARY
 
-      account_no = capture_row.account_no
+      account_code = capture_row.account_code
       row_number = capture_row.row_no
 
       # 832: 給与手当
@@ -271,16 +273,16 @@ module JournalEntryData
       # 866: 旅費交通費
       # 854: 福利厚生費
       skip_accounts = [836, 866, 854]
-      return false unless skip_accounts.include?(account_no)
+      return false unless skip_accounts.include?(account_code)
 
       data_in_row = TrnCaptureData.where(
         CAPTURE_HISTORY_NO: capture_row.capture_history_no,
         ROW_NO: row_number
       )
 
-      return true if data_in_row.where(ACCOUNT_NO: 832).exists?
-      return true if account_no == 854 && data_in_row.where(ACCOUNT_NO: [836, 866]).exists?
-      return true if account_no == 866 && data_in_row.where(ACCOUNT_NO: 836).exists?
+      return true if data_in_row.where(account_code: 832).exists?
+      return true if account_code == 854 && data_in_row.where(account_code: [836, 866]).exists?
+      return true if account_code == 866 && data_in_row.where(account_code: 836).exists?
 
       false
     end
@@ -290,7 +292,7 @@ module JournalEntryData
       return false unless pattern["JOURNAL_ENTRY_PATTERN_GROUP_NO"] == PATTERN_GROUP_STORE
 
       row_no = pattern["ROW_NO"]
-      debit_account = pattern["DEBIT_ACCOUNT_NO"]
+      debit_account = pattern.debit_account_code
 
       if company_id == 1  # ウィーズ
         row_no == 8
@@ -300,26 +302,26 @@ module JournalEntryData
     end
 
     # JournalEntryDataListApplication::GetAmmount()
-    def amount_for(pattern, capture_row, side, account_no)
+    def amount_for(pattern, capture_row, side, account_code)
       base_amount = capture_row.amount.to_i
       pattern_group = pattern["JOURNAL_ENTRY_PATTERN_GROUP_NO"]
 
       if pattern_group == PATTERN_GROUP_STORE
         case pattern["ROW_NO"]
         when 4
-          return nil if account_no.nil?
+          return nil if account_code.nil?
 
-          return capture_row.amount.to_i if account_no == 823 && capture_row.company_id == 1  # 医薬品仕入/ウィーズ
-          return capture_row.amount.to_i + capture_row.second_amount.to_i if account_no == 823
-          return capture_row.second_amount.to_i if account_no == 820
+          return capture_row.amount.to_i if account_code == 823 && capture_row.company_id == 1  # 医薬品仕入/ウィーズ
+          return capture_row.amount.to_i + capture_row.second_amount.to_i if account_code == 823
+          return capture_row.second_amount.to_i if account_code == 820
 
           capture_row.amount.to_i + capture_row.second_amount.to_i
         when 7, 8
-          return nil if account_no.nil?
+          return nil if account_code.nil?
 
-          if account_no == 823  # 医薬品仕入
+          if account_code == 823  # 医薬品仕入
             capture_row.amount.to_i
-          elsif [622, 620].include?(account_no)
+          elsif [622, 620].include?(account_code)
             capture_row.second_amount.to_i
           else
             capture_row.amount.to_i + capture_row.second_amount.to_i
@@ -335,19 +337,19 @@ module JournalEntryData
 
         case pattern["ROW_NO"]
         when 4
-          return nil if account_no.nil?
+          return nil if account_code.nil?
 
-          return same_row_scope.sum(:AMMOUNT).to_i if account_no == 418 # 関係会社未払金
-          return amount_for_account(same_row_scope, 832) if account_no == 832
-          return amount_for_account(same_row_scope, 866) if account_no == 866
-          return amount_for_account(same_row_scope, 836) if account_no == 836
-          return amount_for_account(same_row_scope, 854) if account_no == 854
+          return same_row_scope.sum(:AMMOUNT).to_i if account_code == 418 # 関係会社未払金
+          return amount_for_account(same_row_scope, 832) if account_code == 832
+          return amount_for_account(same_row_scope, 866) if account_code == 866
+          return amount_for_account(same_row_scope, 836) if account_code == 836
+          return amount_for_account(same_row_scope, 854) if account_code == 854
 
           0
         when 7
-          return nil if account_no.nil?
+          return nil if account_code.nil?
 
-          return same_row_scope.sum(:AMMOUNT).to_i if account_no == 418 # 関係会社未払金
+          return same_row_scope.sum(:AMMOUNT).to_i if account_code == 418 # 関係会社未払金
 
           if pattern["ABSTRACT"].to_s.include?("給与")
             return amount_for_account(same_row_scope, 832)
@@ -369,8 +371,8 @@ module JournalEntryData
     end
 
     # JournalEntryDataListApplication::GetAmmount()
-    def amount_for_account(scope, account_no)
-      record = scope.find_by(ACCOUNT_NO: account_no)
+    def amount_for_account(scope, account_code)
+      record = scope.find_by(account_code: account_code)
       record&.amount.to_i
     end
 
@@ -461,24 +463,24 @@ module JournalEntryData
     end
 
     # JournalEntryDataListApplication::getAccountNo()
-    def account_for(pattern_account_no, capture_category_no, side)
-      case pattern_account_no
+    def account_for(pattern_account_code, capture_category_no, side)
+      case pattern_account_code
       when 2
         category = capture_category(capture_category_no)
-        side == "debit" ? category.debit_account_no : category.credit_account_no
+        side == "debit" ? category.debit_account_code : category.credit_account_code
       else
-        pattern_account_no
+        pattern_account_code
       end
     end
 
     # JournalEntryDataListApplication::getSubAccountNo()
-    def sub_account_for(pattern_sub_account_no, capture_category_no, side)
-      case pattern_sub_account_no
+    def sub_account_for(pattern_sub_code, capture_category_no, side)
+      case pattern_sub_code
       when 999
         category = capture_category(capture_category_no)
-        side == "debit" ? category.debit_sub_account_no : category.credit_sub_account_no
+        side == "debit" ? category.debit_account_sub_code : category.credit_account_sub_code
       else
-        pattern_sub_account_no
+        pattern_sub_code
       end
     end
 

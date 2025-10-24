@@ -63,28 +63,28 @@
   <table>
     <thead>
       <tr>
-        <th class="wrap">勘定科目NO<span class="column-key">ACCOUNT_NO</span></th>
-        <th class="wrap">勘定科目名<span class="column-key">ACCOUNT_NAME</span></th>
-        <th class="wrap">勘定科目削除フラグ<span class="column-key">ACCOUNT.DELETE_FLG</span></th>
-        <th class="wrap">補助科目NO<span class="column-key">SUB_ACCOUNT_NO</span></th>
-        <th class="wrap">補助科目名<span class="column-key">SUB_ACCOUNT_NAME</span></th>
-        <th class="wrap">補助科目削除フラグ<span class="column-key">SUB_ACCOUNT.DELETE_FLG</span></th>
+        <th class="wrap">勘定科目コード<span class="column-key">accounts.code</span></th>
+        <th class="wrap">勘定科目名<span class="column-key">accounts.name</span></th>
+        <th class="wrap">勘定科目削除フラグ<span class="column-key">accounts.delete_flg</span></th>
+        <th class="wrap">補助科目コード<span class="column-key">sub_accounts.sub_code</span></th>
+        <th class="wrap">補助科目名<span class="column-key">sub_accounts.name</span></th>
+        <th class="wrap">補助科目削除フラグ<span class="column-key">sub_accounts.delete_flg</span></th>
       </tr>
     </thead>
     <tbody>
       <% @accounts.each do |account| %>
-        <% sub_accounts = account.sub_accounts.sort_by(&:sub_account_no) %>
+        <% sub_accounts = account.sub_accounts.sort_by(&:sub_code) %>
         <% rows = sub_accounts.presence || [nil] %>
         <% rows.each_with_index do |sub_account, index| %>
           <tr>
             <% if index.zero? %>
               <% rowspan = rows.size %>
-              <td class="wrap" rowspan="<%= rowspan %>"><%= account.account_no %></td>
-              <td class="wrap" rowspan="<%= rowspan %>"><%= account.account_name %></td>
+              <td class="wrap" rowspan="<%= rowspan %>"><%= account.code %></td>
+              <td class="wrap" rowspan="<%= rowspan %>"><%= account.name %></td>
               <td class="wrap flag" rowspan="<%= rowspan %>"><%= account.delete_flg ? "有" : "無" %></td>
             <% end %>
-            <td class="wrap"><%= sub_account&.sub_account_no || "-" %></td>
-            <td class="wrap"><%= sub_account&.sub_account_name || "-" %></td>
+            <td class="wrap"><%= sub_account&.sub_code || "-" %></td>
+            <td class="wrap"><%= sub_account&.name || "-" %></td>
             <td class="wrap flag">
               <% if sub_account.present? %>
                 <%= sub_account.delete_flg ? "有" : "無" %>
