@@ -29,7 +29,7 @@ module JournalEntryData
     def relation
       scope = TrnJournalEntryData.joins(:journal_entry_history)
       scope = scope.where("TRN_JOURNAL_ENTRY_HISTORY.PAYMENT_MONTH = ?", payment_month) if payment_month.present?
-      scope = scope.where("TRN_JOURNAL_ENTRY_HISTORY.CAPTURE_CATEGORY_NO = ?", supplier) if supplier.present?
+      scope = scope.where("TRN_JOURNAL_ENTRY_HISTORY.capture_category_id = ?", supplier) if supplier.present?
       scope = scope.where("TRN_JOURNAL_ENTRY_HISTORY.EXECUTE_FLG = ?", false) if except_already_output?
 
       scope.order(<<~SQL.squish)

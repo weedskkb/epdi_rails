@@ -34,9 +34,8 @@ class CapturePaymentDataViewModel
   end
 
   def capture_category_options
-    # CaptureCategory.active.order(:CAPTURE_CATEGORY_NO).pluck(:CAPTURE_CATEGORY_NAME, :CAPTURE_CATEGORY_NO)
-    CaptureCategory.active.order(:CAPTURE_CATEGORY_NO).map do |cc|
-      [cc.name_with_code, cc.capture_category_no.to_s]
+    CaptureCategory.active.order(:id).map do |cc|
+      [cc.name_with_code, cc.id.to_s]
     end
   end
   def capture_category

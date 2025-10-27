@@ -10,30 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2024_07_05_101000) do
-  create_table "MST_CAPTURE_CATEGORY", primary_key: "CAPTURE_CATEGORY_NO", id: :integer, charset: "utf8mb4", collation: "utf8mb4_general_ci", force: :cascade do |t|
-    t.string "CAPTURE_CATEGORY_NAME", null: false
-    t.integer "tax_class_id"
-    t.integer "tax_rate_id"
-    t.integer "supplier_id"
-    t.integer "supplier_company_id"
-    t.integer "debit_department_id"
-    t.integer "debit_account_code"
-    t.integer "debit_account_sub_code"
-    t.integer "credit_department_id"
-    t.integer "credit_account_code"
-    t.integer "credit_account_sub_code"
-    t.string "ABSTRACT"
-    t.string "SUPPLIER_ABSTRACT"
-    t.integer "JOURNAL_ENTRY_PATTERN_GROUP_NO", null: false
-    t.integer "PAYMENT_TERMS"
-    t.boolean "DELETE_FLG", default: false, null: false
-    t.integer "CREATE_USER_ID", null: false
-    t.datetime "CREATE_DATE", null: false
-    t.integer "UPDATE_USER_ID"
-    t.datetime "UPDATE_DATE"
-  end
-
+ActiveRecord::Schema[8.0].define(version: 2024_07_05_112000) do
   create_table "MST_JOURNAL_ENTRY_PATTERN", primary_key: "JOURNAL_ENTRY_PATTERN_NO", id: :integer, charset: "utf8mb4", collation: "utf8mb4_general_ci", force: :cascade do |t|
     t.integer "JOURNAL_ENTRY_PATTERN_GROUP_NO", null: false
     t.string "JOURNAL_ENTRY_PATTERN_NAME", null: false
@@ -90,12 +67,13 @@ ActiveRecord::Schema[8.0].define(version: 2024_07_05_101000) do
   end
 
   create_table "TRN_CAPTURE_HISTORY", primary_key: "CAPTURE_HISTORY_NO", id: :integer, charset: "utf8mb4", collation: "utf8mb4_general_ci", force: :cascade do |t|
-    t.integer "CAPTURE_CATEGORY_NO", null: false
+    t.integer "capture_category_id", null: false
     t.date "ACCRUAL_MONTH"
     t.date "PAYMENT_MONTH"
     t.boolean "LOCK_FLG", default: false, null: false
     t.integer "CREATE_USER_ID", null: false
     t.datetime "CREATE_DATE", null: false
+    t.index ["capture_category_id"], name: "fk_rails_6b3f99d39c"
   end
 
   create_table "TRN_JOURNAL_ENTRY_DATA", primary_key: "JOURNAL_ENTRY_DATA_NO", id: :integer, charset: "utf8mb4", collation: "utf8mb4_general_ci", force: :cascade do |t|
@@ -126,13 +104,13 @@ ActiveRecord::Schema[8.0].define(version: 2024_07_05_101000) do
 
   create_table "TRN_JOURNAL_ENTRY_HISTORY", primary_key: "JOURNAL_ENTRY_HISTORY_NO", id: :integer, charset: "utf8mb4", collation: "utf8mb4_general_ci", force: :cascade do |t|
     t.integer "CAPTURE_HISTORY_NO", null: false
-    t.integer "CAPTURE_CATEGORY_NO", null: false
+    t.integer "capture_category_id", null: false
     t.date "ACCRUAL_MONTH", null: false
     t.date "PAYMENT_MONTH", null: false
     t.boolean "EXECUTE_FLG", default: false, null: false
     t.integer "CREATE_USER_ID", null: false
     t.datetime "CREATE_DATE", null: false
-    t.index ["CAPTURE_CATEGORY_NO"], name: "fk_rails_98e1ec1471"
+    t.index ["capture_category_id"], name: "fk_rails_98e1ec1471"
   end
 
   create_table "accounts", id: :integer, charset: "utf8mb4", collation: "utf8mb4_general_ci", force: :cascade do |t|
@@ -143,6 +121,29 @@ ActiveRecord::Schema[8.0].define(version: 2024_07_05_101000) do
     t.integer "updated_by_id"
     t.datetime "updated_at"
     t.integer "code"
+  end
+
+  create_table "capture_categories", id: :integer, charset: "utf8mb4", collation: "utf8mb4_general_ci", force: :cascade do |t|
+    t.string "name", null: false
+    t.integer "tax_class_id"
+    t.integer "tax_rate_id"
+    t.integer "supplier_id"
+    t.integer "supplier_company_id"
+    t.integer "debit_department_id"
+    t.integer "debit_account_code"
+    t.integer "debit_account_sub_code"
+    t.integer "credit_department_id"
+    t.integer "credit_account_code"
+    t.integer "credit_account_sub_code"
+    t.string "abstract"
+    t.string "supplier_abstract"
+    t.integer "journal_entry_pattern_group_no", null: false
+    t.integer "payment_terms"
+    t.boolean "delete_flg", default: false, null: false
+    t.integer "created_by_id", null: false
+    t.datetime "created_at", null: false
+    t.integer "updated_by_id"
+    t.datetime "updated_at"
   end
 
   create_table "companies", id: :integer, charset: "utf8mb4", collation: "utf8mb4_general_ci", force: :cascade do |t|
@@ -221,7 +222,8 @@ ActiveRecord::Schema[8.0].define(version: 2024_07_05_101000) do
 
   add_foreign_key "TRN_CAPTURE_DATA", "TRN_CAPTURE_HISTORY", column: "CAPTURE_HISTORY_NO", primary_key: "CAPTURE_HISTORY_NO"
   add_foreign_key "TRN_CAPTURE_DATA", "departments"
-  add_foreign_key "TRN_JOURNAL_ENTRY_HISTORY", "MST_CAPTURE_CATEGORY", column: "CAPTURE_CATEGORY_NO", primary_key: "CAPTURE_CATEGORY_NO"
+  add_foreign_key "TRN_CAPTURE_HISTORY", "capture_categories"
+  add_foreign_key "TRN_JOURNAL_ENTRY_HISTORY", "capture_categories"
   add_foreign_key "departments", "companies", name: "fk_departments_company", on_delete: :cascade
   add_foreign_key "sub_accounts", "accounts", column: "code"
   add_foreign_key "sub_accounts", "accounts", column: "code"

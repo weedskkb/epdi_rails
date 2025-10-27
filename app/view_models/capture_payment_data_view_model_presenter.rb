@@ -1,7 +1,15 @@
 # frozen_string_literal: true
 
 class CapturePaymentDataViewModelPresenter
-  HistoryItem = Struct.new(:capture_date, :capture_category_no, :capture_category, :accrual_month, :payment_month, keyword_init: true)
+  HistoryItem = Struct.new(:capture_date, :capture_category_id, :capture_category_label, :accrual_month, :payment_month, keyword_init: true) do
+    def capture_category_no
+      capture_category_id
+    end
+
+    def capture_category
+      capture_category_label
+    end
+  end
 
   def self.build(current_user, view_model = CapturePaymentDataViewModel.new)
     new(current_user).build(view_model)
@@ -27,18 +35,18 @@ class CapturePaymentDataViewModelPresenter
       category = history.capture_category
       HistoryItem.new(
         capture_date: history.create_date&.strftime('%Y/%m/%d'),
-        capture_category_no: category.capture_category_no,
-        capture_category: format('%02d：%s', category.capture_category_no, category.capture_category_name),
+        capture_category_id: category.id,
+        capture_category_label: format('%02d：%s', category.id, category.name),
         accrual_month: normalize_month(history.accrual_month),
         payment_month: normalize_month(history.payment_month)
       )
     end
 
     view_model.capture_payment_data_item_view_models = items
-    view_model.store_data_capture_history = items.select { |item| item.capture_category_no == 16 }
-    view_model.fixed_data_capture_history = items.select { |item| item.capture_category_no == 24 }
-    view_model.whole_data_capture_history = items.select { |item| item.capture_category_no == 1 }
-    view_model.share_data_capture_history = items.reject { |item| [16, 24, 1].include?(item.capture_category_no) }
+    view_model.store_data_capture_history = items.select { |item| item.capture_category_id == 16 }
+    view_model.fixed_data_capture_history = items.select { |item| item.capture_category_id == 24 }
+    view_model.whole_data_capture_history = items.select { |item| item.capture_category_id == 1 }
+    view_model.share_data_capture_history = items.reject { |item| [16, 24, 1].include?(item.capture_category_id) }
   end
 
   def recent_histories

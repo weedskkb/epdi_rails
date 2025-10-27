@@ -68,7 +68,7 @@ module CapturePaymentData
     end
 
     def capture_category
-      view_model.capture_category.to_i
+      view_model.capture_category_id.to_i
     end
 
     def target_month_value
@@ -102,12 +102,12 @@ module CapturePaymentData
 
       exists = case capture_category
                when CATEGORY_STORE, CATEGORY_FIXED
-                 TrnCaptureHistory.exists?(CAPTURE_CATEGORY_NO: capture_category, ACCRUAL_MONTH: target_month_value)
+                 TrnCaptureHistory.exists?(capture_category_id: capture_category, ACCRUAL_MONTH: target_month_value)
                when CATEGORY_WHOLESALE
                  pm = next_month_string(target_month_value)
-                 TrnCaptureHistory.exists?(CAPTURE_CATEGORY_NO: capture_category, PAYMENT_MONTH: pm)
+                 TrnCaptureHistory.exists?(capture_category_id: capture_category, PAYMENT_MONTH: pm)
                else
-                 TrnCaptureHistory.exists?(CAPTURE_CATEGORY_NO: capture_category,
+                 TrnCaptureHistory.exists?(capture_category_id: capture_category,
                                           ACCRUAL_MONTH: accrual_month_value,
                                           PAYMENT_MONTH: payment_month_value)
                end
@@ -251,14 +251,14 @@ module CapturePaymentData
     def process_overwrite
       history_numbers = case capture_category
                         when CATEGORY_STORE, CATEGORY_FIXED
-                          TrnCaptureHistory.where(CAPTURE_CATEGORY_NO: capture_category,
+                          TrnCaptureHistory.where(capture_category_id: capture_category,
                                                    ACCRUAL_MONTH: target_month_value).pluck(:CAPTURE_HISTORY_NO)
                         when CATEGORY_WHOLESALE
                           pm = next_month_string(target_month_value)
-                          TrnCaptureHistory.where(CAPTURE_CATEGORY_NO: capture_category,
+                          TrnCaptureHistory.where(capture_category_id: capture_category,
                                                   PAYMENT_MONTH: pm).pluck(:CAPTURE_HISTORY_NO)
                         else
-                          TrnCaptureHistory.where(CAPTURE_CATEGORY_NO: capture_category,
+                          TrnCaptureHistory.where(capture_category_id: capture_category,
                                                   ACCRUAL_MONTH: accrual_month_value,
                                                   PAYMENT_MONTH: payment_month_value).pluck(:CAPTURE_HISTORY_NO)
                         end
@@ -294,7 +294,7 @@ module CapturePaymentData
     # CapturePaymentDataApplication::RecordHistory() - create entry
     def create_history(accrual_month: nil, payment_month:)
       TrnCaptureHistory.create!(
-        capture_category_no: capture_category,
+        capture_category_id: capture_category,
         accrual_month: accrual_month,
         payment_month: payment_month,
         lock_flg: false,
@@ -498,7 +498,7 @@ module CapturePaymentData
     # CapturePaymentDataApplication::existHistory()/getHistoryNo()
     def find_or_create_store_history(payment_month)
       TrnCaptureHistory.find_or_create_by!(
-        CAPTURE_CATEGORY_NO: capture_category,
+        capture_category_id: capture_category,
         ACCRUAL_MONTH: parse_month_string(target_month_value),
         PAYMENT_MONTH: parse_month_string(payment_month)
       ) do |history|

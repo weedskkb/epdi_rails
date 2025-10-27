@@ -69,7 +69,7 @@ module JournalEntryData
     def capture_history_numbers_without_journal_entries
       scope = TrnCaptureHistory.all
       scope = scope.where(PAYMENT_MONTH: payment_month_range) if payment_month_range
-      scope = scope.where(CAPTURE_CATEGORY_NO: form.supplier) unless form.supplier_all?
+      scope = scope.where(capture_category_id: form.supplier) unless form.supplier_all?
 
       scope
         .left_outer_joins(:journal_entry_histories)
@@ -86,7 +86,7 @@ module JournalEntryData
           capture_history_no: capture_history.capture_history_no,
           accrual_month: capture_history.accrual_month,
           payment_month: capture_history.payment_month,
-          capture_category_no: capture_history.capture_category_no,
+          capture_category_id: capture_history.capture_category_id,
           execute_flg: false,
           create_user_id: current_user_id,
           create_date: Time.zone.now
@@ -100,10 +100,10 @@ module JournalEntryData
     def create_journal_entry_data(history_ids)
       history_ids.each do |history_id|
         history = TrnJournalEntryHistory.find_by(journal_entry_history_no: history_id)
-        capture_category = capture_category(history.capture_category_no)
+        category = capture_category_record(history.capture_category_id)
 
         patterns = JournalEntryPattern
-                   .where(JOURNAL_ENTRY_PATTERN_GROUP_NO: capture_category.journal_entry_pattern_group_no)
+                   .where(JOURNAL_ENTRY_PATTERN_GROUP_NO: category.journal_entry_pattern_group_no)
                    .order(:ROW_NO, :JOURNAL_ENTRY_PATTERN_NO)
 
         capture_rows = TrnCaptureData
@@ -112,13 +112,13 @@ module JournalEntryData
 
         grouping_rows = []
         capture_rows.each do |row|
-          next if skip_expense_summary_row?(capture_category.capture_category_no, row)
+          next if skip_expense_summary_row?(category.id, row)
 
           patterns.each do |pattern|
             next if skip_store_pattern_row?(pattern, row.company_id)
 
-            debit_account_code = account_for(pattern.debit_account_code, capture_category.capture_category_no, "debit")
-            credit_account_code = account_for(pattern.credit_account_code, capture_category.capture_category_no, "credit")
+            debit_account_code = account_for(pattern.debit_account_code, category.id, "debit")
+            credit_account_code = account_for(pattern.credit_account_code, category.id, "credit")
 
             debit_amount = amount_for(pattern, row, "debit", debit_account_code)
             credit_amount = amount_for(pattern, row, "credit", credit_account_code)
@@ -126,7 +126,7 @@ module JournalEntryData
             entry_hash = build_entry_hash(
               history: history,
               pattern: pattern,
-              capture_category: capture_category,
+              capture_category: category,
               capture_row: row,
               debit_account_code: debit_account_code,
               credit_account_code: credit_account_code,
@@ -203,31 +203,31 @@ module JournalEntryData
         row_no: pattern["ROW_NO"],
         excel_row_no: capture_row.row_no,
         date: date_for(pattern["DATE_PATTERN_NO"], history.accrual_month, history.payment_month, form.fund_transfer_date),
-        company_id: company_for(pattern.company_id, capture_row.company_id, capture_category.capture_category_no),
+        company_id: company_for(pattern.company_id, capture_row.company_id, capture_category.id),
         department_id: capture_row.department_id,
-        debit_department_id: department_for(pattern.debit_department_id, capture_row.department_id, capture_row.company_id, capture_category.capture_category_no, "debit"),
+        debit_department_id: department_for(pattern.debit_department_id, capture_row.department_id, capture_row.company_id, capture_category.id, "debit"),
         debit_account_code: debit_account_code,
         debit_account_sub_code: sub_account_for(pattern.debit_account_sub_code,
-                                               capture_category.capture_category_no, "debit"),
-        debit_supplier_id: supplier_for(pattern.debit_supplier_id, capture_row.company_id, capture_row.supplier_id, capture_category.capture_category_no),
+                                               capture_category.id, "debit"),
+        debit_supplier_id: supplier_for(pattern.debit_supplier_id, capture_row.company_id, capture_row.supplier_id, capture_category.id),
         debit_amount: debit_amount,
-        debit_tax_class_id: tax_class_for(pattern.debit_tax_class_id, capture_category.capture_category_no),
-        debit_tax_rate_id: tax_rate_for(pattern.debit_tax_rate_id, capture_category.capture_category_no),
-        credit_department_id: department_for(pattern.credit_department_id, capture_row.department_id, capture_row.company_id, capture_category.capture_category_no, "credit"),
+        debit_tax_class_id: tax_class_for(pattern.debit_tax_class_id, capture_category.id),
+        debit_tax_rate_id: tax_rate_for(pattern.debit_tax_rate_id, capture_category.id),
+        credit_department_id: department_for(pattern.credit_department_id, capture_row.department_id, capture_row.company_id, capture_category.id, "credit"),
         credit_account_code: credit_account_code,
         credit_account_sub_code: sub_account_for(pattern.credit_account_sub_code,
-                                                 capture_category.capture_category_no, "credit"),
-        credit_supplier_id: supplier_for(pattern.credit_supplier_id, capture_row.company_id, capture_row.supplier_id, capture_category.capture_category_no),
+                                                 capture_category.id, "credit"),
+        credit_supplier_id: supplier_for(pattern.credit_supplier_id, capture_row.company_id, capture_row.supplier_id, capture_category.id),
         credit_amount: credit_amount,
-        credit_tax_class_id: tax_class_for(pattern.credit_tax_class_id, capture_category.capture_category_no),
-        credit_tax_rate_id: tax_rate_for(pattern.credit_tax_rate_id, capture_category.capture_category_no),
+        credit_tax_class_id: tax_class_for(pattern.credit_tax_class_id, capture_category.id),
+        credit_tax_rate_id: tax_rate_for(pattern.credit_tax_rate_id, capture_category.id),
         abstract: abstract_for(
           pattern["ABSTRACT"].to_s,
           history.accrual_month,
           history.payment_month,
           capture_row.department_id,
           capture_row.company_id,
-          capture_category.capture_category_no
+          capture_category.id
         )
       }
     end
@@ -262,8 +262,8 @@ module JournalEntryData
     end
 
     # JournalEntryDataListApplication::Create() - expense summary skip
-    def skip_expense_summary_row?(capture_category_no, capture_row)
-      return false unless capture_category_no == CATEGORY_EXPENSE_SUMMARY
+    def skip_expense_summary_row?(capture_category_id, capture_row)
+      return false unless capture_category_id == CATEGORY_EXPENSE_SUMMARY
 
       account_code = capture_row.account_code
       row_number = capture_row.row_no
@@ -427,19 +427,19 @@ module JournalEntryData
     end
 
     # JournalEntryDataListApplication::getCompanyNo()
-    def company_for(pattern_company_value, data_company_id, capture_category_no)
+    def company_for(pattern_company_value, data_company_id, capture_category_id)
       case pattern_company_value
       when 0
         data_company_id
       when 1
-        capture_category(capture_category_no).supplier_company_id || 1
+        capture_category_record(capture_category_id).supplier_company_id || 1
       else
         pattern_company_value
       end
     end
 
     # JournalEntryDataListApplication::getDepartmentNo()
-    def department_for(pattern_department_id, department_id, company_id, capture_category_no, side)
+    def department_for(pattern_department_id, department_id, company_id, capture_category_id, side)
       case pattern_department_id
       when 0
         department_id
@@ -455,7 +455,7 @@ module JournalEntryData
           company_id
         end
       when 2
-        category = capture_category(capture_category_no)
+        category = capture_category_record(capture_category_id)
         side == "debit" ? category.debit_department_id : category.credit_department_id
       else
         pattern_department_id
@@ -463,10 +463,10 @@ module JournalEntryData
     end
 
     # JournalEntryDataListApplication::getAccountNo()
-    def account_for(pattern_account_code, capture_category_no, side)
+    def account_for(pattern_account_code, capture_category_id, side)
       case pattern_account_code
       when 2
-        category = capture_category(capture_category_no)
+        category = capture_category_record(capture_category_id)
         side == "debit" ? category.debit_account_code : category.credit_account_code
       else
         pattern_account_code
@@ -474,10 +474,10 @@ module JournalEntryData
     end
 
     # JournalEntryDataListApplication::getSubAccountNo()
-    def sub_account_for(pattern_sub_code, capture_category_no, side)
+    def sub_account_for(pattern_sub_code, capture_category_id, side)
       case pattern_sub_code
       when 999
-        category = capture_category(capture_category_no)
+        category = capture_category_record(capture_category_id)
         side == "debit" ? category.debit_account_sub_code : category.credit_account_sub_code
       else
         pattern_sub_code
@@ -485,24 +485,24 @@ module JournalEntryData
     end
 
     # JournalEntryDataListApplication::getSupplierNo()
-    def supplier_for(pattern_supplier_id, company_id, supplier_id, capture_category_no)
+    def supplier_for(pattern_supplier_id, company_id, supplier_id, capture_category_id)
       case pattern_supplier_id
       when 0
         supplier_id
       when 1
         company(company_id)&.supplier_id
       when 2
-        capture_category(capture_category_no).supplier_id
+        capture_category_record(capture_category_id).supplier_id
       else
         pattern_supplier_id
       end
     end
 
     # JournalEntryDataListApplication::getTaxClass()
-    def tax_class_for(pattern_tax_class_id, capture_category_no)
+    def tax_class_for(pattern_tax_class_id, capture_category_id)
       case pattern_tax_class_id
       when 2
-        capture_category(capture_category_no).tax_class_id
+        capture_category_record(capture_category_id).tax_class_id
       else
         pattern_tax_class_id
       end
@@ -511,21 +511,21 @@ module JournalEntryData
     # JournalEntryDataListApplication::getTaxRate()
     PATTERN_TAX_RATE_USE_CAPTURE_CATEGORY = 2
 
-    def tax_rate_for(pattern_tax_rate_id, capture_category_no)
+    def tax_rate_for(pattern_tax_rate_id, capture_category_id)
       return nil if pattern_tax_rate_id.blank?
 
       rate_id = pattern_tax_rate_id.to_i
       if rate_id == PATTERN_TAX_RATE_USE_CAPTURE_CATEGORY
-        capture_category(capture_category_no).tax_rate_id
+        capture_category_record(capture_category_id).tax_rate_id
       else
         rate_id
       end
     end
 
     # JournalEntryDataListApplication::getAbstract()
-    def abstract_for(pattern_abstract, accrual_month, payment_month, store_no, company_id, capture_category_no)
+    def abstract_for(pattern_abstract, accrual_month, payment_month, store_no, company_id, capture_category_id)
       abstract = pattern_abstract.to_s.dup
-      category = capture_category(capture_category_no)
+      category = capture_category_record(capture_category_id)
 
       accrual_text = accrual_month ? format_month(accrual_month) : format_month(payment_month)
       payment_text = format_month(payment_month)
@@ -566,8 +566,8 @@ module JournalEntryData
       @department_cache ||= {}
     end
 
-    def capture_category(number)
-      capture_category_cache[number] ||= CaptureCategory.find(number)
+    def capture_category_record(id)
+      capture_category_cache[id] ||= CaptureCategory.find(id)
     end
 
     def company(number)

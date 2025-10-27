@@ -23,10 +23,10 @@ class JournalEntryDataListForm
   end
 
   def supplier_options
-    CaptureCategory.active.order(:CAPTURE_CATEGORY_NO).map do |category|
+    CaptureCategory.active.order(:id).map do |category|
       [
-        format("%02d %s", category.capture_category_no, category.capture_category_name),
-        category.capture_category_no
+        format("%02d %s", category.id, category.name),
+        category.id
       ]
     end
   end

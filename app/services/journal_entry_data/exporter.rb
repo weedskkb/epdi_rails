@@ -34,7 +34,7 @@ module JournalEntryData
       :row_no,
       :excel_row_no,
       :create_date,
-      :capture_category_no,
+      :capture_category_id,
       keyword_init: true
     )
 
@@ -85,7 +85,7 @@ module JournalEntryData
       if form.payment_month_date.present?
         scope = scope.where("TRN_JOURNAL_ENTRY_HISTORY.PAYMENT_MONTH = ?", form.payment_month_date)
       end
-      scope = scope.where("TRN_JOURNAL_ENTRY_HISTORY.CAPTURE_CATEGORY_NO = ?", form.supplier) unless form.supplier_all?
+      scope = scope.where("TRN_JOURNAL_ENTRY_HISTORY.capture_category_id = ?", form.supplier) unless form.supplier_all?
       scope = scope.where("TRN_JOURNAL_ENTRY_HISTORY.EXECUTE_FLG = ?", false) if form.except_already_output?
 
       scope = scope.order(<<~SQL.squish)
@@ -118,7 +118,7 @@ module JournalEntryData
         "TRN_JOURNAL_ENTRY_DATA.ROW_NO",
         "TRN_JOURNAL_ENTRY_DATA.EXCEL_ROW_NO",
         "TRN_JOURNAL_ENTRY_DATA.CREATE_DATE",
-        "TRN_JOURNAL_ENTRY_HISTORY.CAPTURE_CATEGORY_NO"
+        "TRN_JOURNAL_ENTRY_HISTORY.capture_category_id"
       ).map do |values|
         Row.new(
           journal_entry_history_no: values[0],
@@ -143,7 +143,7 @@ module JournalEntryData
           row_no: values[19],
           excel_row_no: values[20],
           create_date: values[21],
-          capture_category_no: values[22]
+          capture_category_id: values[22]
         )
       end
     end
@@ -263,7 +263,7 @@ module JournalEntryData
 
     # JournalEntryDataListApplication::CreateCsvFolder()
     def requires_additional_split?(row)
-      [LOGISTICS_CATEGORY, LABOR_COST_CATEGORY].include?(row.capture_category_no.to_i)
+      [LOGISTICS_CATEGORY, LABOR_COST_CATEGORY].include?(row.capture_category_id.to_i)
     end
 
     # JournalEntryDataListApplication::CreateCsvFolder()

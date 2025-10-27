@@ -15,7 +15,7 @@ class CaptureCategoriesController < ApplicationController
                               :debit_department,
                               :credit_department
                             )
-                            .order(:capture_category_no)
+                            .order(:id)
   end
 
   def edit; end
@@ -37,7 +37,7 @@ class CaptureCategoriesController < ApplicationController
 
   def capture_category_params
     params.require(:capture_category).permit(
-      :capture_category_name,
+      :name,
       :tax_class_id,
       :tax_rate_id,
       :supplier_id,

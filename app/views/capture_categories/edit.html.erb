@@ -114,13 +114,13 @@
   <%= form_with model: @capture_category, local: true do |form| %>
     <div class="form-grid">
       <div class="form-group">
-        <label>取込区分NO</label>
-        <div class="readonly-field"><%= @capture_category.capture_category_no %></div>
+        <label>取込区分ID</label>
+        <div class="readonly-field"><%= @capture_category.id %></div>
       </div>
 
       <div class="form-group">
-        <%= form.label :capture_category_name, "取込区分名" %>
-        <%= form.text_field :capture_category_name, class: "input-field" %>
+        <%= form.label :name, "取込区分名" %>
+        <%= form.text_field :name, class: "input-field" %>
       </div>
 
       <div class="form-group">

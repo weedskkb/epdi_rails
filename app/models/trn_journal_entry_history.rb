@@ -5,7 +5,7 @@ class TrnJournalEntryHistory < ApplicationRecord
   self.primary_key = "JOURNAL_ENTRY_HISTORY_NO"
 
   alias_attribute :journal_entry_history_no, "JOURNAL_ENTRY_HISTORY_NO"
-  alias_attribute :capture_category_no, "CAPTURE_CATEGORY_NO"
+  # capture_category_id column already snake_case after normalization
   alias_attribute :capture_history_no, "CAPTURE_HISTORY_NO"
   alias_attribute :accrual_month, "ACCRUAL_MONTH"
   alias_attribute :payment_month, "PAYMENT_MONTH"
@@ -13,7 +13,7 @@ class TrnJournalEntryHistory < ApplicationRecord
   alias_attribute :create_user_id, "CREATE_USER_ID"
   alias_attribute :create_date, "CREATE_DATE"
 
-  belongs_to :capture_category, class_name: "CaptureCategory", foreign_key: "CAPTURE_CATEGORY_NO"
+  belongs_to :capture_category, class_name: "CaptureCategory", foreign_key: :capture_category_id
   belongs_to :capture_history, class_name: "TrnCaptureHistory", foreign_key: "CAPTURE_HISTORY_NO"
   has_many :journal_entry_data, class_name: "TrnJournalEntryData", foreign_key: "JOURNAL_ENTRY_HISTORY_NO"
 end
