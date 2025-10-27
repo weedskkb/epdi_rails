@@ -68,22 +68,22 @@ module JournalEntryData
     # JournalEntryDataListApplication::GetNoJournalEntryHistory()
     def capture_history_numbers_without_journal_entries
       scope = TrnCaptureHistory.all
-      scope = scope.where(PAYMENT_MONTH: payment_month_range) if payment_month_range
+      scope = scope.where(payment_month: payment_month_range) if payment_month_range
       scope = scope.where(capture_category_id: form.supplier) unless form.supplier_all?
 
       scope
         .left_outer_joins(:journal_entry_histories)
         .where(TRN_JOURNAL_ENTRY_HISTORY: { JOURNAL_ENTRY_HISTORY_NO: nil })
-        .pluck(:CAPTURE_HISTORY_NO)
+        .pluck(:id)
     end
 
     # JournalEntryDataListApplication::RecordHistory()
     def record_histories(capture_history_numbers)
-      capture_history_numbers.map do |history_no|
-        capture_history = TrnCaptureHistory.find(history_no)
+      capture_history_numbers.map do |history_id|
+        capture_history = TrnCaptureHistory.find(history_id)
 
         history = TrnJournalEntryHistory.create!(
-          capture_history_no: capture_history.capture_history_no,
+          capture_history_id: capture_history.id,
           accrual_month: capture_history.accrual_month,
           payment_month: capture_history.payment_month,
           capture_category_id: capture_history.capture_category_id,
@@ -106,9 +106,9 @@ module JournalEntryData
                    .where(group_no: category.journal_entry_pattern_group_no)
                    .order(:row_no, :id)
 
-        capture_rows = TrnCaptureData
-                       .where(CAPTURE_HISTORY_NO: history.capture_history_no)
-                       .order(:department_id, :ROW_NO)
+        capture_rows = TrnCaptureRecord
+                       .where(capture_history_id: history.capture_history_id)
+                       .order(:department_id, :row_no)
 
         grouping_rows = []
         capture_rows.each do |row|
@@ -275,9 +275,9 @@ module JournalEntryData
       skip_accounts = [836, 866, 854]
       return false unless skip_accounts.include?(account_code)
 
-      data_in_row = TrnCaptureData.where(
-        CAPTURE_HISTORY_NO: capture_row.capture_history_no,
-        ROW_NO: row_number
+      data_in_row = TrnCaptureRecord.where(
+        capture_history_id: capture_row.capture_history_id,
+        row_no: row_number
       )
 
       return true if data_in_row.where(account_code: 832).exists?
@@ -330,16 +330,16 @@ module JournalEntryData
           capture_row.amount.to_i + capture_row.second_amount.to_i
         end
       elsif pattern_group == PATTERN_GROUP_LABOR
-        same_row_scope = TrnCaptureData.where(
-          CAPTURE_HISTORY_NO: capture_row.capture_history_no,
-          ROW_NO: capture_row.row_no
+        same_row_scope = TrnCaptureRecord.where(
+          capture_history_id: capture_row.capture_history_id,
+          row_no: capture_row.row_no
         )
 
         case pattern.row_no
         when 4
           return nil if account_code.nil?
 
-          return same_row_scope.sum(:AMMOUNT).to_i if account_code == 418 # 関係会社未払金
+          return same_row_scope.sum(:amount).to_i if account_code == 418 # 関係会社未払金
           return amount_for_account(same_row_scope, 832) if account_code == 832
           return amount_for_account(same_row_scope, 866) if account_code == 866
           return amount_for_account(same_row_scope, 836) if account_code == 836
@@ -349,7 +349,7 @@ module JournalEntryData
         when 7
           return nil if account_code.nil?
 
-          return same_row_scope.sum(:AMMOUNT).to_i if account_code == 418 # 関係会社未払金
+          return same_row_scope.sum(:amount).to_i if account_code == 418 # 関係会社未払金
 
           if pattern.abstract.to_s.include?("給与")
             return amount_for_account(same_row_scope, 832)
@@ -363,7 +363,7 @@ module JournalEntryData
 
           0
         else
-          same_row_scope.sum(:AMMOUNT).to_i
+          same_row_scope.sum(:amount).to_i
         end
       else
         base_amount

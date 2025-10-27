@@ -25,9 +25,9 @@
   <tbody>
     <% @payment_data.each do |row| %>
       <tr>
-        <td><%= row.capture_data_no %></td>
+        <td><%= row.id %></td>
         <td><%= row.capture_history&.capture_category&.name %></td>
-        <td><%= row.capture_history_no %></td>
+        <td><%= row.capture_history_id %></td>
         <td><%= row.row_no %></td>
         <td><%= row.company_id %></td>
         <td><%= row.company&.name %></td>

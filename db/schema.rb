@@ -10,36 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2024_07_09_000000) do
-  create_table "TRN_CAPTURE_DATA", primary_key: "CAPTURE_DATA_NO", id: :integer, charset: "utf8mb4", collation: "utf8mb4_general_ci", force: :cascade do |t|
-    t.integer "CAPTURE_HISTORY_NO", null: false
-    t.integer "ROW_NO", null: false
-    t.integer "company_id", null: false
-    t.integer "department_id", null: false
-    t.integer "supplier_id"
-    t.integer "account_code"
-    t.integer "account_sub_code"
-    t.integer "AMMOUNT", null: false
-    t.integer "SECOND_AMMOUNT", null: false
-    t.integer "tax_class_id"
-    t.integer "tax_rate_id"
-    t.datetime "CREATE_DATE", null: false
-    t.integer "CREATE_USER_ID", null: false
-    t.string "LIST_CD"
-    t.index ["CAPTURE_HISTORY_NO"], name: "fk_rails_8171a22b36"
-    t.index ["department_id"], name: "index_trn_capture_data_on_department_id"
-  end
-
-  create_table "TRN_CAPTURE_HISTORY", primary_key: "CAPTURE_HISTORY_NO", id: :integer, charset: "utf8mb4", collation: "utf8mb4_general_ci", force: :cascade do |t|
-    t.integer "capture_category_id", null: false
-    t.date "ACCRUAL_MONTH"
-    t.date "PAYMENT_MONTH"
-    t.boolean "LOCK_FLG", default: false, null: false
-    t.integer "CREATE_USER_ID", null: false
-    t.datetime "CREATE_DATE", null: false
-    t.index ["capture_category_id"], name: "fk_rails_6b3f99d39c"
-  end
-
+ActiveRecord::Schema[8.0].define(version: 2024_07_09_002000) do
   create_table "TRN_JOURNAL_ENTRY_DATA", primary_key: "JOURNAL_ENTRY_DATA_NO", id: :integer, charset: "utf8mb4", collation: "utf8mb4_general_ci", force: :cascade do |t|
     t.integer "JOURNAL_ENTRY_HISTORY_NO", null: false
     t.integer "EXCEL_ROW_NO", null: false
@@ -67,7 +38,7 @@ ActiveRecord::Schema[8.0].define(version: 2024_07_09_000000) do
   end
 
   create_table "TRN_JOURNAL_ENTRY_HISTORY", primary_key: "JOURNAL_ENTRY_HISTORY_NO", id: :integer, charset: "utf8mb4", collation: "utf8mb4_general_ci", force: :cascade do |t|
-    t.integer "CAPTURE_HISTORY_NO", null: false
+    t.integer "capture_history_id", null: false
     t.integer "capture_category_id", null: false
     t.date "ACCRUAL_MONTH", null: false
     t.date "PAYMENT_MONTH", null: false
@@ -206,6 +177,35 @@ ActiveRecord::Schema[8.0].define(version: 2024_07_09_000000) do
     t.datetime "updated_at"
   end
 
+  create_table "trn_capture_histories", id: :integer, charset: "utf8mb4", collation: "utf8mb4_general_ci", force: :cascade do |t|
+    t.integer "capture_category_id", null: false
+    t.date "accrual_month"
+    t.date "payment_month"
+    t.boolean "lock_flg", default: false, null: false
+    t.integer "created_by_id", null: false
+    t.datetime "created_at", null: false
+    t.index ["capture_category_id"], name: "fk_rails_6b3f99d39c"
+  end
+
+  create_table "trn_capture_records", id: :integer, charset: "utf8mb4", collation: "utf8mb4_general_ci", force: :cascade do |t|
+    t.integer "capture_history_id", null: false
+    t.integer "row_no", null: false
+    t.integer "company_id", null: false
+    t.integer "department_id", null: false
+    t.integer "supplier_id"
+    t.integer "account_code"
+    t.integer "account_sub_code"
+    t.integer "amount", null: false
+    t.integer "second_amount", null: false
+    t.integer "tax_class_id"
+    t.integer "tax_rate_id"
+    t.datetime "created_at", null: false
+    t.integer "created_by_id", null: false
+    t.string "list_cd"
+    t.index ["capture_history_id"], name: "index_trn_capture_records_on_capture_history_id"
+    t.index ["department_id"], name: "index_trn_capture_records_on_department_id"
+  end
+
   create_table "users", id: :integer, charset: "utf8mb4", collation: "utf8mb4_general_ci", force: :cascade do |t|
     t.string "user_name", limit: 12
     t.string "login_id", limit: 15
@@ -220,13 +220,13 @@ ActiveRecord::Schema[8.0].define(version: 2024_07_09_000000) do
     t.index ["updated_by_id"], name: "index_users_on_updated_by_id"
   end
 
-  add_foreign_key "TRN_CAPTURE_DATA", "TRN_CAPTURE_HISTORY", column: "CAPTURE_HISTORY_NO", primary_key: "CAPTURE_HISTORY_NO"
-  add_foreign_key "TRN_CAPTURE_DATA", "departments"
-  add_foreign_key "TRN_CAPTURE_HISTORY", "capture_categories"
   add_foreign_key "TRN_JOURNAL_ENTRY_HISTORY", "capture_categories"
   add_foreign_key "departments", "companies", name: "fk_departments_company", on_delete: :cascade
   add_foreign_key "sub_accounts", "accounts", column: "code"
   add_foreign_key "sub_accounts", "accounts", column: "code"
+  add_foreign_key "trn_capture_histories", "capture_categories"
+  add_foreign_key "trn_capture_records", "departments"
+  add_foreign_key "trn_capture_records", "trn_capture_histories", column: "capture_history_id"
   add_foreign_key "users", "users", column: "created_by_id", name: "fk_users_created_by"
   add_foreign_key "users", "users", column: "updated_by_id", name: "fk_users_updated_by"
 end

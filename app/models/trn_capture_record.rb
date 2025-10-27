@@ -1,19 +1,7 @@
 # frozen_string_literal: true
 
-class TrnCaptureData < ApplicationRecord
-  self.table_name = "TRN_CAPTURE_DATA"
-  self.primary_key = "CAPTURE_DATA_NO"
-
-  alias_attribute :capture_data_no, "CAPTURE_DATA_NO"
-  alias_attribute :capture_history_no, "CAPTURE_HISTORY_NO"
-  alias_attribute :row_no, "ROW_NO"
-  alias_attribute :list_cd, "LIST_CD"
-  alias_attribute :amount, "AMMOUNT"
-  alias_attribute :second_amount, "SECOND_AMMOUNT"
-  alias_attribute :create_date, "CREATE_DATE"
-  alias_attribute :create_user_id, "CREATE_USER_ID"
-
-  belongs_to :capture_history, class_name: "TrnCaptureHistory", foreign_key: "CAPTURE_HISTORY_NO"
+class TrnCaptureRecord < ApplicationRecord
+  belongs_to :capture_history, class_name: "TrnCaptureHistory", inverse_of: :capture_records
   belongs_to :department, class_name: "Department", foreign_key: :department_id
   belongs_to :tax_class, class_name: "TaxClass", foreign_key: :tax_class_id, optional: true
   belongs_to :tax_rate, class_name: "TaxRate", foreign_key: :tax_rate_id, optional: true

@@ -34,7 +34,7 @@ class CapturePaymentDataViewModelPresenter
     items = recent_histories.map do |history|
       category = history.capture_category
       HistoryItem.new(
-        capture_date: history.create_date&.strftime('%Y/%m/%d'),
+        capture_date: history.created_at&.strftime('%Y/%m/%d'),
         capture_category_id: category.id,
         capture_category_label: format('%02d：%s', category.id, category.name),
         accrual_month: normalize_month(history.accrual_month),
@@ -54,8 +54,8 @@ class CapturePaymentDataViewModelPresenter
     from_time = to_time - 2.months
     TrnCaptureHistory
       .includes(:capture_category)
-      .where('CREATE_DATE BETWEEN ? AND ?', from_time, to_time)
-      .order('CREATE_DATE DESC')
+      .where(created_at: from_time..to_time)
+      .order(created_at: :desc)
   end
 
   def current_month

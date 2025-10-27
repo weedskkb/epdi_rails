@@ -100,16 +100,21 @@ module CapturePaymentData
     def ensure_history_uniqueness
       return if capture_category.zero?
 
+      target_month_date = parse_month_string(target_month_value)
+      accrual_month_date = parse_month_string(accrual_month_value)
+      payment_month_date = parse_month_string(payment_month_value)
+
       exists = case capture_category
                when CATEGORY_STORE, CATEGORY_FIXED
-                 TrnCaptureHistory.exists?(capture_category_id: capture_category, ACCRUAL_MONTH: target_month_value)
+                 TrnCaptureHistory.exists?(capture_category_id: capture_category, accrual_month: target_month_date)
                when CATEGORY_WHOLESALE
                  pm = next_month_string(target_month_value)
-                 TrnCaptureHistory.exists?(capture_category_id: capture_category, PAYMENT_MONTH: pm)
+                 TrnCaptureHistory.exists?(capture_category_id: capture_category,
+                                           payment_month: parse_month_string(pm))
                else
                  TrnCaptureHistory.exists?(capture_category_id: capture_category,
-                                          ACCRUAL_MONTH: accrual_month_value,
-                                          PAYMENT_MONTH: payment_month_value)
+                                           accrual_month: accrual_month_date,
+                                           payment_month: payment_month_date)
                end
       view_model.errors.add(:base, '既に取込済みです。') if exists
     end
@@ -249,27 +254,27 @@ module CapturePaymentData
 
     # CapturePaymentDataApplication::Overwrite()
     def process_overwrite
-      history_numbers = case capture_category
-                        when CATEGORY_STORE, CATEGORY_FIXED
-                          TrnCaptureHistory.where(capture_category_id: capture_category,
-                                                   ACCRUAL_MONTH: target_month_value).pluck(:CAPTURE_HISTORY_NO)
-                        when CATEGORY_WHOLESALE
-                          pm = next_month_string(target_month_value)
-                          TrnCaptureHistory.where(capture_category_id: capture_category,
-                                                  PAYMENT_MONTH: pm).pluck(:CAPTURE_HISTORY_NO)
-                        else
-                          TrnCaptureHistory.where(capture_category_id: capture_category,
-                                                  ACCRUAL_MONTH: accrual_month_value,
-                                                  PAYMENT_MONTH: payment_month_value).pluck(:CAPTURE_HISTORY_NO)
-                        end
+      history_ids = case capture_category
+                    when CATEGORY_STORE, CATEGORY_FIXED
+                      TrnCaptureHistory.where(capture_category_id: capture_category,
+                                              accrual_month: parse_month_string(target_month_value)).pluck(:id)
+                    when CATEGORY_WHOLESALE
+                      pm = next_month_string(target_month_value)
+                      TrnCaptureHistory.where(capture_category_id: capture_category,
+                                              payment_month: parse_month_string(pm)).pluck(:id)
+                    else
+                      TrnCaptureHistory.where(capture_category_id: capture_category,
+                                              accrual_month: parse_month_string(accrual_month_value),
+                                              payment_month: parse_month_string(payment_month_value)).pluck(:id)
+                    end
 
-      history_numbers.each do |history_no|
-        TrnJournalEntryHistory.where(CAPTURE_HISTORY_NO: history_no).find_each do |journal_history|
+      history_ids.each do |history_id|
+        TrnJournalEntryHistory.where(capture_history_id: history_id).find_each do |journal_history|
           TrnJournalEntryData.where(JOURNAL_ENTRY_HISTORY_NO: journal_history.journal_entry_history_no).delete_all
           journal_history.destroy!
         end
-        TrnCaptureData.where(CAPTURE_HISTORY_NO: history_no).delete_all
-        TrnCaptureHistory.where(CAPTURE_HISTORY_NO: history_no).delete_all
+        TrnCaptureRecord.where(capture_history_id: history_id).delete_all
+        TrnCaptureHistory.where(id: history_id).delete_all
       end
     end
 
@@ -298,8 +303,8 @@ module CapturePaymentData
         accrual_month: accrual_month,
         payment_month: payment_month,
         lock_flg: false,
-        create_user_id: user_id,
-        create_date: Time.zone.now
+        created_by_id: user_id,
+        created_at: Time.zone.now
       )
     end
 
@@ -342,8 +347,8 @@ module CapturePaymentData
             account_sub_code = cell_integer(sheet, 7, col_idx)
             list_cd = [account_code, account_sub_code, supplier_id].map { |v| v.to_i }.join('-')
 
-            create_capture_data(
-              capture_history_no: history.capture_history_no,
+            create_capture_record(
+              capture_history_id: history.id,
               row_no: row_idx + 1,
               company_id: company_id,
               department_id: department_id,
@@ -381,8 +386,8 @@ module CapturePaymentData
             account_sub_code = cell_integer(sheet, 5, col_idx)
             list_cd = [account_code, account_sub_code, supplier_id].map { |v| v.to_i }.join('-')
 
-            create_capture_data(
-              capture_history_no: history_no,
+            create_capture_record(
+              capture_history_id: history_no,
               row_no: row_idx + 1,
               company_id: company_id,
               department_id: department_id,
@@ -417,8 +422,8 @@ module CapturePaymentData
             list_cd = "--#{supplier_id}"
 
             # 勘定科目はここでは設定しない
-            create_capture_data(
-              capture_history_no: history_no,
+            create_capture_record(
+              capture_history_id: history_no,
               row_no: row_idx + 1,
               company_id: company_id,
               department_id: department_id,
@@ -447,8 +452,8 @@ module CapturePaymentData
             next unless amount
 
             account_code = expense_summary_account_for(col_idx)
-            create_capture_data(
-              capture_history_no: history_no,
+            create_capture_record(
+              capture_history_id: history_no,
               row_no: row_idx + 1,
               company_id: company_id,
               department_id: department_id,
@@ -479,8 +484,8 @@ module CapturePaymentData
           amount = primary_amount || 0
           second_amount = secondary_amount || 0
 
-          create_capture_data(
-            capture_history_no: history_no,
+          create_capture_record(
+            capture_history_id: history_no,
             row_no: row_idx + 1,
             company_id: department_company_id(department_id),
             department_id: department_id,
@@ -499,23 +504,23 @@ module CapturePaymentData
     def find_or_create_store_history(payment_month)
       TrnCaptureHistory.find_or_create_by!(
         capture_category_id: capture_category,
-        ACCRUAL_MONTH: parse_month_string(target_month_value),
-        PAYMENT_MONTH: parse_month_string(payment_month)
+        accrual_month: parse_month_string(target_month_value),
+        payment_month: parse_month_string(payment_month)
       ) do |history|
         history.lock_flg = false
-        history.create_user_id = user_id
-        history.create_date = Time.zone.now
+        history.created_by_id = user_id
+        history.created_at = Time.zone.now
       end
     end
 
     # CapturePaymentDataApplication::getHistoryNo()
     def base_history_id
-      @base_history&.capture_history_no
+      @base_history&.id
     end
 
-    def create_capture_data(attrs)
-      TrnCaptureData.create!(
-        capture_history_no: attrs[:capture_history_no],
+    def create_capture_record(attrs)
+      TrnCaptureRecord.create!(
+        capture_history_id: attrs[:capture_history_id],
         row_no: attrs[:row_no],
         company_id: attrs[:company_id],
         department_id: attrs[:department_id],
@@ -527,8 +532,8 @@ module CapturePaymentData
         second_amount: attrs[:second_amount] || 0,
         tax_rate_id: attrs[:tax_rate_id],
         tax_class_id: attrs[:tax_class_id],
-        create_user_id: user_id,
-        create_date: Time.zone.now
+        created_by_id: user_id,
+        created_at: Time.zone.now
       )
     end
 
