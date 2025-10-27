@@ -82,12 +82,11 @@ class CaptureCategoriesController < ApplicationController
     end
 
     @journal_entry_pattern_group_options = JournalEntryPattern
-                                            .select(:journal_entry_pattern_group_no, :journal_entry_pattern_name)
+                                            .select(:group_no, :name)
                                             .distinct
-                                            .order(:journal_entry_pattern_group_no)
+                                            .order(:group_no)
                                             .map do |pattern|
-      ["#{pattern.journal_entry_pattern_group_no} #{pattern.journal_entry_pattern_name}",
-       pattern.journal_entry_pattern_group_no]
+      ["#{pattern.group_no} #{pattern.name}", pattern.group_no]
     end
   end
 end

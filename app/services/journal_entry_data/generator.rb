@@ -103,8 +103,8 @@ module JournalEntryData
         category = capture_category_record(history.capture_category_id)
 
         patterns = JournalEntryPattern
-                   .where(JOURNAL_ENTRY_PATTERN_GROUP_NO: category.journal_entry_pattern_group_no)
-                   .order(:ROW_NO, :JOURNAL_ENTRY_PATTERN_NO)
+                   .where(group_no: category.journal_entry_pattern_group_no)
+                   .order(:row_no, :id)
 
         capture_rows = TrnCaptureData
                        .where(CAPTURE_HISTORY_NO: history.capture_history_no)
@@ -134,7 +134,7 @@ module JournalEntryData
               credit_amount: credit_amount
             )
 
-            if pattern["JOURNAL_ENTRY_PATTERN_GROUP_NO"] == PATTERN_GROUP_STORE && [7, 8].include?(pattern["ROW_NO"])
+            if pattern.group_no == PATTERN_GROUP_STORE && [7, 8].include?(pattern.row_no)
               grouping_rows << entry_hash
             else
               create_entry(entry_hash)
@@ -200,9 +200,9 @@ module JournalEntryData
     def build_entry_hash(history:, pattern:, capture_category:, capture_row:, debit_account_code:, credit_account_code:, debit_amount:, credit_amount:)
       {
         journal_entry_history_no: history.journal_entry_history_no,
-        row_no: pattern["ROW_NO"],
+        row_no: pattern.row_no,
         excel_row_no: capture_row.row_no,
-        date: date_for(pattern["DATE_PATTERN_NO"], history.accrual_month, history.payment_month, form.fund_transfer_date),
+        date: date_for(pattern.date_pattern_no, history.accrual_month, history.payment_month, form.fund_transfer_date),
         company_id: company_for(pattern.company_id, capture_row.company_id, capture_category.id),
         department_id: capture_row.department_id,
         debit_department_id: department_for(pattern.debit_department_id, capture_row.department_id, capture_row.company_id, capture_category.id, "debit"),
@@ -222,7 +222,7 @@ module JournalEntryData
         credit_tax_class_id: tax_class_for(pattern.credit_tax_class_id, capture_category.id),
         credit_tax_rate_id: tax_rate_for(pattern.credit_tax_rate_id, capture_category.id),
         abstract: abstract_for(
-          pattern["ABSTRACT"].to_s,
+          pattern.abstract.to_s,
           history.accrual_month,
           history.payment_month,
           capture_row.department_id,
@@ -289,9 +289,9 @@ module JournalEntryData
 
     # JournalEntryDataListApplication::Create() - store pattern skip
     def skip_store_pattern_row?(pattern, company_id)
-      return false unless pattern["JOURNAL_ENTRY_PATTERN_GROUP_NO"] == PATTERN_GROUP_STORE
+      return false unless pattern.group_no == PATTERN_GROUP_STORE
 
-      row_no = pattern["ROW_NO"]
+      row_no = pattern.row_no
       debit_account = pattern.debit_account_code
 
       if company_id == 1  # ウィーズ
@@ -304,10 +304,10 @@ module JournalEntryData
     # JournalEntryDataListApplication::GetAmmount()
     def amount_for(pattern, capture_row, side, account_code)
       base_amount = capture_row.amount.to_i
-      pattern_group = pattern["JOURNAL_ENTRY_PATTERN_GROUP_NO"]
+      pattern_group = pattern.group_no
 
       if pattern_group == PATTERN_GROUP_STORE
-        case pattern["ROW_NO"]
+        case pattern.row_no
         when 4
           return nil if account_code.nil?
 
@@ -335,7 +335,7 @@ module JournalEntryData
           ROW_NO: capture_row.row_no
         )
 
-        case pattern["ROW_NO"]
+        case pattern.row_no
         when 4
           return nil if account_code.nil?
 
@@ -351,13 +351,13 @@ module JournalEntryData
 
           return same_row_scope.sum(:AMMOUNT).to_i if account_code == 418 # 関係会社未払金
 
-          if pattern["ABSTRACT"].to_s.include?("給与")
+          if pattern.abstract.to_s.include?("給与")
             return amount_for_account(same_row_scope, 832)
-          elsif pattern["ABSTRACT"].to_s.include?("通勤手当")
+          elsif pattern.abstract.to_s.include?("通勤手当")
             return amount_for_account(same_row_scope, 866)
-          elsif pattern["ABSTRACT"].to_s.include?("法定福利費")
+          elsif pattern.abstract.to_s.include?("法定福利費")
             return amount_for_account(same_row_scope, 836)
-          elsif pattern["ABSTRACT"].to_s.include?("福利厚生費")
+          elsif pattern.abstract.to_s.include?("福利厚生費")
             return amount_for_account(same_row_scope, 854)
           end
 

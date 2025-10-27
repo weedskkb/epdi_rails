@@ -74,45 +74,45 @@
   <table>
     <thead>
       <tr>
-        <th class="wrap">パターンNO<span class="column-key">JOURNAL_ENTRY_PATTERN_NO</span></th>
-        <th class="wrap">グループNO<span class="column-key">JOURNAL_ENTRY_PATTERN_GROUP_NO</span></th>
-        <th class="wrap">パターン名<span class="column-key">JOURNAL_ENTRY_PATTERN_NAME</span></th>
-        <th class="wrap">行NO<span class="column-key">ROW_NO</span></th>
-        <th class="wrap">日付パターンNO<span class="column-key">DATE_PATTERN_NO</span></th>
-        <th class="wrap">会社<span class="column-key">COMPANY_ID</span></th>
-        <th class="wrap">借方部署<span class="column-key">DEBIT_DEPARTMENT_ID</span></th>
+        <th class="wrap">パターンNO<span class="column-key">id</span></th>
+        <th class="wrap">グループNO<span class="column-key">group_no</span></th>
+        <th class="wrap">パターン名<span class="column-key">name</span></th>
+        <th class="wrap">行NO<span class="column-key">row_no</span></th>
+        <th class="wrap">日付パターンNO<span class="column-key">date_pattern_no</span></th>
+        <th class="wrap">会社<span class="column-key">company_id</span></th>
+        <th class="wrap">借方部署<span class="column-key">debit_department_id</span></th>
         <th class="wrap">借方勘定科目<span class="column-key">debit_account_code</span></th>
         <th class="wrap">借方補助科目<span class="column-key">debit_account_sub_code</span></th>
-        <th class="wrap">借方取引先<span class="column-key">DEBIT_SUPPLIER_ID</span></th>
-        <th class="wrap">借方税率<span class="column-key">DEBIT_TAX_RATE_ID</span></th>
-        <th class="wrap">借方税区分<span class="column-key">DEBIT_TAX_CLASS_ID</span></th>
-        <th class="wrap">貸方部署<span class="column-key">CREDIT_DEPARTMENT_ID</span></th>
+        <th class="wrap">借方取引先<span class="column-key">debit_supplier_id</span></th>
+        <th class="wrap">借方税率<span class="column-key">debit_tax_rate_id</span></th>
+        <th class="wrap">借方税区分<span class="column-key">debit_tax_class_id</span></th>
+        <th class="wrap">貸方部署<span class="column-key">credit_department_id</span></th>
         <th class="wrap">貸方勘定科目<span class="column-key">credit_account_code</span></th>
         <th class="wrap">貸方補助科目<span class="column-key">credit_account_sub_code</span></th>
-        <th class="wrap">貸方取引先<span class="column-key">CREDIT_SUPPLIER_ID</span></th>
-        <th class="wrap">貸方税率<span class="column-key">CREDIT_TAX_RATE_ID</span></th>
-        <th class="wrap">貸方税区分<span class="column-key">CREDIT_TAX_CLASS_ID</span></th>
-        <th class="wrap">固定金額フラグ<span class="column-key">FIXED_AMOUNT_FLG</span></th>
-        <th class="wrap">固定金額<span class="column-key">FIXED_AMOUNT</span></th>
-        <th class="wrap">按分率フラグ<span class="column-key">FILTER_RATIO_FLG</span></th>
-        <th class="wrap">按分率<span class="column-key">FILTER_RATIO</span></th>
-        <th class="wrap">按分金額フラグ<span class="column-key">FILTER_AMOUNT_FLG</span></th>
-        <th class="wrap">按分金額<span class="column-key">FILTER_AMOUNT</span></th>
-        <th class="wrap">明細区分<span class="column-key">DETAIL_DIVISION_NO</span></th>
-        <th class="wrap">税込フラグ<span class="column-key">INCLUDE_TAX_FLG</span></th>
-        <th class="wrap">税計算フラグ<span class="column-key">TAX_CALC_FLG</span></th>
-        <th class="wrap">発生計上フラグ<span class="column-key">ACCURE_FLG</span></th>
-        <th class="wrap">削除フラグ<span class="column-key">DELETE_FLG</span></th>
-        <th class="wrap">摘要<span class="column-key">ABSTRACT</span></th>
+        <th class="wrap">貸方取引先<span class="column-key">credit_supplier_id</span></th>
+        <th class="wrap">貸方税率<span class="column-key">credit_tax_rate_id</span></th>
+        <th class="wrap">貸方税区分<span class="column-key">credit_tax_class_id</span></th>
+        <th class="wrap">固定金額フラグ<span class="column-key">fixed_amount_flag</span></th>
+        <th class="wrap">固定金額<span class="column-key">fixed_amount</span></th>
+        <th class="wrap">按分率フラグ<span class="column-key">filter_ratio_flag</span></th>
+        <th class="wrap">按分率<span class="column-key">filter_ratio</span></th>
+        <th class="wrap">按分金額フラグ<span class="column-key">filter_amount_flag</span></th>
+        <th class="wrap">按分金額<span class="column-key">filter_amount</span></th>
+        <th class="wrap">明細区分<span class="column-key">detail_division_no</span></th>
+        <th class="wrap">税込フラグ<span class="column-key">include_tax_flag</span></th>
+        <th class="wrap">税計算フラグ<span class="column-key">tax_calc_flag</span></th>
+        <th class="wrap">発生計上フラグ<span class="column-key">accure_flag</span></th>
+        <th class="wrap">削除フラグ<span class="column-key">delete_flg</span></th>
+        <th class="wrap">摘要<span class="column-key">abstract</span></th>
         <th>操作</th>
       </tr>
     </thead>
     <tbody>
       <% @patterns.each do |pattern| %>
         <tr>
-          <td class="wrap"><%= pattern.journal_entry_pattern_no %></td>
-          <td class="wrap"><%= pattern.journal_entry_pattern_group_no %></td>
-          <td class="wrap"><%= pattern.journal_entry_pattern_name %></td>
+          <td class="wrap"><%= pattern.id %></td>
+          <td class="wrap"><%= pattern.group_no %></td>
+          <td class="wrap"><%= pattern.name %></td>
           <td class="wrap"><%= pattern.row_no %></td>
           <td class="wrap"><%= pattern.date_pattern_no %></td>
           <td class="wrap"><%= display_reference(pattern.company_id, pattern.company&.name) %></td>

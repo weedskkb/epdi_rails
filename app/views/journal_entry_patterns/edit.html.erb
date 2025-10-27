@@ -116,17 +116,17 @@
     <div class="form-grid">
       <div class="form-group">
         <label>パターンNO</label>
-        <div class="readonly-field"><%= @pattern.journal_entry_pattern_no %></div>
+        <div class="readonly-field"><%= @pattern.id %></div>
       </div>
 
       <div class="form-group">
-        <%= form.label :journal_entry_pattern_group_no, "グループNO" %>
-        <%= form.number_field :journal_entry_pattern_group_no, class: "input-field" %>
+        <%= form.label :group_no, "グループNO" %>
+        <%= form.number_field :group_no, class: "input-field" %>
       </div>
 
       <div class="form-group">
-        <%= form.label :journal_entry_pattern_name, "パターン名" %>
-        <%= form.text_field :journal_entry_pattern_name, class: "input-field" %>
+        <%= form.label :name, "パターン名" %>
+        <%= form.text_field :name, class: "input-field" %>
       </div>
 
       <div class="form-group">

@@ -10,43 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2024_07_05_112000) do
-  create_table "MST_JOURNAL_ENTRY_PATTERN", primary_key: "JOURNAL_ENTRY_PATTERN_NO", id: :integer, charset: "utf8mb4", collation: "utf8mb4_general_ci", force: :cascade do |t|
-    t.integer "JOURNAL_ENTRY_PATTERN_GROUP_NO", null: false
-    t.string "JOURNAL_ENTRY_PATTERN_NAME", null: false
-    t.integer "ROW_NO", null: false
-    t.integer "DATE_PATTERN_NO", null: false
-    t.integer "company_id"
-    t.integer "debit_department_id"
-    t.integer "debit_account_code"
-    t.integer "debit_account_sub_code"
-    t.integer "debit_supplier_id"
-    t.integer "debit_tax_rate_id"
-    t.integer "debit_tax_class_id"
-    t.integer "credit_department_id"
-    t.integer "credit_account_code"
-    t.integer "credit_account_sub_code"
-    t.integer "credit_supplier_id"
-    t.integer "credit_tax_rate_id"
-    t.integer "credit_tax_class_id"
-    t.boolean "FIXED_AMOUNT_FLG", default: false, null: false
-    t.integer "FIXED_AMOUNT"
-    t.boolean "FILTER_RATIO_FLG", default: false, null: false
-    t.integer "FILTER_RATIO"
-    t.boolean "FILTER_AMOUNT_FLG", default: false, null: false
-    t.integer "FILTER_AMOUNT"
-    t.integer "DETAIL_DIVISION_NO"
-    t.boolean "INCLUDE_TAX_FLG", default: false, null: false
-    t.boolean "TAX_CALC_FLG", default: false, null: false
-    t.boolean "ACCURE_FLG", default: false, null: false
-    t.boolean "DELETE_FLG", default: false, null: false
-    t.string "ABSTRACT"
-    t.integer "CREATE_USER_ID"
-    t.integer "UPDATE_USER_ID"
-    t.datetime "CREATE_DATE", null: false
-    t.datetime "UPDATE_DATE"
-  end
-
+ActiveRecord::Schema[8.0].define(version: 2024_07_09_000000) do
   create_table "TRN_CAPTURE_DATA", primary_key: "CAPTURE_DATA_NO", id: :integer, charset: "utf8mb4", collation: "utf8mb4_general_ci", force: :cascade do |t|
     t.integer "CAPTURE_HISTORY_NO", null: false
     t.integer "ROW_NO", null: false
@@ -165,6 +129,42 @@ ActiveRecord::Schema[8.0].define(version: 2024_07_05_112000) do
     t.integer "updated_by_id"
     t.datetime "updated_at"
     t.index ["company_id"], name: "index_departments_on_company_id"
+  end
+
+  create_table "journal_entry_patterns", id: :integer, charset: "utf8mb4", collation: "utf8mb4_general_ci", force: :cascade do |t|
+    t.integer "group_no", null: false
+    t.string "name", null: false
+    t.integer "row_no", null: false
+    t.integer "date_pattern_no", null: false
+    t.integer "company_id"
+    t.integer "debit_department_id"
+    t.integer "debit_account_code"
+    t.integer "debit_account_sub_code"
+    t.integer "debit_supplier_id"
+    t.integer "debit_tax_rate_id"
+    t.integer "debit_tax_class_id"
+    t.integer "credit_department_id"
+    t.integer "credit_account_code"
+    t.integer "credit_account_sub_code"
+    t.integer "credit_supplier_id"
+    t.integer "credit_tax_rate_id"
+    t.integer "credit_tax_class_id"
+    t.boolean "fixed_amount_flag", default: false, null: false
+    t.integer "fixed_amount"
+    t.boolean "filter_ratio_flag", default: false, null: false
+    t.integer "filter_ratio"
+    t.boolean "filter_amount_flag", default: false, null: false
+    t.integer "filter_amount"
+    t.integer "detail_division_no"
+    t.boolean "include_tax_flag", default: false, null: false
+    t.boolean "tax_calc_flag", default: false, null: false
+    t.boolean "accure_flag", default: false, null: false
+    t.boolean "delete_flg", default: false, null: false
+    t.string "abstract"
+    t.integer "created_by_id"
+    t.integer "updated_by_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at"
   end
 
   create_table "sub_accounts", id: :integer, charset: "utf8mb4", collation: "utf8mb4_general_ci", force: :cascade do |t|

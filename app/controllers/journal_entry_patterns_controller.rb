@@ -6,7 +6,7 @@ class JournalEntryPatternsController < ApplicationController
   before_action :set_reference_options, only: [:edit, :update]
 
   def index
-    @patterns = base_query.order(:journal_entry_pattern_no)
+    @patterns = base_query.order(:id)
   end
 
   def edit; end
@@ -42,8 +42,8 @@ class JournalEntryPatternsController < ApplicationController
 
   def pattern_params
     params.require(:journal_entry_pattern).permit(
-      :journal_entry_pattern_name,
-      :journal_entry_pattern_group_no,
+      :name,
+      :group_no,
       :row_no,
       :date_pattern_no,
       :company_id,
