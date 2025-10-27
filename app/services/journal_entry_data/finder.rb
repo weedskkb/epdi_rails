@@ -27,16 +27,19 @@ module JournalEntryData
 
     # JournalEntryDataListApplication::GenerateItemViewModel()
     def relation
-      scope = TrnJournalEntryData.joins(:journal_entry_history)
-      scope = scope.where("TRN_JOURNAL_ENTRY_HISTORY.PAYMENT_MONTH = ?", payment_month) if payment_month.present?
-      scope = scope.where("TRN_JOURNAL_ENTRY_HISTORY.capture_category_id = ?", supplier) if supplier.present?
-      scope = scope.where("TRN_JOURNAL_ENTRY_HISTORY.EXECUTE_FLG = ?", false) if except_already_output?
+      records_table = TrnJournalEntryRecord.table_name
+      histories_table = TrnJournalEntryHistory.table_name
+
+      scope = TrnJournalEntryRecord.joins(:journal_entry_history)
+      scope = scope.where("#{histories_table}.payment_month = ?", payment_month) if payment_month.present?
+      scope = scope.where("#{histories_table}.capture_category_id = ?", supplier) if supplier.present?
+      scope = scope.where("#{histories_table}.execute_flag = ?", false) if except_already_output?
 
       scope.order(<<~SQL.squish)
-        TRN_JOURNAL_ENTRY_HISTORY.JOURNAL_ENTRY_HISTORY_NO ASC,
-        TRN_JOURNAL_ENTRY_DATA.ROW_NO ASC,
-        TRN_JOURNAL_ENTRY_DATA.department_id ASC,
-        TRN_JOURNAL_ENTRY_DATA.CREATE_DATE ASC
+        #{histories_table}.id ASC,
+        #{records_table}.row_no ASC,
+        #{records_table}.department_id ASC,
+        #{records_table}.created_at ASC
       SQL
     end
 

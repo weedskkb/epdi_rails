@@ -270,7 +270,7 @@ module CapturePaymentData
 
       history_ids.each do |history_id|
         TrnJournalEntryHistory.where(capture_history_id: history_id).find_each do |journal_history|
-          TrnJournalEntryData.where(JOURNAL_ENTRY_HISTORY_NO: journal_history.journal_entry_history_no).delete_all
+        TrnJournalEntryRecord.where(journal_entry_history_id: journal_history.id).delete_all
           journal_history.destroy!
         end
         TrnCaptureRecord.where(capture_history_id: history_id).delete_all

@@ -12,7 +12,7 @@ module JournalEntryData
     LABOR_COST_CATEGORY = 23
 
     Row = Struct.new(
-      :journal_entry_history_no,
+      :journal_entry_history_id,
       :company_id,
       :date,
       :department_id,
@@ -33,7 +33,7 @@ module JournalEntryData
       :abstract,
       :row_no,
       :excel_row_no,
-      :create_date,
+      :created_at,
       :capture_category_id,
       keyword_init: true
     )
@@ -59,7 +59,7 @@ module JournalEntryData
       ActiveRecord::Base.transaction do
         csv_files = build_company_files(rows)
         zip_data = build_zip(csv_files)
-        mark_histories_executed(rows.map(&:journal_entry_history_no).uniq)
+        mark_histories_executed(rows.map(&:journal_entry_history_id).uniq)
         payload = { zip_data: zip_data, filename: zip_filename }
       end
 
@@ -81,47 +81,50 @@ module JournalEntryData
 
     # JournalEntryDataListApplication::CreateCsvFolder()
     def fetch_rows
-      scope = TrnJournalEntryData.joins(:journal_entry_history)
+      records_table = TrnJournalEntryRecord.table_name
+      histories_table = TrnJournalEntryHistory.table_name
+
+      scope = TrnJournalEntryRecord.joins(:journal_entry_history)
       if form.payment_month_date.present?
-        scope = scope.where("TRN_JOURNAL_ENTRY_HISTORY.PAYMENT_MONTH = ?", form.payment_month_date)
+        scope = scope.where("#{histories_table}.payment_month = ?", form.payment_month_date)
       end
-      scope = scope.where("TRN_JOURNAL_ENTRY_HISTORY.capture_category_id = ?", form.supplier) unless form.supplier_all?
-      scope = scope.where("TRN_JOURNAL_ENTRY_HISTORY.EXECUTE_FLG = ?", false) if form.except_already_output?
+      scope = scope.where("#{histories_table}.capture_category_id = ?", form.supplier) unless form.supplier_all?
+      scope = scope.where("#{histories_table}.execute_flag = ?", false) if form.except_already_output?
 
       scope = scope.order(<<~SQL.squish)
-        TRN_JOURNAL_ENTRY_HISTORY.JOURNAL_ENTRY_HISTORY_NO ASC,
-        TRN_JOURNAL_ENTRY_DATA.ROW_NO ASC,
-        TRN_JOURNAL_ENTRY_DATA.department_id ASC,
-        TRN_JOURNAL_ENTRY_DATA.CREATE_DATE ASC
+        #{histories_table}.id ASC,
+        #{records_table}.row_no ASC,
+        #{records_table}.department_id ASC,
+        #{records_table}.created_at ASC
       SQL
 
       scope.pluck(
-        "TRN_JOURNAL_ENTRY_DATA.JOURNAL_ENTRY_HISTORY_NO",
-        "TRN_JOURNAL_ENTRY_DATA.company_id",
-        "TRN_JOURNAL_ENTRY_DATA.DATE",
-        "TRN_JOURNAL_ENTRY_DATA.department_id",
-        "TRN_JOURNAL_ENTRY_DATA.debit_department_id",
-        "TRN_JOURNAL_ENTRY_DATA.debit_account_code",
-        "TRN_JOURNAL_ENTRY_DATA.debit_account_sub_code",
-        "TRN_JOURNAL_ENTRY_DATA.DEBIT_SUPPLIER_ID",
-        "TRN_JOURNAL_ENTRY_DATA.DEBIT_AMMOUNT",
-        "TRN_JOURNAL_ENTRY_DATA.debit_tax_class_id",
-        "TRN_JOURNAL_ENTRY_DATA.debit_tax_rate_id",
-        "TRN_JOURNAL_ENTRY_DATA.credit_department_id",
-        "TRN_JOURNAL_ENTRY_DATA.credit_account_code",
-        "TRN_JOURNAL_ENTRY_DATA.credit_account_sub_code",
-        "TRN_JOURNAL_ENTRY_DATA.CREDIT_SUPPLIER_ID",
-        "TRN_JOURNAL_ENTRY_DATA.CREDIT_AMMOUNT",
-        "TRN_JOURNAL_ENTRY_DATA.credit_tax_class_id",
-        "TRN_JOURNAL_ENTRY_DATA.credit_tax_rate_id",
-        "TRN_JOURNAL_ENTRY_DATA.ABSTRACT",
-        "TRN_JOURNAL_ENTRY_DATA.ROW_NO",
-        "TRN_JOURNAL_ENTRY_DATA.EXCEL_ROW_NO",
-        "TRN_JOURNAL_ENTRY_DATA.CREATE_DATE",
-        "TRN_JOURNAL_ENTRY_HISTORY.capture_category_id"
+        "#{records_table}.journal_entry_history_id",
+        "#{records_table}.company_id",
+        "#{records_table}.date",
+        "#{records_table}.department_id",
+        "#{records_table}.debit_department_id",
+        "#{records_table}.debit_account_code",
+        "#{records_table}.debit_account_sub_code",
+        "#{records_table}.debit_supplier_id",
+        "#{records_table}.debit_amount",
+        "#{records_table}.debit_tax_class_id",
+        "#{records_table}.debit_tax_rate_id",
+        "#{records_table}.credit_department_id",
+        "#{records_table}.credit_account_code",
+        "#{records_table}.credit_account_sub_code",
+        "#{records_table}.credit_supplier_id",
+        "#{records_table}.credit_amount",
+        "#{records_table}.credit_tax_class_id",
+        "#{records_table}.credit_tax_rate_id",
+        "#{records_table}.abstract",
+        "#{records_table}.row_no",
+        "#{records_table}.excel_row_no",
+        "#{records_table}.created_at",
+        "#{histories_table}.capture_category_id"
       ).map do |values|
         Row.new(
-          journal_entry_history_no: values[0],
+          journal_entry_history_id: values[0],
           company_id: values[1],
           date: values[2],
           department_id: values[3],
@@ -142,7 +145,7 @@ module JournalEntryData
           abstract: values[18],
           row_no: values[19],
           excel_row_no: values[20],
-          create_date: values[21],
+          created_at: values[21],
           capture_category_id: values[22]
         )
       end
@@ -190,7 +193,7 @@ module JournalEntryData
 
         if requires_additional_split?(row)
           same_excel_count = rows[(index + 1)..].to_a.count do |other|
-            other.create_date > row.create_date &&
+            other.created_at > row.created_at &&
               other.excel_row_no == row.excel_row_no &&
               other.row_no == row.row_no
           end
@@ -257,8 +260,7 @@ module JournalEntryData
     def mark_histories_executed(history_numbers)
       return if history_numbers.blank?
 
-      TrnJournalEntryHistory.where("JOURNAL_ENTRY_HISTORY_NO IN (?)", history_numbers)
-                             .update_all("EXECUTE_FLG" => true)
+      TrnJournalEntryHistory.where(id: history_numbers).update_all(execute_flag: true)
     end
 
     # JournalEntryDataListApplication::CreateCsvFolder()

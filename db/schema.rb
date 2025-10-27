@@ -10,44 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2024_07_09_002000) do
-  create_table "TRN_JOURNAL_ENTRY_DATA", primary_key: "JOURNAL_ENTRY_DATA_NO", id: :integer, charset: "utf8mb4", collation: "utf8mb4_general_ci", force: :cascade do |t|
-    t.integer "JOURNAL_ENTRY_HISTORY_NO", null: false
-    t.integer "EXCEL_ROW_NO", null: false
-    t.integer "ROW_NO", null: false
-    t.date "DATE", null: false
-    t.integer "company_id", null: false
-    t.integer "department_id"
-    t.integer "debit_department_id"
-    t.integer "debit_account_code"
-    t.integer "debit_account_sub_code"
-    t.integer "DEBIT_AMMOUNT"
-    t.integer "debit_tax_class_id"
-    t.integer "debit_tax_rate_id"
-    t.integer "debit_supplier_id"
-    t.integer "credit_department_id"
-    t.integer "credit_account_code"
-    t.integer "credit_account_sub_code"
-    t.integer "CREDIT_AMMOUNT"
-    t.integer "credit_tax_class_id"
-    t.integer "credit_tax_rate_id"
-    t.integer "credit_supplier_id"
-    t.string "ABSTRACT"
-    t.datetime "CREATE_DATE", null: false
-    t.integer "CREATE_USER_ID", null: false
-  end
-
-  create_table "TRN_JOURNAL_ENTRY_HISTORY", primary_key: "JOURNAL_ENTRY_HISTORY_NO", id: :integer, charset: "utf8mb4", collation: "utf8mb4_general_ci", force: :cascade do |t|
-    t.integer "capture_history_id", null: false
-    t.integer "capture_category_id", null: false
-    t.date "ACCRUAL_MONTH", null: false
-    t.date "PAYMENT_MONTH", null: false
-    t.boolean "EXECUTE_FLG", default: false, null: false
-    t.integer "CREATE_USER_ID", null: false
-    t.datetime "CREATE_DATE", null: false
-    t.index ["capture_category_id"], name: "fk_rails_98e1ec1471"
-  end
-
+ActiveRecord::Schema[8.0].define(version: 2024_07_09_003000) do
   create_table "accounts", id: :integer, charset: "utf8mb4", collation: "utf8mb4_general_ci", force: :cascade do |t|
     t.string "name", null: false
     t.boolean "delete_flg", default: false, null: false
@@ -206,6 +169,43 @@ ActiveRecord::Schema[8.0].define(version: 2024_07_09_002000) do
     t.index ["department_id"], name: "index_trn_capture_records_on_department_id"
   end
 
+  create_table "trn_journal_entry_histories", id: :integer, charset: "utf8mb4", collation: "utf8mb4_general_ci", force: :cascade do |t|
+    t.integer "capture_history_id", null: false
+    t.integer "capture_category_id", null: false
+    t.date "accrual_month", null: false
+    t.date "payment_month", null: false
+    t.boolean "execute_flag", default: false, null: false
+    t.integer "created_by_id", null: false
+    t.datetime "created_at", null: false
+    t.index ["capture_category_id"], name: "fk_rails_98e1ec1471"
+  end
+
+  create_table "trn_journal_entry_records", id: :integer, charset: "utf8mb4", collation: "utf8mb4_general_ci", force: :cascade do |t|
+    t.integer "journal_entry_history_id", null: false
+    t.integer "excel_row_no", null: false
+    t.integer "row_no", null: false
+    t.date "date", null: false
+    t.integer "company_id", null: false
+    t.integer "department_id"
+    t.integer "debit_department_id"
+    t.integer "debit_account_code"
+    t.integer "debit_account_sub_code"
+    t.integer "debit_amount"
+    t.integer "debit_tax_class_id"
+    t.integer "debit_tax_rate_id"
+    t.integer "debit_supplier_id"
+    t.integer "credit_department_id"
+    t.integer "credit_account_code"
+    t.integer "credit_account_sub_code"
+    t.integer "credit_amount"
+    t.integer "credit_tax_class_id"
+    t.integer "credit_tax_rate_id"
+    t.integer "credit_supplier_id"
+    t.string "abstract"
+    t.datetime "created_at", null: false
+    t.integer "created_by_id", null: false
+  end
+
   create_table "users", id: :integer, charset: "utf8mb4", collation: "utf8mb4_general_ci", force: :cascade do |t|
     t.string "user_name", limit: 12
     t.string "login_id", limit: 15
@@ -220,13 +220,13 @@ ActiveRecord::Schema[8.0].define(version: 2024_07_09_002000) do
     t.index ["updated_by_id"], name: "index_users_on_updated_by_id"
   end
 
-  add_foreign_key "TRN_JOURNAL_ENTRY_HISTORY", "capture_categories"
   add_foreign_key "departments", "companies", name: "fk_departments_company", on_delete: :cascade
   add_foreign_key "sub_accounts", "accounts", column: "code"
   add_foreign_key "sub_accounts", "accounts", column: "code"
   add_foreign_key "trn_capture_histories", "capture_categories"
   add_foreign_key "trn_capture_records", "departments"
   add_foreign_key "trn_capture_records", "trn_capture_histories", column: "capture_history_id"
+  add_foreign_key "trn_journal_entry_histories", "capture_categories"
   add_foreign_key "users", "users", column: "created_by_id", name: "fk_users_created_by"
   add_foreign_key "users", "users", column: "updated_by_id", name: "fk_users_updated_by"
 end

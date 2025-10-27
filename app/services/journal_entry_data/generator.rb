@@ -71,9 +71,11 @@ module JournalEntryData
       scope = scope.where(payment_month: payment_month_range) if payment_month_range
       scope = scope.where(capture_category_id: form.supplier) unless form.supplier_all?
 
+      histories_table = TrnJournalEntryHistory.table_name
+
       scope
         .left_outer_joins(:journal_entry_histories)
-        .where(TRN_JOURNAL_ENTRY_HISTORY: { JOURNAL_ENTRY_HISTORY_NO: nil })
+        .where("#{histories_table}.id IS NULL")
         .pluck(:id)
     end
 
@@ -87,19 +89,19 @@ module JournalEntryData
           accrual_month: capture_history.accrual_month,
           payment_month: capture_history.payment_month,
           capture_category_id: capture_history.capture_category_id,
-          execute_flg: false,
-          create_user_id: current_user_id,
-          create_date: Time.zone.now
+          execute_flag: false,
+          created_by_id: current_user_id,
+          created_at: Time.zone.now
         )
 
-        history.journal_entry_history_no
+        history.id
       end
     end
 
     # JournalEntryDataListApplication::Create()
     def create_journal_entry_data(history_ids)
       history_ids.each do |history_id|
-        history = TrnJournalEntryHistory.find_by(journal_entry_history_no: history_id)
+        history = TrnJournalEntryHistory.find(history_id)
         category = capture_category_record(history.capture_category_id)
 
         patterns = JournalEntryPattern
@@ -171,7 +173,7 @@ module JournalEntryData
           credit_sum = grouped_amount(rows, :credit_amount)
 
           create_entry(
-            journal_entry_history_no: history.journal_entry_history_no,
+            journal_entry_history_id: history.id,
             row_no: key[0],
             excel_row_no: 0,
             date: key[1],
@@ -199,7 +201,7 @@ module JournalEntryData
     # JournalEntryDataListApplication::Create()
     def build_entry_hash(history:, pattern:, capture_category:, capture_row:, debit_account_code:, credit_account_code:, debit_amount:, credit_amount:)
       {
-        journal_entry_history_no: history.journal_entry_history_no,
+        journal_entry_history_id: history.id,
         row_no: pattern.row_no,
         excel_row_no: capture_row.row_no,
         date: date_for(pattern.date_pattern_no, history.accrual_month, history.payment_month, form.fund_transfer_date),
@@ -234,8 +236,8 @@ module JournalEntryData
 
     # JournalEntryDataListApplication::Create()
     def create_entry(attributes)
-      TrnJournalEntryData.create!(
-        journal_entry_history_no: attributes[:journal_entry_history_no],
+      TrnJournalEntryRecord.create!(
+        journal_entry_history_id: attributes[:journal_entry_history_id],
         row_no: attributes[:row_no],
         excel_row_no: attributes[:excel_row_no],
         date: attributes[:date],
@@ -256,8 +258,8 @@ module JournalEntryData
         credit_tax_class_id: attributes[:credit_tax_class_id],
         credit_tax_rate_id: attributes[:credit_tax_rate_id],
         abstract: attributes[:abstract],
-        create_user_id: current_user_id,
-        create_date: Time.zone.now
+        created_by_id: current_user_id,
+        created_at: Time.zone.now
       )
     end
 
