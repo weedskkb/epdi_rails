@@ -6,6 +6,7 @@
       <th>ID</th>
       <th>会社名</th>
       <th>取引先ID</th>
+      <th>取引先</th>
     </tr>
   </thead>
   <tbody>
@@ -14,6 +15,7 @@
         <td><%= company.id %></td>
         <td><%= company.name %></td>
         <td><%= company.supplier_id %></td>
+        <td><%= company.supplier&.name %></td>
       </tr>
     <% end %>
   </tbody>

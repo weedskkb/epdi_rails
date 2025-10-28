@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2024_07_09_003000) do
+ActiveRecord::Schema[8.0].define(version: 2025_10_27_152001) do
   create_table "accounts", id: :integer, charset: "utf8mb4", collation: "utf8mb4_general_ci", force: :cascade do |t|
     t.string "name", null: false
     t.boolean "delete_flg", default: false, null: false
@@ -19,6 +19,18 @@ ActiveRecord::Schema[8.0].define(version: 2024_07_09_003000) do
     t.integer "updated_by_id"
     t.datetime "updated_at"
     t.integer "code"
+  end
+
+  create_table "business_connections", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
+    t.string "code", null: false
+    t.string "name", null: false
+    t.boolean "hidden", default: false, null: false
+    t.integer "created_by_id"
+    t.integer "updated_by_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["created_by_id"], name: "index_business_connections_on_created_by_id"
+    t.index ["updated_by_id"], name: "index_business_connections_on_updated_by_id"
   end
 
   create_table "capture_categories", id: :integer, charset: "utf8mb4", collation: "utf8mb4_general_ci", force: :cascade do |t|
@@ -220,6 +232,8 @@ ActiveRecord::Schema[8.0].define(version: 2024_07_09_003000) do
     t.index ["updated_by_id"], name: "index_users_on_updated_by_id"
   end
 
+  add_foreign_key "business_connections", "users", column: "created_by_id"
+  add_foreign_key "business_connections", "users", column: "updated_by_id"
   add_foreign_key "departments", "companies", name: "fk_departments_company", on_delete: :cascade
   add_foreign_key "sub_accounts", "accounts", column: "code"
   add_foreign_key "sub_accounts", "accounts", column: "code"
