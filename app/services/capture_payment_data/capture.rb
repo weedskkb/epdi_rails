@@ -336,8 +336,8 @@ module CapturePaymentData
           company_id = department_company_id(department_id)
           (3...last_column).each do |col_idx|
             amount = cell_integer(sheet, row_idx, col_idx)
-            supplier_id = cell_integer(sheet, 9, col_idx)
-            next unless amount && supplier_id
+            business_connection_code = cell_string(sheet, 9, col_idx).presence
+            next unless amount && business_connection_code
 
             term = cell_integer(sheet, 4, col_idx) || 0
             payment_month = payment_month_from_term(target_month_value, term)
@@ -345,14 +345,15 @@ module CapturePaymentData
 
             account_code = cell_integer(sheet, 5, col_idx)
             account_sub_code = cell_integer(sheet, 7, col_idx)
-            list_cd = [account_code, account_sub_code, supplier_id].map { |v| v.to_i }.join('-')
+            list_cd_values = [account_code, account_sub_code, business_connection_code]
+            list_cd = list_cd_values.map { |value| value.present? ? value.to_s : "0" }.join('-')
 
             create_capture_record(
               capture_history_id: history.id,
               row_no: row_idx + 1,
               company_id: company_id,
               department_id: department_id,
-              supplier_id: supplier_id,
+              business_connection_code: business_connection_code,
               account_code: account_code,
               account_sub_code: account_sub_code,
               list_cd: list_cd,
@@ -374,8 +375,8 @@ module CapturePaymentData
         last_column = last_column_index(sheet, 0) - 1
         (8..last_row).each do |row_idx|
           department_id = cell_integer(sheet, row_idx, 0)
-          supplier_id = cell_integer(sheet, row_idx, 3)
-          next unless department_id && supplier_id
+          business_connection_code = cell_string(sheet, row_idx, 3).presence
+          next unless department_id && business_connection_code
 
           company_id = department_company_id(department_id)
           (5...last_column).each do |col_idx|
@@ -384,14 +385,15 @@ module CapturePaymentData
 
             account_code = cell_integer(sheet, 3, col_idx)
             account_sub_code = cell_integer(sheet, 5, col_idx)
-            list_cd = [account_code, account_sub_code, supplier_id].map { |v| v.to_i }.join('-')
+            list_cd_values = [account_code, account_sub_code, business_connection_code]
+            list_cd = list_cd_values.map { |value| value.present? ? value.to_s : "0" }.join('-')
 
             create_capture_record(
               capture_history_id: history_no,
               row_no: row_idx + 1,
               company_id: company_id,
               department_id: department_id,
-              supplier_id: supplier_id,
+              business_connection_code: business_connection_code,
               account_code: account_code,
               account_sub_code: account_sub_code,
               list_cd: list_cd,
@@ -416,10 +418,10 @@ module CapturePaymentData
           company_id = department_company_id(department_id)
           (2...last_column).each do |col_idx|
             amount = cell_integer(sheet, row_idx, col_idx)
-            next unless amount
+            business_connection_code = cell_string(sheet, 2, col_idx).presence
+            next unless amount && business_connection_code
 
-            supplier_id = cell_integer(sheet, 2, col_idx)
-            list_cd = "--#{supplier_id}"
+            list_cd = "--#{business_connection_code}"
 
             # 勘定科目はここでは設定しない
             create_capture_record(
@@ -427,7 +429,7 @@ module CapturePaymentData
               row_no: row_idx + 1,
               company_id: company_id,
               department_id: department_id,
-              supplier_id: supplier_id,
+              business_connection_code: business_connection_code,
               list_cd: list_cd,
               amount: amount,
               second_amount: 0
@@ -489,7 +491,7 @@ module CapturePaymentData
             row_no: row_idx + 1,
             company_id: department_company_id(department_id),
             department_id: department_id,
-            supplier_id: category.supplier_id,
+            business_connection_code: category.business_connection_code,
             account_code: category.debit_account_code,
             account_sub_code: category.debit_account_sub_code,
             list_cd: capture_category.to_s,
@@ -524,7 +526,7 @@ module CapturePaymentData
         row_no: attrs[:row_no],
         company_id: attrs[:company_id],
         department_id: attrs[:department_id],
-        supplier_id: attrs[:supplier_id],
+        business_connection_code: attrs[:business_connection_code],
         account_code: attrs[:account_code],
         account_sub_code: attrs[:account_sub_code],
         list_cd: attrs[:list_cd],

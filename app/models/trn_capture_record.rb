@@ -6,6 +6,11 @@ class TrnCaptureRecord < ApplicationRecord
   belongs_to :tax_class, class_name: "TaxClass", foreign_key: :tax_class_id, optional: true
   belongs_to :tax_rate, class_name: "TaxRate", foreign_key: :tax_rate_id, optional: true
   belongs_to :company, class_name: "Company", foreign_key: :company_id, optional: true
+  belongs_to :business_connection,
+             class_name: "BusinessConnection",
+             foreign_key: :business_connection_code,
+             primary_key: :code,
+             optional: true
 
   delegate :capture_category, to: :capture_history, allow_nil: true
 

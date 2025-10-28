@@ -10,7 +10,7 @@ class CaptureCategoriesController < ApplicationController
                             .includes(
                               :tax_class,
                               :tax_rate,
-                              :supplier,
+                              :business_connection,
                               :supplier_company,
                               :debit_department,
                               :credit_department
@@ -40,7 +40,7 @@ class CaptureCategoriesController < ApplicationController
       :name,
       :tax_class_id,
       :tax_rate_id,
-      :supplier_id,
+      :business_connection_code,
       :supplier_company_id,
       :debit_department_id,
       :debit_account_code,
@@ -65,8 +65,8 @@ class CaptureCategoriesController < ApplicationController
       ["#{tax_rate.id} => #{tax_rate.rate}%", tax_rate.id]
     end
 
-    @supplier_options = Supplier.active.order(:id).map do |supplier|
-      ["#{supplier.id} #{supplier.name}", supplier.id]
+    @business_connection_options = BusinessConnection.active.order(:code).map do |connection|
+      ["#{connection.code} #{connection.name}", connection.code]
     end
 
     @company_options = Company.active.order(:id).map do |company|

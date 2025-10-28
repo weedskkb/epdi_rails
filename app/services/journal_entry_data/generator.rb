@@ -160,11 +160,11 @@ module JournalEntryData
             row[:debit_department_id],
             row[:debit_account_code],
             row[:debit_account_sub_code],
-            row[:debit_supplier_id],
+            row[:debit_business_connection_code],
             row[:credit_department_id],
             row[:credit_account_code],
             row[:credit_account_sub_code],
-            row[:credit_supplier_id],
+            row[:credit_business_connection_code],
             row[:abstract]
           ]
         end
@@ -182,12 +182,12 @@ module JournalEntryData
             debit_department_id: key[2],
             debit_account_code: key[3],
             debit_account_sub_code: key[4],
-            debit_supplier_id: key[5],
+            debit_business_connection_code: key[5],
             debit_amount: sum_amount(debit_sum),
             credit_department_id: key[6],
             credit_account_code: key[7],
             credit_account_sub_code: key[8],
-            credit_supplier_id: key[9],
+            credit_business_connection_code: key[9],
             credit_amount: sum_amount(credit_sum),
             abstract: key[10],
             debit_tax_class_id: nil,
@@ -211,7 +211,12 @@ module JournalEntryData
         debit_account_code: debit_account_code,
         debit_account_sub_code: sub_account_for(pattern.debit_account_sub_code,
                                                capture_category.id, "debit"),
-        debit_supplier_id: supplier_for(pattern.debit_supplier_id, capture_row.company_id, capture_row.supplier_id, capture_category.id),
+        debit_business_connection_code: business_connection_code_for(
+          pattern.debit_business_connection_code,
+          capture_row.company_id,
+          capture_row.business_connection_code,
+          capture_category.id
+        ),
         debit_amount: debit_amount,
         debit_tax_class_id: tax_class_for(pattern.debit_tax_class_id, capture_category.id),
         debit_tax_rate_id: tax_rate_for(pattern.debit_tax_rate_id, capture_category.id),
@@ -219,7 +224,12 @@ module JournalEntryData
         credit_account_code: credit_account_code,
         credit_account_sub_code: sub_account_for(pattern.credit_account_sub_code,
                                                  capture_category.id, "credit"),
-        credit_supplier_id: supplier_for(pattern.credit_supplier_id, capture_row.company_id, capture_row.supplier_id, capture_category.id),
+        credit_business_connection_code: business_connection_code_for(
+          pattern.credit_business_connection_code,
+          capture_row.company_id,
+          capture_row.business_connection_code,
+          capture_category.id
+        ),
         credit_amount: credit_amount,
         credit_tax_class_id: tax_class_for(pattern.credit_tax_class_id, capture_category.id),
         credit_tax_rate_id: tax_rate_for(pattern.credit_tax_rate_id, capture_category.id),
@@ -246,14 +256,14 @@ module JournalEntryData
         debit_department_id: attributes[:debit_department_id],
         debit_account_code: attributes[:debit_account_code],
         debit_account_sub_code: attributes[:debit_account_sub_code],
-        debit_supplier_id: attributes[:debit_supplier_id],
+        debit_business_connection_code: attributes[:debit_business_connection_code],
         debit_amount: attributes[:debit_amount],
         debit_tax_class_id: attributes[:debit_tax_class_id],
         debit_tax_rate_id: attributes[:debit_tax_rate_id],
         credit_department_id: attributes[:credit_department_id],
         credit_account_code: attributes[:credit_account_code],
         credit_account_sub_code: attributes[:credit_account_sub_code],
-        credit_supplier_id: attributes[:credit_supplier_id],
+        credit_business_connection_code: attributes[:credit_business_connection_code],
         credit_amount: attributes[:credit_amount],
         credit_tax_class_id: attributes[:credit_tax_class_id],
         credit_tax_rate_id: attributes[:credit_tax_rate_id],
@@ -487,16 +497,18 @@ module JournalEntryData
     end
 
     # JournalEntryDataListApplication::getSupplierNo()
-    def supplier_for(pattern_supplier_id, company_id, supplier_id, capture_category_id)
-      case pattern_supplier_id
-      when 0
-        supplier_id
-      when 1
-        company(company_id)&.supplier_id
-      when 2
-        capture_category_record(capture_category_id).supplier_id
+    def business_connection_code_for(pattern_code, company_id, data_code, capture_category_id)
+      normalized_code = pattern_code.to_s
+
+      case normalized_code
+      when "0"
+        data_code.presence
+      when "1"
+        company(company_id)&.business_connection_code
+      when "2"
+        capture_category_record(capture_category_id).business_connection_code
       else
-        pattern_supplier_id
+        normalized_code.presence
       end
     end
 

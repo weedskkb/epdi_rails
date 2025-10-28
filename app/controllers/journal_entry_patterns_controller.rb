@@ -26,11 +26,11 @@ class JournalEntryPatternsController < ApplicationController
     JournalEntryPattern.includes(
       :company,
       :debit_department,
-      :debit_supplier,
+      :debit_business_connection,
       :debit_tax_rate,
       :debit_tax_class,
       :credit_department,
-      :credit_supplier,
+      :credit_business_connection,
       :credit_tax_rate,
       :credit_tax_class,
     )
@@ -50,13 +50,13 @@ class JournalEntryPatternsController < ApplicationController
       :debit_department_id,
       :debit_account_code,
       :debit_account_sub_code,
-      :debit_supplier_id,
+      :debit_business_connection_code,
       :debit_tax_rate_id,
       :debit_tax_class_id,
       :credit_department_id,
       :credit_account_code,
       :credit_account_sub_code,
-      :credit_supplier_id,
+      :credit_business_connection_code,
       :credit_tax_rate_id,
       :credit_tax_class_id,
       :fixed_amount_flag,
@@ -87,9 +87,17 @@ class JournalEntryPatternsController < ApplicationController
       ["#{account.code} #{account.name}", account.code]
     end
 
-    @supplier_options = Supplier.active.order(:id).map do |supplier|
-      ["#{supplier.id} #{supplier.name}", supplier.id]
+    placeholder_options = [
+      ["0 取込データの取引先を使用", "0"],
+      ["1 会社の取引先を使用", "1"],
+      ["2 取込区分の取引先を使用", "2"]
+    ]
+
+    business_connection_choices = BusinessConnection.active.order(:code).map do |connection|
+      ["#{connection.code} #{connection.name}", connection.code]
     end
+
+    @business_connection_options = placeholder_options + business_connection_choices
 
     @tax_class_options = TaxClass.active.order(:id).map do |tax_class|
       ["#{tax_class.id} #{tax_class.name}", tax_class.id]

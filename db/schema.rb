@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_10_27_152001) do
+ActiveRecord::Schema[8.0].define(version: 2025_10_27_160000) do
   create_table "accounts", id: :integer, charset: "utf8mb4", collation: "utf8mb4_general_ci", force: :cascade do |t|
     t.string "name", null: false
     t.boolean "delete_flg", default: false, null: false
@@ -37,7 +37,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_10_27_152001) do
     t.string "name", null: false
     t.integer "tax_class_id"
     t.integer "tax_rate_id"
-    t.integer "supplier_id"
+    t.string "business_connection_code"
     t.integer "supplier_company_id"
     t.integer "debit_department_id"
     t.integer "debit_account_code"
@@ -58,7 +58,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_10_27_152001) do
 
   create_table "companies", id: :integer, charset: "utf8mb4", collation: "utf8mb4_general_ci", force: :cascade do |t|
     t.string "name", null: false
-    t.integer "supplier_id"
+    t.string "business_connection_code"
     t.boolean "delete_flg", default: false, null: false
     t.integer "created_by_id", null: false
     t.datetime "created_at", null: false
@@ -86,13 +86,13 @@ ActiveRecord::Schema[8.0].define(version: 2025_10_27_152001) do
     t.integer "debit_department_id"
     t.integer "debit_account_code"
     t.integer "debit_account_sub_code"
-    t.integer "debit_supplier_id"
+    t.string "debit_business_connection_code"
     t.integer "debit_tax_rate_id"
     t.integer "debit_tax_class_id"
     t.integer "credit_department_id"
     t.integer "credit_account_code"
     t.integer "credit_account_sub_code"
-    t.integer "credit_supplier_id"
+    t.string "credit_business_connection_code"
     t.integer "credit_tax_rate_id"
     t.integer "credit_tax_class_id"
     t.boolean "fixed_amount_flag", default: false, null: false
@@ -167,7 +167,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_10_27_152001) do
     t.integer "row_no", null: false
     t.integer "company_id", null: false
     t.integer "department_id", null: false
-    t.integer "supplier_id"
+    t.string "business_connection_code"
     t.integer "account_code"
     t.integer "account_sub_code"
     t.integer "amount", null: false
@@ -205,14 +205,14 @@ ActiveRecord::Schema[8.0].define(version: 2025_10_27_152001) do
     t.integer "debit_amount"
     t.integer "debit_tax_class_id"
     t.integer "debit_tax_rate_id"
-    t.integer "debit_supplier_id"
+    t.string "debit_business_connection_code"
     t.integer "credit_department_id"
     t.integer "credit_account_code"
     t.integer "credit_account_sub_code"
     t.integer "credit_amount"
     t.integer "credit_tax_class_id"
     t.integer "credit_tax_rate_id"
-    t.integer "credit_supplier_id"
+    t.string "credit_business_connection_code"
     t.string "abstract"
     t.datetime "created_at", null: false
     t.integer "created_by_id", null: false
