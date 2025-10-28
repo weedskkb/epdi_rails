@@ -36,3 +36,5 @@ gem 'roo'
 gem 'roo-xls'
 gem 'csv'
 gem 'rubyzip', '~> 2.3'
+
+gem 'nkf'
