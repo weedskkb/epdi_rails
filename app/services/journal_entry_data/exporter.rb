@@ -13,7 +13,7 @@ module JournalEntryData
 
     Row = Struct.new(
       :journal_entry_history_id,
-      :company_id,
+      :company_code,
       :date,
       :department_id,
       :debit_department_id,
@@ -100,7 +100,7 @@ module JournalEntryData
 
       scope.pluck(
         "#{records_table}.journal_entry_history_id",
-        "#{records_table}.company_id",
+        "#{records_table}.company_code",
         "#{records_table}.date",
         "#{records_table}.department_id",
         "#{records_table}.debit_department_id",
@@ -125,7 +125,7 @@ module JournalEntryData
       ).map do |values|
         Row.new(
           journal_entry_history_id: values[0],
-          company_id: values[1],
+          company_code: values[1],
           date: values[2],
           department_id: values[3],
           debit_department_id: values[4],
@@ -153,12 +153,12 @@ module JournalEntryData
 
     # JournalEntryDataListApplication::CreateCsvFolder()
     def build_company_files(rows)
-      grouped = rows.group_by(&:company_id)
-      company_names = Company.where(id: grouped.keys).pluck(:id, :name).to_h
+      grouped = rows.group_by(&:company_code)
+      company_names = Company.where(code: grouped.keys).pluck(:code, :name).to_h
       today_stamp = Time.zone.today.strftime("%Y%m%d")
 
-      grouped.map do |company_id, company_rows|
-        file_name = "#{company_names[company_id] || company_id}_#{today_stamp}.csv"
+      grouped.map do |company_code, company_rows|
+        file_name = "#{company_names[company_code] || company_code}_#{today_stamp}.csv"
         [file_name, build_company_csv(company_rows)]
       end
     end

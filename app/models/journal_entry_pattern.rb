@@ -3,7 +3,7 @@
 class JournalEntryPattern < ApplicationRecord
   scope :ordered, -> { order(:group_no, :row_no) }
 
-  belongs_to :company, class_name: "Company", foreign_key: :company_id, optional: true
+  belongs_to :company, class_name: "Company", foreign_key: :company_code, primary_key: :code, optional: true
   belongs_to :debit_department,
              class_name: "Department",
              foreign_key: :debit_department_id,

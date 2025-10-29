@@ -5,15 +5,18 @@
     <tr>
       <th>部門NO</th>
       <th>部門名</th>
-      <th>会社ID</th>
+      <th>会社コード</th>
+      <th>会社名</th>
     </tr>
   </thead>
   <tbody>
     <% @departments.each do |department| %>
+      <% company = department.get_company(Date.today) %>
       <tr>
         <td><%= department.id %></td>
         <td><%= department.department_name %></td>
-        <td><%= department.company_id %></td>
+        <td><%= company&.code %></td>
+        <td><%= company&.name %></td>
       </tr>
     <% end %>
   </tbody>

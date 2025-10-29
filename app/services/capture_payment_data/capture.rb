@@ -333,7 +333,7 @@ module CapturePaymentData
           department_id = cell_integer(sheet, row_idx, 0)
           next unless department_id
 
-          company_id = department_company_id(department_id)
+          company_code = department_company_code(department_id)
           (3...last_column).each do |col_idx|
             amount = cell_integer(sheet, row_idx, col_idx)
             business_connection_code = cell_string(sheet, 9, col_idx).presence
@@ -351,7 +351,7 @@ module CapturePaymentData
             create_capture_record(
               capture_history_id: history.id,
               row_no: row_idx + 1,
-              company_id: company_id,
+              company_code: company_code,
               department_id: department_id,
               business_connection_code: business_connection_code,
               account_code: account_code,
@@ -378,7 +378,7 @@ module CapturePaymentData
           business_connection_code = cell_string(sheet, row_idx, 3).presence
           next unless department_id && business_connection_code
 
-          company_id = department_company_id(department_id)
+          company_code = department_company_code(department_id)
           (5...last_column).each do |col_idx|
             amount = cell_integer(sheet, row_idx, col_idx)
             next unless amount
@@ -391,7 +391,7 @@ module CapturePaymentData
             create_capture_record(
               capture_history_id: history_no,
               row_no: row_idx + 1,
-              company_id: company_id,
+              company_code: company_code,
               department_id: department_id,
               business_connection_code: business_connection_code,
               account_code: account_code,
@@ -415,7 +415,7 @@ module CapturePaymentData
           department_id = cell_integer(sheet, row_idx, 0)
           next unless department_id
 
-          company_id = department_company_id(department_id)
+          company_code = department_company_code(department_id)
           (2...last_column).each do |col_idx|
             amount = cell_integer(sheet, row_idx, col_idx)
             business_connection_code = cell_string(sheet, 2, col_idx).presence
@@ -427,7 +427,7 @@ module CapturePaymentData
             create_capture_record(
               capture_history_id: history_no,
               row_no: row_idx + 1,
-              company_id: company_id,
+              company_code: company_code,
               department_id: department_id,
               business_connection_code: business_connection_code,
               list_cd: list_cd,
@@ -448,7 +448,7 @@ module CapturePaymentData
           department_id = cell_integer(sheet, row_idx, 0)
           next unless department_id
 
-          company_id = department_company_id(department_id)
+          company_code = department_company_code(department_id)
           (2..5).each do |col_idx|
             amount = cell_integer(sheet, row_idx, col_idx)
             next unless amount
@@ -457,7 +457,7 @@ module CapturePaymentData
             create_capture_record(
               capture_history_id: history_no,
               row_no: row_idx + 1,
-              company_id: company_id,
+              company_code: company_code,
               department_id: department_id,
               account_code: account_code,
               list_cd: capture_category.to_s,
@@ -489,7 +489,7 @@ module CapturePaymentData
           create_capture_record(
             capture_history_id: history_no,
             row_no: row_idx + 1,
-            company_id: department_company_id(department_id),
+            company_code: department_company_code(department_id),
             department_id: department_id,
             business_connection_code: category.business_connection_code,
             account_code: category.debit_account_code,
@@ -524,7 +524,7 @@ module CapturePaymentData
       TrnCaptureRecord.create!(
         capture_history_id: attrs[:capture_history_id],
         row_no: attrs[:row_no],
-        company_id: attrs[:company_id],
+        company_code: attrs[:company_code],
         department_id: attrs[:department_id],
         business_connection_code: attrs[:business_connection_code],
         account_code: attrs[:account_code],
@@ -539,8 +539,14 @@ module CapturePaymentData
       )
     end
 
-    def department_company_id(department_id)
-      Department.find(department_id).company_id
+    def department_company_code(department_id)
+      department = Department.find_by(id: department_id)
+      return nil unless department
+
+      # company = Company.find_by(id: department.company_id)
+      # company&.code || department.company_id&.to_s
+      month = parse_month_string(target_month_value)
+      department.get_company_code(month)
     end
 
     # CapturePaymentDataApplication::getPaymentMonth()

@@ -2,7 +2,7 @@
 # frozen_string_literal: true
 # 例:
 # ruby runner/csv_dir_diff.rb ../../check/LEFT ../../check/RIGHT --headers --ignore-cols CSJS005,CSJS100
-# mysql -u kkb_rails -ppassword -D epdi -B -e "SELECT * FROM trn_capture_records order by row_no,account_no" | sed 's/\t/,/g' > trn_capture_mydata.csv
+# mysql -u kkb_rails -ppassword -D epdi -B -e "SELECT * FROM trn_capture_records order by row_no,account_code" | sed 's/\t/,/g' > trn_capture_mydata.csv
 
 require 'csv'
 require 'optparse'

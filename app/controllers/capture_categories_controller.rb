@@ -11,7 +11,7 @@ class CaptureCategoriesController < ApplicationController
                               :tax_class,
                               :tax_rate,
                               :business_connection,
-                              :supplier_company,
+                              :business_connection_company,
                               :debit_department,
                               :credit_department
                             )
@@ -41,7 +41,7 @@ class CaptureCategoriesController < ApplicationController
       :tax_class_id,
       :tax_rate_id,
       :business_connection_code,
-      :supplier_company_id,
+      :business_connection_company_code,
       :debit_department_id,
       :debit_account_code,
       :debit_account_sub_code,
@@ -69,8 +69,8 @@ class CaptureCategoriesController < ApplicationController
       ["#{connection.code} #{connection.name}", connection.code]
     end
 
-    @company_options = Company.active.order(:id).map do |company|
-      ["#{company.id} #{company.name}", company.id]
+    @company_options = Company.active.order(:code).map do |company|
+      ["#{company.code} #{company.name}", company.code]
     end
 
     @department_options = Department.active.order(:id).map do |department|

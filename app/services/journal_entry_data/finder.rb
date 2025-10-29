@@ -3,7 +3,7 @@
 module JournalEntryData
   class Finder
     PreviewItem = Struct.new(
-      :company_id,
+      :company_code,
       :date,
       :debit_department_id,
       :debit_account_code,
@@ -51,7 +51,7 @@ module JournalEntryData
     def preview_items
       relation.includes(:journal_entry_history).map do |record|
         PreviewItem.new(
-          company_id: record.company_id,
+          company_code: record.company_code,
           date: record.date,
           debit_department_id: record.debit_department_id,
           debit_account_code: record.debit_account_code,

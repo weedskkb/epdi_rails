@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_10_27_160000) do
+ActiveRecord::Schema[8.0].define(version: 2025_10_28_164000) do
   create_table "accounts", id: :integer, charset: "utf8mb4", collation: "utf8mb4_general_ci", force: :cascade do |t|
     t.string "name", null: false
     t.boolean "delete_flg", default: false, null: false
@@ -19,6 +19,16 @@ ActiveRecord::Schema[8.0].define(version: 2025_10_27_160000) do
     t.integer "updated_by_id"
     t.datetime "updated_at"
     t.integer "code"
+  end
+
+  create_table "bs_companies", id: :integer, charset: "utf8mb4", collation: "utf8mb4_general_ci", force: :cascade do |t|
+    t.string "name", null: false
+    t.string "business_connection_code"
+    t.boolean "delete_flg", default: false, null: false
+    t.integer "created_by_id", null: false
+    t.datetime "created_at", null: false
+    t.integer "updated_by_id"
+    t.datetime "updated_at"
   end
 
   create_table "business_connections", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
@@ -38,7 +48,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_10_27_160000) do
     t.integer "tax_class_id"
     t.integer "tax_rate_id"
     t.string "business_connection_code"
-    t.integer "supplier_company_id"
+    t.string "business_connection_company_code"
     t.integer "debit_department_id"
     t.integer "debit_account_code"
     t.integer "debit_account_sub_code"
@@ -56,14 +66,13 @@ ActiveRecord::Schema[8.0].define(version: 2025_10_27_160000) do
     t.datetime "updated_at"
   end
 
-  create_table "companies", id: :integer, charset: "utf8mb4", collation: "utf8mb4_general_ci", force: :cascade do |t|
+  create_table "companies", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
+    t.string "code", null: false
     t.string "name", null: false
+    t.boolean "hidden", default: false, null: false
     t.string "business_connection_code"
-    t.boolean "delete_flg", default: false, null: false
-    t.integer "created_by_id", null: false
     t.datetime "created_at", null: false
-    t.integer "updated_by_id"
-    t.datetime "updated_at"
+    t.datetime "updated_at", null: false
   end
 
   create_table "departments", id: :integer, charset: "utf8mb4", collation: "utf8mb4_general_ci", force: :cascade do |t|
@@ -82,7 +91,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_10_27_160000) do
     t.string "name", null: false
     t.integer "row_no", null: false
     t.integer "date_pattern_no", null: false
-    t.integer "company_id"
+    t.string "company_code"
     t.integer "debit_department_id"
     t.integer "debit_account_code"
     t.integer "debit_account_sub_code"
@@ -165,7 +174,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_10_27_160000) do
   create_table "trn_capture_records", id: :integer, charset: "utf8mb4", collation: "utf8mb4_general_ci", force: :cascade do |t|
     t.integer "capture_history_id", null: false
     t.integer "row_no", null: false
-    t.integer "company_id", null: false
+    t.string "company_code", null: false
     t.integer "department_id", null: false
     t.string "business_connection_code"
     t.integer "account_code"
@@ -197,7 +206,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_10_27_160000) do
     t.integer "excel_row_no", null: false
     t.integer "row_no", null: false
     t.date "date", null: false
-    t.integer "company_id", null: false
+    t.string "company_code", null: false
     t.integer "department_id"
     t.integer "debit_department_id"
     t.integer "debit_account_code"
@@ -234,7 +243,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_10_27_160000) do
 
   add_foreign_key "business_connections", "users", column: "created_by_id"
   add_foreign_key "business_connections", "users", column: "updated_by_id"
-  add_foreign_key "departments", "companies", name: "fk_departments_company", on_delete: :cascade
+  add_foreign_key "departments", "bs_companies", column: "company_id", name: "fk_departments_company", on_delete: :cascade
   add_foreign_key "sub_accounts", "accounts", column: "code"
   add_foreign_key "sub_accounts", "accounts", column: "code"
   add_foreign_key "trn_capture_histories", "capture_categories"

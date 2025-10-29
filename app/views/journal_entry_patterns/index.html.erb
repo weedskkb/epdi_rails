@@ -79,7 +79,7 @@
         <th class="wrap">パターン名<span class="column-key">name</span></th>
         <th class="wrap">行NO<span class="column-key">row_no</span></th>
         <th class="wrap">日付パターンNO<span class="column-key">date_pattern_no</span></th>
-        <th class="wrap">会社<span class="column-key">company_id</span></th>
+        <th class="wrap">会社<span class="column-key">company_code</span></th>
         <th class="wrap">借方部署<span class="column-key">debit_department_id</span></th>
         <th class="wrap">借方勘定科目<span class="column-key">debit_account_code</span></th>
         <th class="wrap">借方補助科目<span class="column-key">debit_account_sub_code</span></th>
@@ -115,7 +115,7 @@
           <td class="wrap"><%= pattern.name %></td>
           <td class="wrap"><%= pattern.row_no %></td>
           <td class="wrap"><%= pattern.date_pattern_no %></td>
-          <td class="wrap"><%= display_reference(pattern.company_id, pattern.company&.name) %></td>
+          <td class="wrap"><%= display_reference(pattern.company_code, pattern.company&.name) %></td>
           <td class="wrap"><%= display_reference(pattern.debit_department_id, pattern.debit_department&.department_name) %></td>
           <td class="wrap"><%= pattern.debit_account_code %></td>
           <td class="wrap"><%= pattern.debit_account_sub_code || "-" %></td>

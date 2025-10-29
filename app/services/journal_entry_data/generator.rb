@@ -117,7 +117,7 @@ module JournalEntryData
           next if skip_expense_summary_row?(category.id, row)
 
           patterns.each do |pattern|
-            next if skip_store_pattern_row?(pattern, row.company_id)
+          next if skip_store_pattern_row?(pattern, row.company_code)
 
             debit_account_code = account_for(pattern.debit_account_code, category.id, "debit")
             credit_account_code = account_for(pattern.credit_account_code, category.id, "credit")
@@ -177,7 +177,7 @@ module JournalEntryData
             row_no: key[0],
             excel_row_no: 0,
             date: key[1],
-            company_id: 1,  # ウィーズ
+            company_code: primary_company_code,
             department_id: 201,
             debit_department_id: key[2],
             debit_account_code: key[3],
@@ -205,28 +205,28 @@ module JournalEntryData
         row_no: pattern.row_no,
         excel_row_no: capture_row.row_no,
         date: date_for(pattern.date_pattern_no, history.accrual_month, history.payment_month, form.fund_transfer_date),
-        company_id: company_for(pattern.company_id, capture_row.company_id, capture_category.id),
+        company_code: company_for(pattern.company_code, capture_row.company_code, capture_category.id),
         department_id: capture_row.department_id,
-        debit_department_id: department_for(pattern.debit_department_id, capture_row.department_id, capture_row.company_id, capture_category.id, "debit"),
+        debit_department_id: department_for(pattern.debit_department_id, capture_row.department_id, capture_row.company_code, capture_category.id, "debit"),
         debit_account_code: debit_account_code,
         debit_account_sub_code: sub_account_for(pattern.debit_account_sub_code,
                                                capture_category.id, "debit"),
         debit_business_connection_code: business_connection_code_for(
           pattern.debit_business_connection_code,
-          capture_row.company_id,
+          capture_row.company_code,
           capture_row.business_connection_code,
           capture_category.id
         ),
         debit_amount: debit_amount,
         debit_tax_class_id: tax_class_for(pattern.debit_tax_class_id, capture_category.id),
         debit_tax_rate_id: tax_rate_for(pattern.debit_tax_rate_id, capture_category.id),
-        credit_department_id: department_for(pattern.credit_department_id, capture_row.department_id, capture_row.company_id, capture_category.id, "credit"),
+        credit_department_id: department_for(pattern.credit_department_id, capture_row.department_id, capture_row.company_code, capture_category.id, "credit"),
         credit_account_code: credit_account_code,
         credit_account_sub_code: sub_account_for(pattern.credit_account_sub_code,
                                                  capture_category.id, "credit"),
         credit_business_connection_code: business_connection_code_for(
           pattern.credit_business_connection_code,
-          capture_row.company_id,
+          capture_row.company_code,
           capture_row.business_connection_code,
           capture_category.id
         ),
@@ -238,7 +238,7 @@ module JournalEntryData
           history.accrual_month,
           history.payment_month,
           capture_row.department_id,
-          capture_row.company_id,
+          capture_row.company_code,
           capture_category.id
         )
       }
@@ -251,7 +251,7 @@ module JournalEntryData
         row_no: attributes[:row_no],
         excel_row_no: attributes[:excel_row_no],
         date: attributes[:date],
-        company_id: attributes[:company_id],
+        company_code: attributes[:company_code],
         department_id: attributes[:department_id],
         debit_department_id: attributes[:debit_department_id],
         debit_account_code: attributes[:debit_account_code],
@@ -300,13 +300,14 @@ module JournalEntryData
     end
 
     # JournalEntryDataListApplication::Create() - store pattern skip
-    def skip_store_pattern_row?(pattern, company_id)
+    def skip_store_pattern_row?(pattern, company_code)
       return false unless pattern.group_no == PATTERN_GROUP_STORE
 
       row_no = pattern.row_no
       debit_account = pattern.debit_account_code
+      company_number = company_code.to_i
 
-      if company_id == 1  # ウィーズ
+      if company_number == 1  # ウィーズ
         row_no == 8
       else
         (row_no == 4 && debit_account == 820) || row_no == 7
@@ -323,7 +324,7 @@ module JournalEntryData
         when 4
           return nil if account_code.nil?
 
-          return capture_row.amount.to_i if account_code == 823 && capture_row.company_id == 1  # 医薬品仕入/ウィーズ
+          return capture_row.amount.to_i if account_code == 823 && capture_row.company_code.to_i == 1  # 医薬品仕入/ウィーズ
           return capture_row.amount.to_i + capture_row.second_amount.to_i if account_code == 823
           return capture_row.second_amount.to_i if account_code == 820
 
@@ -439,24 +440,29 @@ module JournalEntryData
     end
 
     # JournalEntryDataListApplication::getCompanyNo()
-    def company_for(pattern_company_value, data_company_id, capture_category_id)
-      case pattern_company_value
-      when 0
-        data_company_id
-      when 1
-        capture_category_record(capture_category_id).supplier_company_id || 1
+    def company_for(pattern_company_value, data_company_code, capture_category_id)
+      normalized = pattern_company_value.to_s
+      fallback_code = data_company_code.presence || primary_company_code
+
+      case normalized
+      when "", "0"
+        fallback_code
+      when "1"
+        capture_category_record(capture_category_id).business_connection_company_code.presence || fallback_code
       else
-        pattern_company_value
+        normalized
       end
     end
 
     # JournalEntryDataListApplication::getDepartmentNo()
-    def department_for(pattern_department_id, department_id, company_id, capture_category_id, side)
+    def department_for(pattern_department_id, department_id, company_code, capture_category_id, side)
       case pattern_department_id
       when 0
         department_id
       when 1
-        case company_id
+        company_number = company_code.to_i
+
+        case company_number
         when 1
           201
         when 792
@@ -464,7 +470,7 @@ module JournalEntryData
         when 808
           425
         else
-          company_id
+          company_number.nonzero? || department_id
         end
       when 2
         category = capture_category_record(capture_category_id)
@@ -497,14 +503,14 @@ module JournalEntryData
     end
 
     # JournalEntryDataListApplication::getSupplierNo()
-    def business_connection_code_for(pattern_code, company_id, data_code, capture_category_id)
+    def business_connection_code_for(pattern_code, company_code, data_code, capture_category_id)
       normalized_code = pattern_code.to_s
 
       case normalized_code
       when "0"
         data_code.presence
       when "1"
-        company(company_id)&.business_connection_code
+        company(company_code)&.business_connection_code
       when "2"
         capture_category_record(capture_category_id).business_connection_code
       else
@@ -537,14 +543,14 @@ module JournalEntryData
     end
 
     # JournalEntryDataListApplication::getAbstract()
-    def abstract_for(pattern_abstract, accrual_month, payment_month, store_no, company_id, capture_category_id)
+    def abstract_for(pattern_abstract, accrual_month, payment_month, store_no, company_code, capture_category_id)
       abstract = pattern_abstract.to_s.dup
       category = capture_category_record(capture_category_id)
 
       accrual_text = accrual_month ? format_month(accrual_month) : format_month(payment_month)
       payment_text = format_month(payment_month)
       store_name = department(store_no)&.department_name.to_s
-      company_name = company(company_id)&.name.to_s
+      company_name = company(company_code)&.name.to_s
 
       abstract.gsub!("取引先別", category.abstract.to_s)
       abstract.gsub!("仕入先別", category.supplier_abstract.to_s)
@@ -584,16 +590,29 @@ module JournalEntryData
       capture_category_cache[id] ||= CaptureCategory.find(id)
     end
 
-    def company(number)
-      return nil if number.nil?
+    def primary_company_code
+      @primary_company_code ||= begin
+        company("1")&.code || Company.order(:code).limit(1).pluck(:code).first || "1"
+      end
+    end
 
-      company_cache[number] ||= Company.find_by(id: number)
+    def company(identifier)
+      return nil if identifier.blank?
+
+      key = identifier.to_s
+      company_cache[key] ||= begin
+        Company.find_by(code: key) || (numeric?(key) ? Company.find_by(id: key.to_i) : nil)
+      end
     end
 
     def department(number)
       return nil if number.nil?
 
       department_cache[number] ||= Department.find_by(id: number)
+    end
+
+    def numeric?(value)
+      value.to_s.match?(/\A\d+\z/)
     end
   end
 end

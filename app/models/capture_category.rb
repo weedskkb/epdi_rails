@@ -9,7 +9,11 @@ class CaptureCategory < ApplicationRecord
              foreign_key: :business_connection_code,
              primary_key: :code,
              optional: true
-  belongs_to :supplier_company, class_name: "Company", optional: true
+  belongs_to :business_connection_company,
+             class_name: "Company",
+             foreign_key: :business_connection_company_code,
+             primary_key: :code,
+             optional: true
   belongs_to :debit_department, class_name: "Department", optional: true
   belongs_to :credit_department, class_name: "Department", optional: true
 

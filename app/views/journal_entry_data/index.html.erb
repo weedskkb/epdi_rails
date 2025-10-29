@@ -55,7 +55,7 @@
   <table>
     <thead>
       <tr>
-        <th>会社</th>
+        <th>会社コード</th>
         <th>伝票日付</th>
         <th>借方部門</th>
         <th>借方科目</th>
@@ -73,7 +73,7 @@
     <tbody>
       <% @journal_entries.each do |entry| %>
         <tr>
-          <td class="number"><%= entry.company_id %></td>
+          <td class="number"><%= entry.company_code %></td>
           <td><%= entry.date&.respond_to?(:strftime) ? entry.date.strftime("%Y/%m/%d") : entry.date %></td>
           <td class="number"><%= entry.debit_department_id %></td>
           <td class="number"><%= entry.debit_account_code %></td>
