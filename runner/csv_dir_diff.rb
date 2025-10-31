@@ -1,8 +1,12 @@
 #!/usr/bin/env ruby
 # frozen_string_literal: true
-# 例:
-# ruby runner/csv_dir_diff.rb ../../check/LEFT ../../check/RIGHT --headers --ignore-cols CSJS005,CSJS100
-# mysql -u kkb_rails -ppassword -D epdi -B -e "SELECT * FROM trn_capture_records order by row_no,account_code" | sed 's/\t/,/g' > trn_capture_mydata.csv
+
+# ruby runner/csv_dir_diff.rb ../../check/LEFT ../../check/RIGHT --headers --ignore-cols CSJS005,CSJS100,CAPTURE_HISTORY_NO,CREATE_USER_ID,CREATE_DATE,CAPTURE_DATA_NO,JOURNAL_ENTRY_DATA_NO,DATE
+
+# mysql -u kkb_rails -ppassword -D epdi -B -e "SELECT id as CAPTURE_DATA_NO, capture_history_id as CAPTURE_HISTORY_NO, row_no as ROW_NO, company_code as COMPANY_NO, department_code as DEPARTMENT_NO, business_connection_code as SUPPLIER_NO, account_code as ACCOUNT_NO, account_sub_code as SUB_ACCOUNT_NO, amount as AMMOUNT, second_amount as SECOND_AMMOUNT, tax_class_id as TAX_CLASS_NO, tax_rate_id as TAX_RATE_NO, created_at as CREATE_USER_ID, created_by_id as CREATE_DATE, list_cd as LIST_CD FROM trn_capture_records order by ROW_NO,ACCOUNT_NO" | sed 's/\t/,/g' > trn_capture_mydata.csv
+
+# mysql -u kkb_rails -ppassword -D epdi -B -e "select id as JOURNAL_ENTRY_DATA_NO,journal_entry_history_id as JOURNAL_ENTRY_HISTORY_NO, excel_row_no as EXCEL_ROW_NO, row_no as ROW_NO, date as DATE, company_code as COMPANY_NO, department_code as DEPARTMENT_NO, debit_department_code as DEBIT_DEPARTMENT_NO, debit_account_code as DEBIT_ACCOUNT_NO, debit_account_sub_code as DEBIT_SUB_ACCOUNT_NO, debit_amount as DEBIT_AMOUNT, debit_tax_class_id as DEBIT_TAX_CLASS_NO, debit_tax_rate_id as DEBIT_TAX_RATE_NO, debit_business_connection_code as DEBIT_SUPPLIER_NO, credit_department_code as CREDIT_DEPARTMENT_NO, credit_account_code as CREDIT_ACCOUNT_NO, credit_account_sub_code as CREDIT_SUB_ACCOUNT_NO, credit_amount as CREDIT_AMOUNT, credit_tax_class_id as CREDIT_TAX_CLASS_NO, credit_tax_rate_id as CREDIT_TAX_RATE_NO, credit_business_connection_code as CREDIT_SUPPLIER_NO, abstract as ABSTRACT, created_by_id as CREATE_USER_ID, created_at as CREATE_DATE from trn_journal_entry_records order by EXCEL_ROW_NO,ROW_NO,DEBIT_DEPARTMENT_NO,DEBIT_ACCOUNT_NO,DEBIT_SUB_ACCOUNT_NO,CREDIT_DEPARTMENT_NO,CREDIT_ACCOUNT_NO,CREDIT_SUB_ACCOUNT_NO,ABSTRACT" | sed 's/\t/,/g' > trn_journal_entry_mydata.csv
+
 
 require 'csv'
 require 'optparse'
