@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_10_28_164000) do
+ActiveRecord::Schema[8.0].define(version: 2025_11_01_004000) do
   create_table "accounts", id: :integer, charset: "utf8mb4", collation: "utf8mb4_general_ci", force: :cascade do |t|
     t.string "name", null: false
     t.boolean "delete_flg", default: false, null: false
@@ -31,6 +31,17 @@ ActiveRecord::Schema[8.0].define(version: 2025_10_28_164000) do
     t.datetime "updated_at"
   end
 
+  create_table "bs_departments", id: :integer, charset: "utf8mb4", collation: "utf8mb4_general_ci", force: :cascade do |t|
+    t.string "name", null: false
+    t.integer "company_id", null: false
+    t.boolean "delete_flg", default: false, null: false
+    t.integer "created_by_id", null: false
+    t.datetime "created_at", null: false
+    t.integer "updated_by_id"
+    t.datetime "updated_at"
+    t.index ["company_id"], name: "index_bs_departments_on_company_id"
+  end
+
   create_table "business_connections", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
     t.string "code", null: false
     t.string "name", null: false
@@ -49,10 +60,10 @@ ActiveRecord::Schema[8.0].define(version: 2025_10_28_164000) do
     t.integer "tax_rate_id"
     t.string "business_connection_code"
     t.string "business_connection_company_code"
-    t.integer "debit_department_id"
+    t.string "debit_department_code"
     t.integer "debit_account_code"
     t.integer "debit_account_sub_code"
-    t.integer "credit_department_id"
+    t.string "credit_department_code"
     t.integer "credit_account_code"
     t.integer "credit_account_sub_code"
     t.string "abstract"
@@ -75,15 +86,17 @@ ActiveRecord::Schema[8.0].define(version: 2025_10_28_164000) do
     t.datetime "updated_at", null: false
   end
 
-  create_table "departments", id: :integer, charset: "utf8mb4", collation: "utf8mb4_general_ci", force: :cascade do |t|
+  create_table "departments", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
+    t.string "code", null: false
     t.string "name", null: false
-    t.integer "company_id", null: false
-    t.boolean "delete_flg", default: false, null: false
-    t.integer "created_by_id", null: false
+    t.string "store_code", null: false
+    t.string "store_name", null: false
+    t.boolean "hidden", default: false, null: false
+    t.integer "company_id"
     t.datetime "created_at", null: false
-    t.integer "updated_by_id"
-    t.datetime "updated_at"
-    t.index ["company_id"], name: "index_departments_on_company_id"
+    t.datetime "updated_at", null: false
+    t.index ["code"], name: "index_departments_on_code", unique: true
+    t.index ["store_code"], name: "index_departments_on_store_code", unique: true
   end
 
   create_table "journal_entry_patterns", id: :integer, charset: "utf8mb4", collation: "utf8mb4_general_ci", force: :cascade do |t|
@@ -92,13 +105,13 @@ ActiveRecord::Schema[8.0].define(version: 2025_10_28_164000) do
     t.integer "row_no", null: false
     t.integer "date_pattern_no", null: false
     t.string "company_code"
-    t.integer "debit_department_id"
+    t.string "debit_department_code"
     t.integer "debit_account_code"
     t.integer "debit_account_sub_code"
     t.string "debit_business_connection_code"
     t.integer "debit_tax_rate_id"
     t.integer "debit_tax_class_id"
-    t.integer "credit_department_id"
+    t.string "credit_department_code"
     t.integer "credit_account_code"
     t.integer "credit_account_sub_code"
     t.string "credit_business_connection_code"
@@ -175,7 +188,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_10_28_164000) do
     t.integer "capture_history_id", null: false
     t.integer "row_no", null: false
     t.string "company_code", null: false
-    t.integer "department_id", null: false
+    t.string "department_code", null: false
     t.string "business_connection_code"
     t.integer "account_code"
     t.integer "account_sub_code"
@@ -187,7 +200,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_10_28_164000) do
     t.integer "created_by_id", null: false
     t.string "list_cd"
     t.index ["capture_history_id"], name: "index_trn_capture_records_on_capture_history_id"
-    t.index ["department_id"], name: "index_trn_capture_records_on_department_id"
+    t.index ["department_code"], name: "index_trn_capture_records_on_department_code"
   end
 
   create_table "trn_journal_entry_histories", id: :integer, charset: "utf8mb4", collation: "utf8mb4_general_ci", force: :cascade do |t|
@@ -207,15 +220,15 @@ ActiveRecord::Schema[8.0].define(version: 2025_10_28_164000) do
     t.integer "row_no", null: false
     t.date "date", null: false
     t.string "company_code", null: false
-    t.integer "department_id"
-    t.integer "debit_department_id"
+    t.string "department_code"
+    t.string "debit_department_code"
     t.integer "debit_account_code"
     t.integer "debit_account_sub_code"
     t.integer "debit_amount"
     t.integer "debit_tax_class_id"
     t.integer "debit_tax_rate_id"
     t.string "debit_business_connection_code"
-    t.integer "credit_department_id"
+    t.string "credit_department_code"
     t.integer "credit_account_code"
     t.integer "credit_account_sub_code"
     t.integer "credit_amount"
@@ -225,6 +238,9 @@ ActiveRecord::Schema[8.0].define(version: 2025_10_28_164000) do
     t.string "abstract"
     t.datetime "created_at", null: false
     t.integer "created_by_id", null: false
+    t.index ["credit_department_code"], name: "index_trn_journal_entry_records_on_credit_department_code"
+    t.index ["debit_department_code"], name: "index_trn_journal_entry_records_on_debit_department_code"
+    t.index ["department_code"], name: "index_trn_journal_entry_records_on_department_code"
   end
 
   create_table "users", id: :integer, charset: "utf8mb4", collation: "utf8mb4_general_ci", force: :cascade do |t|
@@ -241,13 +257,12 @@ ActiveRecord::Schema[8.0].define(version: 2025_10_28_164000) do
     t.index ["updated_by_id"], name: "index_users_on_updated_by_id"
   end
 
+  add_foreign_key "bs_departments", "bs_companies", column: "company_id", name: "fk_departments_company", on_delete: :cascade
   add_foreign_key "business_connections", "users", column: "created_by_id"
   add_foreign_key "business_connections", "users", column: "updated_by_id"
-  add_foreign_key "departments", "bs_companies", column: "company_id", name: "fk_departments_company", on_delete: :cascade
   add_foreign_key "sub_accounts", "accounts", column: "code"
   add_foreign_key "sub_accounts", "accounts", column: "code"
   add_foreign_key "trn_capture_histories", "capture_categories"
-  add_foreign_key "trn_capture_records", "departments"
   add_foreign_key "trn_capture_records", "trn_capture_histories", column: "capture_history_id"
   add_foreign_key "trn_journal_entry_histories", "capture_categories"
   add_foreign_key "users", "users", column: "created_by_id", name: "fk_users_created_by"

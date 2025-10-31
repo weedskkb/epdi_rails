@@ -5,12 +5,12 @@ module JournalEntryData
     PreviewItem = Struct.new(
       :company_code,
       :date,
-      :debit_department_id,
+      :debit_department_code,
       :debit_account_code,
       :debit_account_sub_code,
       :debit_business_connection_code,
       :debit_amount,
-      :credit_department_id,
+      :credit_department_code,
       :credit_account_code,
       :credit_account_sub_code,
       :credit_business_connection_code,
@@ -38,7 +38,7 @@ module JournalEntryData
       scope.order(<<~SQL.squish)
         #{histories_table}.id ASC,
         #{records_table}.row_no ASC,
-        #{records_table}.department_id ASC,
+        #{records_table}.department_code ASC,
         #{records_table}.created_at ASC
       SQL
     end
@@ -53,12 +53,12 @@ module JournalEntryData
         PreviewItem.new(
           company_code: record.company_code,
           date: record.date,
-          debit_department_id: record.debit_department_id,
+          debit_department_code: record.debit_department_code,
           debit_account_code: record.debit_account_code,
           debit_account_sub_code: record.debit_account_sub_code,
           debit_business_connection_code: record.debit_business_connection_code,
           debit_amount: record.debit_amount,
-          credit_department_id: record.credit_department_id,
+          credit_department_code: record.credit_department_code,
           credit_account_code: record.credit_account_code,
           credit_account_sub_code: record.credit_account_sub_code,
           credit_business_connection_code: record.credit_business_connection_code,

@@ -47,13 +47,13 @@ class JournalEntryPatternsController < ApplicationController
       :row_no,
       :date_pattern_no,
       :company_code,
-      :debit_department_id,
+      :debit_department_code,
       :debit_account_code,
       :debit_account_sub_code,
       :debit_business_connection_code,
       :debit_tax_rate_id,
       :debit_tax_class_id,
-      :credit_department_id,
+      :credit_department_code,
       :credit_account_code,
       :credit_account_sub_code,
       :credit_business_connection_code,
@@ -79,8 +79,8 @@ class JournalEntryPatternsController < ApplicationController
       ["#{company.code} #{company.name}", company.code]
     end
 
-    @department_options = Department.active.order(:id).map do |department|
-      ["#{department.id} #{department.department_name}", department.id]
+    @department_options = Department.active.order(:code).map do |department|
+      ["#{department.code} #{department.name}", department.code]
     end
 
     @account_options = Account.active.order(:code).map do |account|

@@ -6,11 +6,13 @@ class JournalEntryPattern < ApplicationRecord
   belongs_to :company, class_name: "Company", foreign_key: :company_code, primary_key: :code, optional: true
   belongs_to :debit_department,
              class_name: "Department",
-             foreign_key: :debit_department_id,
+             foreign_key: :debit_department_code,
+             primary_key: :code,
              optional: true
   belongs_to :credit_department,
              class_name: "Department",
-             foreign_key: :credit_department_id,
+             foreign_key: :credit_department_code,
+             primary_key: :code,
              optional: true
   belongs_to :debit_business_connection,
              class_name: "BusinessConnection",

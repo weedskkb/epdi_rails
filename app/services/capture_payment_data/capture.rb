@@ -238,18 +238,17 @@ module CapturePaymentData
       missing = nil
       sheets.each do |sheet|
         (start_row..last_row_index(sheet)).each do |row_idx|
-          department_id = cell_integer(sheet, row_idx, 0)
-          next unless department_id
+          department_code = department_code_from(sheet, row_idx)
+          next unless department_code
 
-          unless Department.exists?(id: department_id)
-            missing = department_id
+          unless department_from_code(department_code)
+            missing = department_code
             break
           end
         end
         break if missing
       end
-
-      view_model.errors.add(:base, "登録されていない店舗番号があります。(店舗番号：#{missing})") if missing
+      view_model.errors.add(:base, "登録されていない店舗コードがあります。(店舗コード：#{missing})") if missing
     end
 
     # CapturePaymentDataApplication::Overwrite()
@@ -330,10 +329,13 @@ module CapturePaymentData
         last_row = last_row_index(sheet)
         last_column = last_column_index(sheet, 0) - 1
         (11..last_row).each do |row_idx|
-          department_id = cell_integer(sheet, row_idx, 0)
-          next unless department_id
+          department_code = department_code_from(sheet, row_idx)
+          next unless department_code
 
-          company_code = department_company_code(department_id)
+          department = department_from_code(department_code)
+          next unless department
+
+          company_code = department_company_code(department)
           (3...last_column).each do |col_idx|
             amount = cell_integer(sheet, row_idx, col_idx)
             business_connection_code = cell_string(sheet, 9, col_idx).presence
@@ -352,7 +354,7 @@ module CapturePaymentData
               capture_history_id: history.id,
               row_no: row_idx + 1,
               company_code: company_code,
-              department_id: department_id,
+              department_code: department.code,
               business_connection_code: business_connection_code,
               account_code: account_code,
               account_sub_code: account_sub_code,
@@ -374,11 +376,16 @@ module CapturePaymentData
         last_row = last_row_index(sheet)
         last_column = last_column_index(sheet, 0) - 1
         (8..last_row).each do |row_idx|
-          department_id = cell_integer(sheet, row_idx, 0)
-          business_connection_code = cell_string(sheet, row_idx, 3).presence
-          next unless department_id && business_connection_code
+          department_code = department_code_from(sheet, row_idx)
+          next unless department_code
 
-          company_code = department_company_code(department_id)
+          department = department_from_code(department_code)
+          next unless department
+
+          business_connection_code = cell_string(sheet, row_idx, 3).presence
+          next unless business_connection_code
+
+          company_code = department_company_code(department)
           (5...last_column).each do |col_idx|
             amount = cell_integer(sheet, row_idx, col_idx)
             next unless amount
@@ -392,7 +399,7 @@ module CapturePaymentData
               capture_history_id: history_no,
               row_no: row_idx + 1,
               company_code: company_code,
-              department_id: department_id,
+              department_code: department.code,
               business_connection_code: business_connection_code,
               account_code: account_code,
               account_sub_code: account_sub_code,
@@ -412,10 +419,13 @@ module CapturePaymentData
         last_row = last_row_index(sheet)
         last_column = last_column_index(sheet, 3) - 1
         (5..last_row).each do |row_idx|
-          department_id = cell_integer(sheet, row_idx, 0)
-          next unless department_id
+          department_code = department_code_from(sheet, row_idx)
+          next unless department_code
 
-          company_code = department_company_code(department_id)
+          department = department_from_code(department_code)
+          next unless department
+
+          company_code = department_company_code(department)
           (2...last_column).each do |col_idx|
             amount = cell_integer(sheet, row_idx, col_idx)
             business_connection_code = cell_string(sheet, 2, col_idx).presence
@@ -428,7 +438,7 @@ module CapturePaymentData
               capture_history_id: history_no,
               row_no: row_idx + 1,
               company_code: company_code,
-              department_id: department_id,
+              department_code: department.code,
               business_connection_code: business_connection_code,
               list_cd: list_cd,
               amount: amount,
@@ -445,10 +455,13 @@ module CapturePaymentData
       sheets.each do |sheet|
         last_row = last_row_index(sheet)
         (3..last_row).each do |row_idx|
-          department_id = cell_integer(sheet, row_idx, 0)
-          next unless department_id
+          department_code = department_code_from(sheet, row_idx)
+          next unless department_code
 
-          company_code = department_company_code(department_id)
+          department = department_from_code(department_code)
+          next unless department
+
+          company_code = department_company_code(department)
           (2..5).each do |col_idx|
             amount = cell_integer(sheet, row_idx, col_idx)
             next unless amount
@@ -458,7 +471,7 @@ module CapturePaymentData
               capture_history_id: history_no,
               row_no: row_idx + 1,
               company_code: company_code,
-              department_id: department_id,
+              department_code: department.code,
               account_code: account_code,
               list_cd: capture_category.to_s,
               amount: amount,
@@ -476,8 +489,11 @@ module CapturePaymentData
       sheets.each do |sheet|
         last_row = last_row_index(sheet)
         (1..last_row).each do |row_idx|
-          department_id = cell_integer(sheet, row_idx, 0)
-          next unless department_id
+          department_code = department_code_from(sheet, row_idx)
+          next unless department_code
+
+          department = department_from_code(department_code)
+          next unless department
 
           primary_amount = cell_integer(sheet, row_idx, 2)
           secondary_amount = cell_integer(sheet, row_idx, 3)
@@ -489,8 +505,8 @@ module CapturePaymentData
           create_capture_record(
             capture_history_id: history_no,
             row_no: row_idx + 1,
-            company_code: department_company_code(department_id),
-            department_id: department_id,
+            company_code: department_company_code(department),
+            department_code: department.code,
             business_connection_code: category.business_connection_code,
             account_code: category.debit_account_code,
             account_sub_code: category.debit_account_sub_code,
@@ -525,7 +541,7 @@ module CapturePaymentData
         capture_history_id: attrs[:capture_history_id],
         row_no: attrs[:row_no],
         company_code: attrs[:company_code],
-        department_id: attrs[:department_id],
+        department_code: attrs[:department_code],
         business_connection_code: attrs[:business_connection_code],
         account_code: attrs[:account_code],
         account_sub_code: attrs[:account_sub_code],
@@ -539,13 +555,26 @@ module CapturePaymentData
       )
     end
 
-    def department_company_code(department_id)
-      department = Department.find_by(id: department_id)
+    def department_code_from(sheet, row_idx)
+      code = cell_string(sheet, row_idx, 0).to_s.strip.presence
+      code =~ /\A\d\z/ ? '0' + code : code  # 1桁コード対応
+    end
+
+    def department_from_code(department_code)
+      return nil if department_code.blank?
+
+      @departments_by_code ||= {}
+      code_key = department_code.to_s
+      # code_key = department_code.to_i # 後で削除
+      return @departments_by_code[code_key] if @departments_by_code.key?(code_key)
+
+      @departments_by_code[code_key] = Department.find_by(code: code_key)
+    end
+
+    def department_company_code(department)
       return nil unless department
 
-      # company = Company.find_by(id: department.company_id)
-      # company&.code || department.company_id&.to_s
-      month = parse_month_string(target_month_value)
+      month = parse_month_string(target_month_value)  # KKBでは会社情報は異動登録なので日付が必要
       department.get_company_code(month)
     end
 

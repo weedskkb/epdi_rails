@@ -80,10 +80,10 @@
         <th class="wrap">税率<span class="column-key">TAX_RATE_ID</span></th>
         <th class="wrap">取引先<span class="column-key">business_connection_code</span></th>
         <th class="wrap">取引先会社<span class="column-key">business_connection_company_code</span></th>
-        <th class="wrap">借方部署<span class="column-key">DEBIT_DEPARTMENT_ID</span></th>
+        <th class="wrap">借方部署<span class="column-key">debit_department_code</span></th>
         <th class="wrap">借方勘定科目<span class="column-key">debit_account_code</span></th>
         <th class="wrap">借方補助科目<span class="column-key">debit_account_sub_code</span></th>
-        <th class="wrap">貸方部署<span class="column-key">CREDIT_DEPARTMENT_ID</span></th>
+        <th class="wrap">貸方部署<span class="column-key">credit_department_code</span></th>
         <th class="wrap">貸方勘定科目<span class="column-key">credit_account_code</span></th>
         <th class="wrap">貸方補助科目<span class="column-key">credit_account_sub_code</span></th>
         <th class="wrap">摘要<span class="column-key">ABSTRACT</span></th>
@@ -103,10 +103,10 @@
           <td class="wrap"><%= display_reference(category.tax_rate_id, category.tax_rate&.rate) %></td>
           <td class="wrap"><%= display_reference(category.business_connection_code, category.business_connection&.name) %></td>
           <td class="wrap"><%= display_reference(category.business_connection_company_code, category.business_connection_company&.name) %></td>
-          <td class="wrap"><%= display_reference(category.debit_department_id, category.debit_department&.department_name) %></td>
+          <td class="wrap"><%= display_reference(category.debit_department_code, category.debit_department&.name) %></td>
           <td class="wrap"><%= category.debit_account_code %></td>
           <td class="wrap"><%= category.debit_account_sub_code || "-" %></td>
-          <td class="wrap"><%= display_reference(category.credit_department_id, category.credit_department&.department_name) %></td>
+          <td class="wrap"><%= display_reference(category.credit_department_code, category.credit_department&.name) %></td>
           <td class="wrap"><%= category.credit_account_code %></td>
           <td class="wrap"><%= category.credit_account_sub_code || "-" %></td>
           <td class="wrap"><%= category.abstract %></td>

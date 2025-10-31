@@ -14,8 +14,16 @@ class CaptureCategory < ApplicationRecord
              foreign_key: :business_connection_company_code,
              primary_key: :code,
              optional: true
-  belongs_to :debit_department, class_name: "Department", optional: true
-  belongs_to :credit_department, class_name: "Department", optional: true
+  belongs_to :debit_department,
+             class_name: "Department",
+             foreign_key: :debit_department_code,
+             primary_key: :code,
+             optional: true
+  belongs_to :credit_department,
+             class_name: "Department",
+             foreign_key: :credit_department_code,
+             primary_key: :code,
+             optional: true
 
   def name_with_code
     code = id ? format('%02d', id) : "--"

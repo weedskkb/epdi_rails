@@ -15,15 +15,15 @@ module JournalEntryData
       :journal_entry_history_id,
       :company_code,
       :date,
-      :department_id,
-      :debit_department_id,
+      :department_code,
+      :debit_department_code,
       :debit_account_code,
       :debit_account_sub_code,
       :debit_business_connection_code,
       :debit_amount,
       :debit_tax_class_id,
       :debit_tax_rate_id,
-      :credit_department_id,
+      :credit_department_code,
       :credit_account_code,
       :credit_account_sub_code,
       :credit_business_connection_code,
@@ -94,7 +94,7 @@ module JournalEntryData
       scope = scope.order(<<~SQL.squish)
         #{histories_table}.id ASC,
         #{records_table}.row_no ASC,
-        #{records_table}.department_id ASC,
+        #{records_table}.department_code ASC,
         #{records_table}.created_at ASC
       SQL
 
@@ -102,15 +102,15 @@ module JournalEntryData
         "#{records_table}.journal_entry_history_id",
         "#{records_table}.company_code",
         "#{records_table}.date",
-        "#{records_table}.department_id",
-        "#{records_table}.debit_department_id",
+        "#{records_table}.department_code",
+        "#{records_table}.debit_department_code",
         "#{records_table}.debit_account_code",
         "#{records_table}.debit_account_sub_code",
         "#{records_table}.debit_business_connection_code",
         "#{records_table}.debit_amount",
         "#{records_table}.debit_tax_class_id",
         "#{records_table}.debit_tax_rate_id",
-        "#{records_table}.credit_department_id",
+        "#{records_table}.credit_department_code",
         "#{records_table}.credit_account_code",
         "#{records_table}.credit_account_sub_code",
         "#{records_table}.credit_business_connection_code",
@@ -127,15 +127,15 @@ module JournalEntryData
           journal_entry_history_id: values[0],
           company_code: values[1],
           date: values[2],
-          department_id: values[3],
-          debit_department_id: values[4],
+          department_code: values[3],
+          debit_department_code: values[4],
           debit_account_code: values[5],
           debit_account_sub_code: values[6],
           debit_business_connection_code: values[7],
           debit_amount: values[8],
           debit_tax_class_id: values[9],
           debit_tax_rate_id: values[10],
-          credit_department_id: values[11],
+          credit_department_code: values[11],
           credit_account_code: values[12],
           credit_account_sub_code: values[13],
           credit_business_connection_code: values[14],
@@ -204,7 +204,7 @@ module JournalEntryData
         end
 
         debit_text = [
-          row.debit_department_id,
+          row.debit_department_code,
           row.debit_account_code,
           row.debit_account_sub_code,
           2,
@@ -215,7 +215,7 @@ module JournalEntryData
         ].map { |value| value.to_s }
 
         credit_text = [
-          row.credit_department_id,
+          row.credit_department_code,
           row.credit_account_code,
           row.credit_account_sub_code,
           2,
