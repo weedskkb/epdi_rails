@@ -1,0 +1,40 @@
+ja:
+  enum:
+    accounting_item:
+      disp_level:
+        disabled: "無効"
+        show_all: "全員"
+        show_keiri: "経理のみ"
+      debit_tax_type:
+        excluded: "対象外"
+        tax_purchase: "課税売上分一般仕入"
+        tax_free_purchase: "非課税売上分一般仕入"
+        common_purchase: "共通売上分一般仕入"
+        sale: "一般売上"
+        sale_returns: "一般売上の返還等"
+        tax_free_sale: "非課税売上"
+        transfer_securities: "有価証券の譲渡"
+        tax_exempt_purchase: "非課税仕入"
+        taxable_purchase_returns: "課税売上分一般仕入の返還等"
+        taxable_purchases_exempt_suppliers: "課税売上分課税仕入（免税事業者等）"
+        common_tax_invoice_purchase: "共通売上分課税仕入（免税事業者等）"
+      credit_tax_type:
+        excluded: "対象外"
+        tax_purchase: "課税売上分一般仕入"
+        tax_free_purchase: "非課税売上分一般仕入"
+        common_purchase: "共通売上分一般仕入"
+        sale: "一般売上"
+        sale_returns: "一般売上の返還等"
+        tax_free_sale: "非課税売上"
+        transfer_securities: "有価証券の譲渡"
+        tax_exempt_purchase: "非課税仕入"
+        taxable_purchase_returns: "課税売上分一般仕入の返還等"
+        taxable_purchases_exempt_suppliers: "課税売上分課税仕入（免税事業者等）"
+        common_tax_invoice_purchase: "共通売上分課税仕入（免税事業者等）"
+      tax_autocalc:
+        disabled_tax_autocalc: "計算無し"
+        tax_excluded_calc: "税抜金額からの自動計算"
+        tax_included_calc: "税込金額からの自動計算"
+      tax_rate:
+        normal_tax_rate: "標準"
+        reduced_tax_rate: "軽減"

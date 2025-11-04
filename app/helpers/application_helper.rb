@@ -8,6 +8,7 @@ module ApplicationHelper
       ["仕訳データ作成", menu_path_for(:journal_entry_data)],
       ["会社マスタ", menu_path_for(:companies)],
       ["部門マスタ", menu_path_for(:departments)],
+      ["勘定科目一覧(KKB)", menu_path_for(:accounting_items)],
       ["勘定科目マスタ", menu_path_for(:accounts)],
       ["補助科目マスタ", menu_path_for(:sub_accounts)],
       ["勘定・補助一覧", menu_path_for(:account_structures)],

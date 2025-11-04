@@ -10,7 +10,25 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_11_01_004000) do
+ActiveRecord::Schema[8.0].define(version: 2025_11_04_095035) do
+  create_table "accounting_items", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
+    t.bigint "company_id"
+    t.string "code"
+    t.string "name"
+    t.string "sub_code"
+    t.string "sub_name"
+    t.integer "disp_level"
+    t.boolean "hidden", default: false
+    t.integer "debit_tax_type", limit: 2
+    t.integer "credit_tax_type", limit: 2
+    t.integer "tax_autocalc", limit: 1
+    t.integer "tax_rate", limit: 1
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["company_id", "code", "sub_code"], name: "index_accounting_items_on_company_id_and_code_and_sub_code", unique: true
+    t.index ["company_id"], name: "index_accounting_items_on_company_id"
+  end
+
   create_table "accounts", id: :integer, charset: "utf8mb4", collation: "utf8mb4_general_ci", force: :cascade do |t|
     t.string "name", null: false
     t.boolean "delete_flg", default: false, null: false
@@ -257,6 +275,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_11_01_004000) do
     t.index ["updated_by_id"], name: "index_users_on_updated_by_id"
   end
 
+  add_foreign_key "accounting_items", "companies"
   add_foreign_key "bs_departments", "bs_companies", column: "company_id", name: "fk_departments_company", on_delete: :cascade
   add_foreign_key "business_connections", "users", column: "created_by_id"
   add_foreign_key "business_connections", "users", column: "updated_by_id"

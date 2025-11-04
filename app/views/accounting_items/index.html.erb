@@ -1,0 +1,113 @@
+<h1>勘定科目一覧</h1>
+
+<style>
+  .accounting-items-table {
+    overflow: auto;
+    max-height: calc(100vh - 220px);
+    padding: 8px;
+    background: #ffffff;
+    border-radius: 6px;
+    box-shadow: 0 1px 3px rgba(15, 23, 42, 0.08);
+  }
+
+  .accounting-items-table table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 12px;
+    white-space: nowrap;
+    table-layout: fixed;
+  }
+
+  .accounting-items-table th {
+    background: #f0f4f9;
+    font-weight: 600;
+    position: sticky;
+    top: 0;
+    z-index: 1;
+  }
+
+  .accounting-items-table th,
+  .accounting-items-table td {
+    padding: 6px 8px;
+    border-bottom: 1px solid #e4e9f2;
+    text-align: left;
+  }
+
+  .accounting-items-table tbody tr:nth-child(even) {
+    background: #f9fbff;
+  }
+
+  .accounting-items-table th.wrap,
+  .accounting-items-table td.wrap {
+    white-space: normal;
+    overflow-wrap: anywhere;
+    word-break: break-word;
+  }
+
+  .accounting-items-table .column-key {
+    display: block;
+    margin-top: 2px;
+    font-size: 10px;
+    color: #64748b;
+    letter-spacing: 0.02em;
+    overflow-wrap: anywhere;
+    word-break: break-all;
+  }
+
+  .accounting-items-table .flag {
+    font-weight: 600;
+  }
+</style>
+
+<div class="accounting-items-table">
+  <table>
+    <thead>
+      <tr>
+        <th class="wrap">会社<span class="column-key">company</span></th>
+        <th class="wrap">勘定科目コード<span class="column-key">code</span></th>
+        <th class="wrap">勘定科目名<span class="column-key">name</span></th>
+        <th class="wrap">補助科目コード<span class="column-key">sub_code</span></th>
+        <th class="wrap">補助科目名<span class="column-key">sub_name</span></th>
+        <th class="wrap">表示レベル<span class="column-key">disp_level</span></th>
+        <th class="wrap">非表示フラグ<span class="column-key">hidden</span></th>
+        <th class="wrap">借方税区分<span class="column-key">debit_tax_type</span></th>
+        <th class="wrap">貸方税区分<span class="column-key">credit_tax_type</span></th>
+        <th class="wrap">税自動計算<span class="column-key">tax_autocalc</span></th>
+        <th class="wrap">税率<span class="column-key">tax_rate</span></th>
+        <th class="wrap">更新日時<span class="column-key">updated_at</span></th>
+      </tr>
+    </thead>
+    <tbody>
+      <% @accounting_items.each do |item| %>
+        <tr>
+          <td class="wrap"><%= item.company&.name_with_code || "-" %></td>
+          <td class="wrap"><%= item.code.presence || "-" %></td>
+          <td class="wrap"><%= item.name.presence || "-" %></td>
+          <td class="wrap"><%= item.sub_code.presence || "-" %></td>
+          <td class="wrap"><%= item.sub_name.presence || "-" %></td>
+          <td class="wrap"><%= item.disp_level.present? ? AccountingItem.human_enum_name(:disp_level, item.disp_level) : "-" %></td>
+          <td class="wrap flag"><%= item.hidden? ? "有" : "無" %></td>
+          <td class="wrap">
+            <% if item.debit_tax_type.present? %>
+              <%= AccountingItem.human_enum_name(:debit_tax_type, item.debit_tax_type) %>
+              (<%= item.debit_tax_type_value %>)
+            <% else %>
+              -
+            <% end %>
+          </td>
+          <td class="wrap">
+            <% if item.credit_tax_type.present? %>
+              <%= AccountingItem.human_enum_name(:credit_tax_type, item.credit_tax_type) %>
+              (<%= item.credit_tax_type_value %>)
+            <% else %>
+              -
+            <% end %>
+          </td>
+          <td class="wrap"><%= item.tax_autocalc.present? ? AccountingItem.human_enum_name(:tax_autocalc, item.tax_autocalc) : "-" %></td>
+          <td class="wrap"><%= item.tax_rate.present? ? AccountingItem.human_enum_name(:tax_rate, item.tax_rate) : "-" %></td>
+          <td class="wrap"><%= item.updated_at&.to_fs(:db) %></td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+</div>

@@ -21,6 +21,7 @@ Rails.application.routes.draw do
   resources :departments, only: [:index]
   resources :accounts, only: [:index]
   resources :sub_accounts, only: [:index]
+  resources :accounting_items, only: [:index]
   resources :account_structures, only: [:index]
   resources :capture_categories, only: [:index, :edit, :update]
   resources :suppliers, only: [:index]
