@@ -77,9 +77,7 @@ class CaptureCategoriesController < ApplicationController
       ["#{department.code} #{department.name}", department.code]
     end
 
-    @account_options = Account.active.order(:code).map do |account|
-      ["#{account.code} #{account.name}", account.code]
-    end
+    @account_options = AccountingItem.root_account_options
 
     @journal_entry_pattern_group_options = JournalEntryPattern
                                             .select(:group_no, :name)

@@ -5,6 +5,7 @@ require 'roo-xls'
 
 module CapturePaymentData
   class Capture
+    include Support::AccountingItemLookup
     CATEGORY_WHOLESALE = 1
     CATEGORY_STORE = 16
     CATEGORY_FIXED = 24
@@ -347,6 +348,13 @@ module CapturePaymentData
 
             account_code = cell_integer(sheet, 5, col_idx)
             account_sub_code = cell_integer(sheet, 7, col_idx)
+            ensure_accounting_item!(
+              account_code,
+              account_sub_code,
+              sheet: sheet,
+              row_idx: row_idx,
+              col_idx: col_idx
+            )
             list_cd_values = [account_code, account_sub_code, business_connection_code]
             list_cd = list_cd_values.map { |value| value.present? ? value.to_s : "0" }.join('-')
 
@@ -392,6 +400,13 @@ module CapturePaymentData
 
             account_code = cell_integer(sheet, 3, col_idx)
             account_sub_code = cell_integer(sheet, 5, col_idx)
+            ensure_accounting_item!(
+              account_code,
+              account_sub_code,
+              sheet: sheet,
+              row_idx: row_idx,
+              col_idx: col_idx
+            )
             list_cd_values = [account_code, account_sub_code, business_connection_code]
             list_cd = list_cd_values.map { |value| value.present? ? value.to_s : "0" }.join('-')
 
@@ -467,6 +482,13 @@ module CapturePaymentData
             next unless amount
 
             account_code = expense_summary_account_for(col_idx)
+            ensure_accounting_item!(
+              account_code,
+              nil,
+              sheet: sheet,
+              row_idx: row_idx,
+              col_idx: col_idx
+            )
             create_capture_record(
               capture_history_id: history_no,
               row_no: row_idx + 1,
@@ -486,6 +508,13 @@ module CapturePaymentData
     def import_shared_data(sheets)
       history_no = base_history_id
       category = capture_category_record
+      ensure_accounting_item!(
+        category.debit_account_code,
+        category.debit_account_sub_code,
+        sheet: nil,
+        row_idx: 0,
+        col_idx: 0
+      )
       sheets.each do |sheet|
         last_row = last_row_index(sheet)
         (1..last_row).each do |row_idx|
@@ -610,6 +639,31 @@ module CapturePaymentData
       when 'K' then 1
       else nil
       end
+    end
+
+    def ensure_accounting_item!(account_code, account_sub_code, sheet:, row_idx:, col_idx:)
+      return if account_code.blank?
+      return if accounting_item_for(account_code, account_sub_code)
+
+      location =
+        if sheet
+          "#{sheet_name(sheet)} #{row_idx + 1}行#{col_idx + 1}列"
+        else
+          "行#{row_idx + 1}"
+        end
+
+      account_label = account_code.present? ? account_code : "-"
+      sub_label = account_sub_code.present? ? account_sub_code : "-"
+
+      view_model.errors.add(
+        :base,
+        "存在しない勘定科目が指定されています。(#{location} 勘定科目: #{account_label}, 補助科目: #{sub_label})"
+      )
+      raise InvalidFileError, '勘定科目を確認してください。'
+    end
+
+    def sheet_name(sheet)
+      sheet.respond_to?(:name) ? sheet.name : "シート"
     end
 
     def expense_summary_account_for(column_index)

@@ -2,6 +2,7 @@
 
 module JournalEntryData
   class Generator
+    include Support::AccountingItemLookup
     CATEGORY_EXPENSE_SUMMARY = 23
     PATTERN_GROUP_STORE = 4
     PATTERN_GROUP_LABOR = 9
@@ -41,6 +42,10 @@ module JournalEntryData
       Rails.logger.error("JournalEntryData::Generator validation failed: #{e.message}")
       form.errors.add(:base, "仕訳データの作成に失敗しました。")
       ServiceResult.new(success: false, message: "仕訳データの作成に失敗しました。 #{e.message}", payload: { form: form })
+    rescue Support::AccountingItemLookup::MissingItemError => e
+      Rails.logger.error("JournalEntryData::Generator accounting item missing: #{e.message}")
+      form.errors.add(:base, e.message)
+      ServiceResult.new(success: false, message: e.message, payload: { form: form })
     rescue StandardError => e
       Rails.logger.error(
         "JournalEntryData::Generator failed: #{e.class} #{e.message}\n#{e.backtrace.join("\n")}"
@@ -200,6 +205,20 @@ module JournalEntryData
 
     # JournalEntryDataListApplication::Create()
     def build_entry_hash(history:, pattern:, capture_category:, capture_row:, debit_account_code:, credit_account_code:, debit_amount:, credit_amount:)
+      debit_sub_code = sub_account_for(pattern.debit_account_sub_code, capture_category.id, "debit")
+      credit_sub_code = sub_account_for(pattern.credit_account_sub_code, capture_category.id, "credit")
+
+      ensure_accounting_item!(
+        debit_account_code,
+        debit_sub_code,
+        "仕訳パターン(row_no=#{pattern.row_no}) 借方"
+      )
+      ensure_accounting_item!(
+        credit_account_code,
+        credit_sub_code,
+        "仕訳パターン(row_no=#{pattern.row_no}) 貸方"
+      )
+
       {
         journal_entry_history_id: history.id,
         row_no: pattern.row_no,
@@ -209,8 +228,7 @@ module JournalEntryData
         department_code: capture_row.department_code,
         debit_department_code: department_for(pattern.debit_department_code, capture_row.department_code, capture_row.company_code, capture_category.id, "debit"),
         debit_account_code: debit_account_code,
-        debit_account_sub_code: sub_account_for(pattern.debit_account_sub_code,
-                                               capture_category.id, "debit"),
+        debit_account_sub_code: debit_sub_code,
         debit_business_connection_code: business_connection_code_for(
           pattern.debit_business_connection_code,
           capture_row.company_code,
@@ -222,8 +240,7 @@ module JournalEntryData
         debit_tax_rate_id: tax_rate_for(pattern.debit_tax_rate_id, capture_category.id),
         credit_department_code: department_for(pattern.credit_department_code, capture_row.department_code, capture_row.company_code, capture_category.id, "credit"),
         credit_account_code: credit_account_code,
-        credit_account_sub_code: sub_account_for(pattern.credit_account_sub_code,
-                                                 capture_category.id, "credit"),
+        credit_account_sub_code: credit_sub_code,
         credit_business_connection_code: business_connection_code_for(
           pattern.credit_business_connection_code,
           capture_row.company_code,
@@ -540,6 +557,16 @@ module JournalEntryData
       else
         rate_id
       end
+    end
+
+    def ensure_accounting_item!(account_code, account_sub_code, context)
+      return if account_code.blank?
+      return if accounting_item_for(account_code, account_sub_code)
+
+      account_label = account_code.present? ? account_code : "-"
+      sub_label = account_sub_code.present? ? account_sub_code : "-"
+      raise Support::AccountingItemLookup::MissingItemError,
+            "#{context} に設定された勘定科目 (#{account_label}-#{sub_label}) が AccountingItem に存在しません。"
     end
 
     # JournalEntryDataListApplication::getAbstract()

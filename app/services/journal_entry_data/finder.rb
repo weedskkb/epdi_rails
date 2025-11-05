@@ -2,17 +2,21 @@
 
 module JournalEntryData
   class Finder
+    include Support::AccountingItemLookup
+
     PreviewItem = Struct.new(
       :company_code,
       :date,
       :debit_department_code,
       :debit_account_code,
       :debit_account_sub_code,
+      :debit_account_name,
       :debit_business_connection_code,
       :debit_amount,
       :credit_department_code,
       :credit_account_code,
       :credit_account_sub_code,
+      :credit_account_name,
       :credit_business_connection_code,
       :credit_amount,
       :abstract,
@@ -50,17 +54,22 @@ module JournalEntryData
     # JournalEntryDataListApplication::GenerateItemViewModel()
     def preview_items
       relation.includes(:journal_entry_history).map do |record|
+        debit_item = accounting_item_for(record.debit_account_code, record.debit_account_sub_code)
+        credit_item = accounting_item_for(record.credit_account_code, record.credit_account_sub_code)
+
         PreviewItem.new(
           company_code: record.company_code,
           date: record.date,
           debit_department_code: record.debit_department_code,
           debit_account_code: record.debit_account_code,
           debit_account_sub_code: record.debit_account_sub_code,
+          debit_account_name: debit_item&.selection_label,
           debit_business_connection_code: record.debit_business_connection_code,
           debit_amount: record.debit_amount,
           credit_department_code: record.credit_department_code,
           credit_account_code: record.credit_account_code,
           credit_account_sub_code: record.credit_account_sub_code,
+          credit_account_name: credit_item&.selection_label,
           credit_business_connection_code: record.credit_business_connection_code,
           credit_amount: record.credit_amount,
           abstract: record.abstract

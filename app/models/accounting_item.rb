@@ -4,7 +4,7 @@ require 'open-uri'
 class AccountingItem < ApplicationRecord
   belongs_to :company, optional: true
   has_many :expense_items
-  
+
   enum :disp_level, {disabled: 0, show_all: 1, show_keiri: 2}
   enum :debit_tax_type, {excluded: 0, tax_purchase: 1, tax_free_purchase: 2, common_purchase: 3, sale: 7, sale_returns: 8,
                         tax_free_sale: 16, transfer_securities: 17, tax_exempt_purchase: 101,
@@ -18,6 +18,24 @@ class AccountingItem < ApplicationRecord
   enum :tax_rate, {normal_tax_rate: 0, reduced_tax_rate: 1}
 
   validates :code, presence: true
+
+  def self.root_account_options
+    where(sub_code: [nil, ""])
+      .where(hidden: false)
+      .order(:code)
+      .map { |item| [item.selection_label, item.code.to_s] }
+  end
+
+  def selection_label
+    base_name =
+      if sub_code.present?
+        sub_name.presence || name.to_s
+      else
+        name.to_s
+      end
+
+    sub_code.present? ? "#{code}-#{sub_code} #{base_name}" : "#{code} #{base_name}"
+  end
 
   def debit_tax_type_value
     AccountingItem.debit_tax_types[debit_tax_type]

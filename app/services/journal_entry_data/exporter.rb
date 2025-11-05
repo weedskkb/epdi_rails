@@ -5,6 +5,7 @@ require "zip"
 
 module JournalEntryData
   class Exporter
+    include Support::AccountingItemLookup
     HEADER = "OBCD001, CSJS005, CSJS200, CSJS201, CSJS202, CSJS206, CSJS208, CSJS213,CSJS222,CSJS220, CSJS300, CSJS301, CSJS302, CSJS306, CSJS308, CSJS313,CSJS322,CSJS320, CSJS100"
     UTF8_BOM = "\uFEFF"
     ZIP_BASENAME = "取込用CSV"
@@ -64,6 +65,9 @@ module JournalEntryData
       end
 
       ServiceResult.new(success: true, payload: payload)
+    rescue Support::AccountingItemLookup::MissingItemError => e
+      Rails.logger.error("JournalEntryData::Exporter accounting item missing: #{e.message}")
+      failure(e.message)
     rescue StandardError => e
       Rails.logger.error(
         "JournalEntryData::Exporter failed: #{e.class} #{e.message}\n#{e.backtrace.join("\n")}"
@@ -127,15 +131,15 @@ module JournalEntryData
           journal_entry_history_id: values[0],
           company_code: values[1],
           date: values[2],
-          department_code: values[3],
-          debit_department_code: values[4],
+          department_code: normalize_department_code(values[3]),
+          debit_department_code: normalize_department_code(values[4]),
           debit_account_code: values[5],
           debit_account_sub_code: values[6],
           debit_business_connection_code: values[7],
           debit_amount: values[8],
           debit_tax_class_id: values[9],
           debit_tax_rate_id: values[10],
-          credit_department_code: values[11],
+          credit_department_code: normalize_department_code(values[11]),
           credit_account_code: values[12],
           credit_account_sub_code: values[13],
           credit_business_connection_code: values[14],
@@ -172,6 +176,17 @@ module JournalEntryData
       row_counter = 0
 
       rows.each_with_index do |row, index|
+        ensure_accounting_item!(
+          row.debit_account_code,
+          row.debit_account_sub_code,
+          "仕訳履歴ID=#{row.journal_entry_history_id} 行No=#{row.row_no} 借方"
+        )
+        ensure_accounting_item!(
+          row.credit_account_code,
+          row.credit_account_sub_code,
+          "仕訳履歴ID=#{row.journal_entry_history_id} 行No=#{row.row_no} 貸方"
+        )
+
         formatted_date = format_date(row.date)
 
         if last_date != formatted_date
@@ -268,11 +283,32 @@ module JournalEntryData
       [LOGISTICS_CATEGORY, LABOR_COST_CATEGORY].include?(row.capture_category_id.to_i)
     end
 
+    def ensure_accounting_item!(account_code, account_sub_code, context)
+      return if account_code.blank?
+      return if accounting_item_for(account_code, account_sub_code)
+
+      account_label = account_code.present? ? account_code : "-"
+      sub_label = account_sub_code.present? ? account_sub_code : "-"
+      raise Support::AccountingItemLookup::MissingItemError,
+            "#{context} の勘定科目 (#{account_label}-#{sub_label}) が AccountingItem に存在しません。"
+    end
+
     # JournalEntryDataListApplication::CreateCsvFolder()
     def format_date(value)
       return value.to_s unless value.respond_to?(:strftime)
 
       value.strftime("%Y/%m/%d")
+    end
+
+    def normalize_department_code(value)
+      return nil if value.nil?
+
+      string = value.to_s
+      return string if string.blank?
+
+      Integer(string, 10).to_s
+    rescue ArgumentError, TypeError
+      string
     end
   end
 end

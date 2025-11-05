@@ -83,9 +83,7 @@ class JournalEntryPatternsController < ApplicationController
       ["#{department.code} #{department.name}", department.code]
     end
 
-    @account_options = Account.active.order(:code).map do |account|
-      ["#{account.code} #{account.name}", account.code]
-    end
+    @account_options = AccountingItem.root_account_options
 
     placeholder_options = [
       ["0 取込データの取引先を使用", "0"],
