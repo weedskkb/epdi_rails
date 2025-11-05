@@ -1,2 +1,28 @@
 ja:
   hello: "こんにちは"
+  activerecord:
+    attributes:
+      capture_category:
+        tax_class_code:
+          standard: "標準"
+          reduced: "軽減"
+      trn_capture_record:
+        tax_class_code:
+          standard: "標準"
+          reduced: "軽減"
+      journal_entry_pattern:
+        debit_tax_class_code:
+          standard: "標準"
+          reduced: "軽減"
+          capture_category: "取込区分を使用"
+        credit_tax_class_code:
+          standard: "標準"
+          reduced: "軽減"
+          capture_category: "取込区分を使用"
+      trn_journal_entry_record:
+        debit_tax_class_code:
+          standard: "標準"
+          reduced: "軽減"
+        credit_tax_class_code:
+          standard: "標準"
+          reduced: "軽減"

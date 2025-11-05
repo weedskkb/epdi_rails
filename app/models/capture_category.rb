@@ -2,7 +2,6 @@
 class CaptureCategory < ApplicationRecord
   scope :active, -> { where(delete_flg: false) }
 
-  belongs_to :tax_class, class_name: "TaxClass", optional: true
   belongs_to :tax_rate, class_name: "TaxRate", optional: true
   belongs_to :business_connection,
              class_name: "BusinessConnection",
@@ -24,6 +23,8 @@ class CaptureCategory < ApplicationRecord
              foreign_key: :credit_department_code,
              primary_key: :code,
              optional: true
+
+  enum :tax_class_code, { standard: 0, reduced: 1 }, prefix: :tax_class
 
   def name_with_code
     code = id ? format('%02d', id) : "--"

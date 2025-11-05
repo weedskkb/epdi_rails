@@ -41,7 +41,7 @@
         <td><%= row.list_cd %></td>
         <td><%= number_to_currency(row.amount, unit: "¥", precision: 0) %></td>
         <td><%= number_to_currency(row.second_amount, unit: "¥", precision: 0) %></td>
-        <td><%= display_reference(row.tax_class_id, row.tax_class&.name) %></td>
+        <td><%= enum_label(row, :tax_class_code, TrnCaptureRecord) %></td>
         <td><%= display_reference(row.tax_rate_id, row.tax_rate&.rate) %></td>
         <td><%= row.summary %></td>
       </tr>

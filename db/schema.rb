@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_11_04_095035) do
+ActiveRecord::Schema[8.0].define(version: 2025_11_05_145630) do
   create_table "accounting_items", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
     t.bigint "company_id"
     t.string "code"
@@ -74,7 +74,6 @@ ActiveRecord::Schema[8.0].define(version: 2025_11_04_095035) do
 
   create_table "capture_categories", id: :integer, charset: "utf8mb4", collation: "utf8mb4_general_ci", force: :cascade do |t|
     t.string "name", null: false
-    t.integer "tax_class_id"
     t.integer "tax_rate_id"
     t.string "business_connection_code"
     t.string "business_connection_company_code"
@@ -93,6 +92,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_11_04_095035) do
     t.datetime "created_at", null: false
     t.integer "updated_by_id"
     t.datetime "updated_at"
+    t.integer "tax_class_code", limit: 1
   end
 
   create_table "companies", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
@@ -128,13 +128,11 @@ ActiveRecord::Schema[8.0].define(version: 2025_11_04_095035) do
     t.integer "debit_account_sub_code"
     t.string "debit_business_connection_code"
     t.integer "debit_tax_rate_id"
-    t.integer "debit_tax_class_id"
     t.string "credit_department_code"
     t.integer "credit_account_code"
     t.integer "credit_account_sub_code"
     t.string "credit_business_connection_code"
     t.integer "credit_tax_rate_id"
-    t.integer "credit_tax_class_id"
     t.boolean "fixed_amount_flag", default: false, null: false
     t.integer "fixed_amount"
     t.boolean "filter_ratio_flag", default: false, null: false
@@ -151,6 +149,8 @@ ActiveRecord::Schema[8.0].define(version: 2025_11_04_095035) do
     t.integer "updated_by_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at"
+    t.integer "debit_tax_class_code", limit: 1
+    t.integer "credit_tax_class_code", limit: 1
   end
 
   create_table "sub_accounts", id: :integer, charset: "utf8mb4", collation: "utf8mb4_general_ci", force: :cascade do |t|
@@ -212,11 +212,11 @@ ActiveRecord::Schema[8.0].define(version: 2025_11_04_095035) do
     t.integer "account_sub_code"
     t.integer "amount", null: false
     t.integer "second_amount", null: false
-    t.integer "tax_class_id"
     t.integer "tax_rate_id"
     t.datetime "created_at", null: false
     t.integer "created_by_id", null: false
     t.string "list_cd"
+    t.integer "tax_class_code", limit: 1
     t.index ["capture_history_id"], name: "index_trn_capture_records_on_capture_history_id"
     t.index ["department_code"], name: "index_trn_capture_records_on_department_code"
   end
@@ -224,7 +224,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_11_04_095035) do
   create_table "trn_journal_entry_histories", id: :integer, charset: "utf8mb4", collation: "utf8mb4_general_ci", force: :cascade do |t|
     t.integer "capture_history_id", null: false
     t.integer "capture_category_id", null: false
-    t.date "accrual_month", null: false
+    t.date "accrual_month"
     t.date "payment_month", null: false
     t.boolean "execute_flag", default: false, null: false
     t.integer "created_by_id", null: false
@@ -243,19 +243,19 @@ ActiveRecord::Schema[8.0].define(version: 2025_11_04_095035) do
     t.integer "debit_account_code"
     t.integer "debit_account_sub_code"
     t.integer "debit_amount"
-    t.integer "debit_tax_class_id"
     t.integer "debit_tax_rate_id"
     t.string "debit_business_connection_code"
     t.string "credit_department_code"
     t.integer "credit_account_code"
     t.integer "credit_account_sub_code"
     t.integer "credit_amount"
-    t.integer "credit_tax_class_id"
     t.integer "credit_tax_rate_id"
     t.string "credit_business_connection_code"
     t.string "abstract"
     t.datetime "created_at", null: false
     t.integer "created_by_id", null: false
+    t.integer "debit_tax_class_code", limit: 1
+    t.integer "credit_tax_class_code", limit: 1
     t.index ["credit_department_code"], name: "index_trn_journal_entry_records_on_credit_department_code"
     t.index ["debit_department_code"], name: "index_trn_journal_entry_records_on_debit_department_code"
     t.index ["department_code"], name: "index_trn_journal_entry_records_on_department_code"

@@ -8,7 +8,6 @@ class CaptureCategoriesController < ApplicationController
   def index
     @capture_categories = CaptureCategory
                             .includes(
-                              :tax_class,
                               :tax_rate,
                               :business_connection,
                               :business_connection_company,
@@ -38,7 +37,7 @@ class CaptureCategoriesController < ApplicationController
   def capture_category_params
     params.require(:capture_category).permit(
       :name,
-      :tax_class_id,
+      :tax_class_code,
       :tax_rate_id,
       :business_connection_code,
       :business_connection_company_code,
@@ -57,8 +56,12 @@ class CaptureCategoriesController < ApplicationController
   end
 
   def set_reference_options
-    @tax_class_options = TaxClass.active.order(:id).map do |tax_class|
-      ["#{tax_class.id} #{tax_class.name}", tax_class.id]
+    @tax_class_code_options = CaptureCategory.tax_class_codes.map do |name, code|
+      label = I18n.t(
+        "activerecord.attributes.capture_category.tax_class_code.#{name}",
+        default: name.to_s.humanize
+      )
+      ["#{code} #{label}", name]
     end
 
     @tax_rate_options = TaxRate.active.order(:id).map do |tax_rate|

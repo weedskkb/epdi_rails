@@ -370,7 +370,7 @@ module CapturePaymentData
               amount: amount,
               second_amount: 0,
               tax_rate_id: tax_rate_for(cell_string(sheet, 3, col_idx)),
-              tax_class_id: tax_class_for(cell_string(sheet, 3, col_idx))
+              tax_class_code: tax_class_for(cell_string(sheet, 3, col_idx))
             ) if amount != 0
           end
         end
@@ -578,7 +578,7 @@ module CapturePaymentData
         amount: attrs[:amount],
         second_amount: attrs[:second_amount] || 0,
         tax_rate_id: attrs[:tax_rate_id],
-        tax_class_id: attrs[:tax_class_id],
+        tax_class_code: attrs[:tax_class_code],
         created_by_id: user_id,
         created_at: Time.zone.now
       )

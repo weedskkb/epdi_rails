@@ -27,6 +27,27 @@ module ApplicationHelper
     content_tag(:p, "全#{size}件", class: "table-meta")
   end
 
+  def enum_label(record, attribute, klass = record.class)
+    return "-" if record.blank?
+    return "-" unless record.respond_to?(attribute)
+
+    value = record.public_send(attribute)
+    return "-" if value.nil?
+
+    code_method = "#{attribute}_before_type_cast"
+    code = record.respond_to?(code_method) ? record.public_send(code_method) : nil
+    humanizer = klass.respond_to?(:human_enum_name) ? klass : enum_humanizer_fallback(klass)
+    label = humanizer.human_enum_name(attribute, value)
+
+    if code.nil?
+      label
+    else
+      "#{code} #{label}"
+    end
+  rescue I18n::MissingTranslationData
+    code.present? ? "#{code} #{value}" : value.to_s
+  end
+
   private
 
   def menu_item(label, controller_name, divider_after: false)
@@ -35,6 +56,24 @@ module ApplicationHelper
       path: menu_path_for(controller_name),
       divider_after: divider_after
     }
+  end
+
+  def enum_humanizer_fallback(klass)
+    Module.new do
+      define_singleton_method(:human_enum_name) do |enum_name, value|
+        humanized =
+          begin
+            I18n.t(
+              "activerecord.attributes.#{klass.model_name.i18n_key}.#{enum_name}.#{value}",
+              default: nil
+            )
+          rescue I18n::MissingTranslationData
+            nil
+          end
+
+        humanized.presence || value.to_s.humanize
+      end
+    end
   end
 
   def menu_path_for(controller_name)
