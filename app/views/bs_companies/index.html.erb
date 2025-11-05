@@ -1,0 +1,89 @@
+<h1>BS会社マスタ</h1>
+
+<style>
+  .bs-companies-table {
+    overflow: auto;
+    max-height: calc(100vh - 220px);
+    padding: 8px;
+    background: #ffffff;
+    border-radius: 6px;
+    box-shadow: 0 1px 3px rgba(15, 23, 42, 0.08);
+  }
+
+  .bs-companies-table table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 12px;
+    white-space: nowrap;
+    table-layout: fixed;
+  }
+
+  .bs-companies-table th {
+    background: #f0f4f9;
+    font-weight: 600;
+    position: sticky;
+    top: 0;
+    z-index: 1;
+  }
+
+  .bs-companies-table th,
+  .bs-companies-table td {
+    padding: 6px 8px;
+    border-bottom: 1px solid #e4e9f2;
+    text-align: left;
+  }
+
+  .bs-companies-table tbody tr:nth-child(even) {
+    background: #f9fbff;
+  }
+
+  .bs-companies-table th.wrap,
+  .bs-companies-table td.wrap {
+    white-space: normal;
+    overflow-wrap: anywhere;
+    word-break: break-word;
+  }
+
+  .bs-companies-table .column-key {
+    display: block;
+    margin-top: 2px;
+    font-size: 10px;
+    color: #64748b;
+    letter-spacing: 0.02em;
+    overflow-wrap: anywhere;
+    word-break: break-all;
+  }
+
+  .bs-companies-table .flag {
+    font-weight: 600;
+  }
+</style>
+
+<%= list_count(@bs_companies) %>
+
+<div class="bs-companies-table">
+  <table>
+    <thead>
+      <tr>
+        <th class="wrap">会社ID<span class="column-key">id</span></th>
+        <th class="wrap">会社名<span class="column-key">name</span></th>
+        <th class="wrap">取引先コード<span class="column-key">business_connection_code</span></th>
+        <th class="wrap">削除フラグ<span class="column-key">delete_flg</span></th>
+        <th class="wrap">作成日時<span class="column-key">created_at</span></th>
+        <th class="wrap">更新日時<span class="column-key">updated_at</span></th>
+      </tr>
+    </thead>
+    <tbody>
+      <% @bs_companies.each do |company| %>
+        <tr>
+          <td class="wrap"><%= company.id %></td>
+          <td class="wrap"><%= company.name %></td>
+          <td class="wrap"><%= display_reference(company.business_connection_code, company.business_connection&.name) %></td>
+          <td class="wrap flag"><%= company.delete_flg ? "有" : "無" %></td>
+          <td class="wrap"><%= display_timestamp(company.created_at) %></td>
+          <td class="wrap"><%= display_timestamp(company.updated_at) %></td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+</div>

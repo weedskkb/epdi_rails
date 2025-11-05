@@ -1,0 +1,87 @@
+<h1>取引先一覧</h1>
+
+<style>
+  .business-connections-table {
+    overflow: auto;
+    max-height: calc(100vh - 220px);
+    padding: 8px;
+    background: #ffffff;
+    border-radius: 6px;
+    box-shadow: 0 1px 3px rgba(15, 23, 42, 0.08);
+  }
+
+  .business-connections-table table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 12px;
+    white-space: nowrap;
+    table-layout: fixed;
+  }
+
+  .business-connections-table th {
+    background: #f0f4f9;
+    font-weight: 600;
+    position: sticky;
+    top: 0;
+    z-index: 1;
+  }
+
+  .business-connections-table th,
+  .business-connections-table td {
+    padding: 6px 8px;
+    border-bottom: 1px solid #e4e9f2;
+    text-align: left;
+  }
+
+  .business-connections-table tbody tr:nth-child(even) {
+    background: #f9fbff;
+  }
+
+  .business-connections-table th.wrap,
+  .business-connections-table td.wrap {
+    white-space: normal;
+    overflow-wrap: anywhere;
+    word-break: break-word;
+  }
+
+  .business-connections-table .column-key {
+    display: block;
+    margin-top: 2px;
+    font-size: 10px;
+    color: #64748b;
+    letter-spacing: 0.02em;
+    overflow-wrap: anywhere;
+    word-break: break-all;
+  }
+
+  .business-connections-table .flag {
+    font-weight: 600;
+  }
+</style>
+
+<%= list_count(@business_connections) %>
+
+<div class="business-connections-table">
+  <table>
+    <thead>
+      <tr>
+        <th class="wrap">取引先コード<span class="column-key">code</span></th>
+        <th class="wrap">取引先名<span class="column-key">name</span></th>
+        <th class="wrap">非表示フラグ<span class="column-key">hidden</span></th>
+        <th class="wrap">作成日時<span class="column-key">created_at</span></th>
+        <th class="wrap">更新日時<span class="column-key">updated_at</span></th>
+      </tr>
+    </thead>
+    <tbody>
+      <% @business_connections.each do |connection| %>
+        <tr>
+          <td class="wrap"><%= connection.code %></td>
+          <td class="wrap"><%= connection.name %></td>
+          <td class="wrap flag"><%= connection.hidden? ? "有" : "無" %></td>
+          <td class="wrap"><%= display_timestamp(connection.created_at) %></td>
+          <td class="wrap"><%= display_timestamp(connection.updated_at) %></td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+</div>

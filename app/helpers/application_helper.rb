@@ -3,23 +3,39 @@
 module ApplicationHelper
   def main_menu_links
     [
-      ["支払データ取込", menu_path_for(:capture_payment_data)],
-      ["支払データ一覧", menu_path_for(:payment_data)],
-      ["仕訳データ作成", menu_path_for(:journal_entry_data)],
-      ["会社マスタ", menu_path_for(:companies)],
-      ["部門マスタ", menu_path_for(:departments)],
-      ["勘定科目一覧", menu_path_for(:accounting_items)],
-      ["勘定科目マスタ(BS)", menu_path_for(:accounts)],
-      ["補助科目マスタ(BS)", menu_path_for(:sub_accounts)],
-      ["勘定・補助一覧(BS)", menu_path_for(:account_structures)],
-      ["取込区分マスタ", menu_path_for(:capture_categories)],
-      ["取引先マスタ", menu_path_for(:suppliers)],
-      ["仕訳パターン", menu_path_for(:journal_entry_patterns)],
-      ["ユーザー管理", menu_path_for(:users)]
+      menu_item("支払データ取込", :capture_payment_data),
+      menu_item("支払データ一覧", :payment_data),
+      menu_item("仕訳データ作成", :journal_entry_data, divider_after: true),
+      menu_item("会社マスタ", :companies),
+      menu_item("部門マスタ", :departments),
+      menu_item("取引先一覧", :business_connections),
+      menu_item("勘定科目一覧", :accounting_items),
+      menu_item("取込区分マスタ", :capture_categories),
+      menu_item("仕訳パターン", :journal_entry_patterns, divider_after: true),
+      menu_item("BS会社マスタ", :bs_companies),
+      menu_item("BS部門マスタ", :bs_departments),
+      menu_item("BS取引先マスタ", :suppliers),
+      menu_item("BS勘定科目マスタ", :accounts),
+      menu_item("BS補助科目マスタ", :sub_accounts),
+      menu_item("BS勘定・補助一覧", :account_structures),
+      menu_item("ユーザー管理", :users)
     ]
   end
 
+  def list_count(collection)
+    size = collection.respond_to?(:size) ? collection.size : Array(collection).size
+    content_tag(:p, "全#{size}件", class: "table-meta")
+  end
+
   private
+
+  def menu_item(label, controller_name, divider_after: false)
+    {
+      label: label,
+      path: menu_path_for(controller_name),
+      divider_after: divider_after
+    }
+  end
 
   def menu_path_for(controller_name)
     url_for(controller: controller_name, action: :index, only_path: true)

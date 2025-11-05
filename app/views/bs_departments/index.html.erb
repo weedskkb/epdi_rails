@@ -1,0 +1,90 @@
+<h1>BS部門マスタ</h1>
+
+<style>
+  .bs-departments-table {
+    overflow: auto;
+    max-height: calc(100vh - 220px);
+    padding: 8px;
+    background: #ffffff;
+    border-radius: 6px;
+    box-shadow: 0 1px 3px rgba(15, 23, 42, 0.08);
+  }
+
+  .bs-departments-table table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 12px;
+    white-space: nowrap;
+    table-layout: fixed;
+  }
+
+  .bs-departments-table th {
+    background: #f0f4f9;
+    font-weight: 600;
+    position: sticky;
+    top: 0;
+    z-index: 1;
+  }
+
+  .bs-departments-table th,
+  .bs-departments-table td {
+    padding: 6px 8px;
+    border-bottom: 1px solid #e4e9f2;
+    text-align: left;
+  }
+
+  .bs-departments-table tbody tr:nth-child(even) {
+    background: #f9fbff;
+  }
+
+  .bs-departments-table th.wrap,
+  .bs-departments-table td.wrap {
+    white-space: normal;
+    overflow-wrap: anywhere;
+    word-break: break-word;
+  }
+
+  .bs-departments-table .column-key {
+    display: block;
+    margin-top: 2px;
+    font-size: 10px;
+    color: #64748b;
+    letter-spacing: 0.02em;
+    overflow-wrap: anywhere;
+    word-break: break-all;
+  }
+
+  .bs-departments-table .flag {
+    font-weight: 600;
+  }
+</style>
+
+<%= list_count(@bs_departments) %>
+
+<div class="bs-departments-table">
+  <table>
+    <thead>
+      <tr>
+        <th class="wrap">部門ID<span class="column-key">id</span></th>
+        <th class="wrap">部門名<span class="column-key">name</span></th>
+        <th class="wrap">会社ID<span class="column-key">company_id</span></th>
+        <th class="wrap">削除フラグ<span class="column-key">delete_flg</span></th>
+        <th class="wrap">作成日時<span class="column-key">created_at</span></th>
+        <th class="wrap">更新日時<span class="column-key">updated_at</span></th>
+      </tr>
+    </thead>
+    <tbody>
+      <% @bs_departments.each do |department| %>
+        <% bs_company = @bs_companies_by_id[department.company_id] %>
+        <tr>
+          <td class="wrap"><%= department.id %></td>
+          <td class="wrap"><%= department.name %></td>
+          <td class="wrap"><%= display_reference(department.company_id, bs_company&.name) %></td>
+          <td class="wrap flag"><%= department.delete_flg ? "有" : "無" %></td>
+          <td class="wrap"><%= display_timestamp(department.created_at) %></td>
+          <td class="wrap"><%= display_timestamp(department.updated_at) %></td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+</div>
