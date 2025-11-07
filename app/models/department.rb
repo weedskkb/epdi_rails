@@ -4,10 +4,10 @@ class Department < ApplicationRecord
 
   # TODO: 仮実装 => KKB側で別途実装
   def get_company_code(day, get_future=false)
-    Company.find_by_code(company_id)&.code
+    Company.find_by_id(company_id)&.code
   end
 
   def get_company(day)
-    Company.find_by_code(company_id)
+    Company.find_by_id(company_id)
   end
 end

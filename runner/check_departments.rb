@@ -1,8 +1,13 @@
 require 'nkf'
 
+# from kkb
 # INSERT departments (code, name, store_code, store_name, hidden) (select code, name, store_code, store_name, hidden from kkb_rails.departments);
+## UPDATE departments AS d JOIN bs_departments AS b ON CAST(d.code AS UNSIGNED) = b.id SET d.company_id = b.company_id;
+# UPDATE departments d JOIN bs_departments b ON CAST(d.code AS UNSIGNED) = b.id JOIN companies c ON CAST(c.code AS UNSIGNED) = b.company_id SET d.company_id = c.id;
+
+# from basket
 ## INSERT departments (code, name, store_code, store_name, company_id, hidden) (select id, name, id, name, company_id, delete_flg from bs_departments);
-# UPDATE departments AS d JOIN bs_departments AS b ON CAST(d.code AS UNSIGNED) = b.id SET d.company_id = b.company_id;
+## (1..5).each{ |i| Department.find_by_code(i).update(code: '0' + i.to_s) }
 
 
 def str_similarity(str1, str2, options = {})
