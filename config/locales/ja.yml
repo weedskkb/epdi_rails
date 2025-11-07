@@ -6,10 +6,16 @@ ja:
         tax_class_code:
           standard: "標準"
           reduced: "軽減"
+        tax_rate_code:
+          tax_rate_8: "8%"
+          tax_rate_10: "10%"
       trn_capture_record:
         tax_class_code:
           standard: "標準"
           reduced: "軽減"
+        tax_rate_code:
+          tax_rate_8: "8%"
+          tax_rate_10: "10%"
       journal_entry_pattern:
         debit_tax_class_code:
           standard: "標準"
@@ -19,6 +25,14 @@ ja:
           standard: "標準"
           reduced: "軽減"
           capture_category: "取込区分を使用"
+        debit_tax_rate_code:
+          tax_rate_8: "8%"
+          tax_rate_10: "10%"
+          capture_category: "取込区分を使用"
+        credit_tax_rate_code:
+          tax_rate_8: "8%"
+          tax_rate_10: "10%"
+          capture_category: "取込区分を使用"
       trn_journal_entry_record:
         debit_tax_class_code:
           standard: "標準"
@@ -26,3 +40,9 @@ ja:
         credit_tax_class_code:
           standard: "標準"
           reduced: "軽減"
+        debit_tax_rate_code:
+          tax_rate_8: "8%"
+          tax_rate_10: "10%"
+        credit_tax_rate_code:
+          tax_rate_8: "8%"
+          tax_rate_10: "10%"

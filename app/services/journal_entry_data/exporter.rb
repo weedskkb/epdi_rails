@@ -23,14 +23,14 @@ module JournalEntryData
       :debit_business_connection_code,
       :debit_amount,
       :debit_tax_class_code,
-      :debit_tax_rate_id,
+      :debit_tax_rate_code,
       :credit_department_code,
       :credit_account_code,
       :credit_account_sub_code,
       :credit_business_connection_code,
       :credit_amount,
       :credit_tax_class_code,
-      :credit_tax_rate_id,
+      :credit_tax_rate_code,
       :abstract,
       :row_no,
       :excel_row_no,
@@ -113,14 +113,14 @@ module JournalEntryData
         "#{records_table}.debit_business_connection_code",
         "#{records_table}.debit_amount",
         "#{records_table}.debit_tax_class_code",
-        "#{records_table}.debit_tax_rate_id",
+        "#{records_table}.debit_tax_rate_code",
         "#{records_table}.credit_department_code",
         "#{records_table}.credit_account_code",
         "#{records_table}.credit_account_sub_code",
         "#{records_table}.credit_business_connection_code",
         "#{records_table}.credit_amount",
         "#{records_table}.credit_tax_class_code",
-        "#{records_table}.credit_tax_rate_id",
+        "#{records_table}.credit_tax_rate_code",
         "#{records_table}.abstract",
         "#{records_table}.row_no",
         "#{records_table}.excel_row_no",
@@ -138,14 +138,14 @@ module JournalEntryData
           debit_business_connection_code: values[7],
           debit_amount: values[8],
           debit_tax_class_code: values[9],
-          debit_tax_rate_id: values[10],
+          debit_tax_rate_code: values[10],
           credit_department_code: normalize_department_code(values[11]),
           credit_account_code: values[12],
           credit_account_sub_code: values[13],
           credit_business_connection_code: values[14],
           credit_amount: values[15],
           credit_tax_class_code: values[16],
-          credit_tax_rate_id: values[17],
+          credit_tax_rate_code: values[17],
           abstract: values[18],
           row_no: values[19],
           excel_row_no: values[20],
@@ -226,7 +226,7 @@ module JournalEntryData
           row.debit_business_connection_code,
           row.debit_amount,
           row.debit_tax_class_code,
-          rate_value_for(row.debit_tax_rate_id)
+          rate_value_for(row.debit_tax_rate_code)
         ].map { |value| value.to_s }
 
         credit_text = [
@@ -237,7 +237,7 @@ module JournalEntryData
           row.credit_business_connection_code,
           row.credit_amount,
           row.credit_tax_class_code,
-          rate_value_for(row.credit_tax_rate_id)
+          rate_value_for(row.credit_tax_rate_code)
         ].map { |value| value.to_s }
 
         line = ([section, formatted_date] + debit_text + credit_text + [row.abstract.to_s]).join(",")
@@ -261,14 +261,11 @@ module JournalEntryData
       buffer.read
     end
 
-    def rate_value_for(tax_rate_id)
-      return nil if tax_rate_id.blank?
+    # TODO: 要確認
+    def rate_value_for(tax_rate_code)
+      return nil if tax_rate_code.blank?
 
-      tax_rate_cache[tax_rate_id] ||= TaxRate.find_by(id: tax_rate_id)&.rate
-    end
-
-    def tax_rate_cache
-      @tax_rate_cache ||= {}
+      tax_rate_code.to_i
     end
 
     # JournalEntryDataListApplication::ExecuteFlg()

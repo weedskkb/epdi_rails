@@ -86,13 +86,13 @@
         <th class="wrap">借方勘定科目<span class="column-key">debit_account_code</span></th>
         <th class="wrap">借方補助科目<span class="column-key">debit_account_sub_code</span></th>
         <th class="wrap">借方取引先<span class="column-key">debit_business_connection_code</span></th>
-        <th class="wrap">借方税率<span class="column-key">debit_tax_rate_id</span></th>
+        <th class="wrap">借方税率<span class="column-key">debit_tax_rate_code</span></th>
         <th class="wrap">借方税区分<span class="column-key">debit_tax_class_code</span></th>
         <th class="wrap">貸方部署<span class="column-key">credit_department_code</span></th>
         <th class="wrap">貸方勘定科目<span class="column-key">credit_account_code</span></th>
         <th class="wrap">貸方補助科目<span class="column-key">credit_account_sub_code</span></th>
         <th class="wrap">貸方取引先<span class="column-key">credit_business_connection_code</span></th>
-        <th class="wrap">貸方税率<span class="column-key">credit_tax_rate_id</span></th>
+        <th class="wrap">貸方税率<span class="column-key">credit_tax_rate_code</span></th>
         <th class="wrap">貸方税区分<span class="column-key">credit_tax_class_code</span></th>
         <th class="wrap">固定金額フラグ<span class="column-key">fixed_amount_flag</span></th>
         <th class="wrap">固定金額<span class="column-key">fixed_amount</span></th>
@@ -122,13 +122,13 @@
           <td class="wrap"><%= pattern.debit_account_code %></td>
           <td class="wrap"><%= pattern.debit_account_sub_code || "-" %></td>
           <td class="wrap"><%= display_reference(pattern.debit_business_connection_code, pattern.debit_business_connection&.name) %></td>
-          <td class="wrap"><%= display_reference(pattern.debit_tax_rate_id, pattern.debit_tax_rate&.rate) %></td>
+          <td class="wrap"><%= enum_label(pattern, :debit_tax_rate_code) %></td>
           <td class="wrap"><%= enum_label(pattern, :debit_tax_class_code) %></td>
           <td class="wrap"><%= display_reference(pattern.credit_department_code, pattern.credit_department&.name) %></td>
           <td class="wrap"><%= pattern.credit_account_code %></td>
           <td class="wrap"><%= pattern.credit_account_sub_code || "-" %></td>
           <td class="wrap"><%= display_reference(pattern.credit_business_connection_code, pattern.credit_business_connection&.name) %></td>
-          <td class="wrap"><%= display_reference(pattern.credit_tax_rate_id, pattern.credit_tax_rate&.rate) %></td>
+          <td class="wrap"><%= enum_label(pattern, :credit_tax_rate_code) %></td>
           <td class="wrap"><%= enum_label(pattern, :credit_tax_class_code) %></td>
           <td class="wrap"><%= pattern.fixed_amount_flag ? "有" : "無" %></td>
           <td class="wrap"><%= pattern.fixed_amount %></td>

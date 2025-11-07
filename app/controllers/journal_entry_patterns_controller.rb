@@ -27,10 +27,8 @@ class JournalEntryPatternsController < ApplicationController
       :company,
       :debit_department,
       :debit_business_connection,
-      :debit_tax_rate,
       :credit_department,
-      :credit_business_connection,
-      :credit_tax_rate
+      :credit_business_connection
     )
   end
 
@@ -49,13 +47,13 @@ class JournalEntryPatternsController < ApplicationController
       :debit_account_code,
       :debit_account_sub_code,
       :debit_business_connection_code,
-      :debit_tax_rate_id,
+      :debit_tax_rate_code,
       :debit_tax_class_code,
       :credit_department_code,
       :credit_account_code,
       :credit_account_sub_code,
       :credit_business_connection_code,
-      :credit_tax_rate_id,
+      :credit_tax_rate_code,
       :credit_tax_class_code,
       :fixed_amount_flag,
       :fixed_amount,
@@ -103,8 +101,12 @@ class JournalEntryPatternsController < ApplicationController
       ["#{code} #{label}", name]
     end
 
-    @tax_rate_options = TaxRate.active.order(:id).map do |tax_rate|
-      ["#{tax_rate.id} => #{tax_rate.rate}%", tax_rate.id]
+    @tax_rate_options = JournalEntryPattern.debit_tax_rate_codes.map do |name, code|
+      label = I18n.t(
+        "activerecord.attributes.journal_entry_pattern.debit_tax_rate_code.#{name}",
+        default: name.to_s.humanize
+      )
+      ["#{code} #{label}", name]
     end
   end
 end

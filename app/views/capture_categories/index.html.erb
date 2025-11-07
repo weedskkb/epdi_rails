@@ -79,7 +79,7 @@
         <th class="wrap">取込区分ID<span class="column-key">id</span></th>
         <th class="wrap">取込区分名<span class="column-key">name</span></th>
         <th class="wrap">税区分<span class="column-key">tax_class_code</span></th>
-        <th class="wrap">税率<span class="column-key">TAX_RATE_ID</span></th>
+        <th class="wrap">税率<span class="column-key">tax_rate_code</span></th>
         <th class="wrap">取引先<span class="column-key">business_connection_code</span></th>
         <th class="wrap">取引先会社<span class="column-key">business_connection_company_code</span></th>
         <th class="wrap">借方部署<span class="column-key">debit_department_code</span></th>
@@ -102,7 +102,7 @@
           <td class="wrap"><%= category.id %></td>
           <td class="wrap"><%= category.name %></td>
           <td class="wrap"><%= enum_label(category, :tax_class_code, CaptureCategory) %></td>
-          <td class="wrap"><%= display_reference(category.tax_rate_id, category.tax_rate&.rate) %></td>
+          <td class="wrap"><%= enum_label(category, :tax_rate_code, CaptureCategory) %></td>
           <td class="wrap"><%= display_reference(category.business_connection_code, category.business_connection&.name) %></td>
           <td class="wrap"><%= display_reference(category.business_connection_company_code, category.business_connection_company&.name) %></td>
           <td class="wrap"><%= display_reference(category.debit_department_code, category.debit_department&.name) %></td>

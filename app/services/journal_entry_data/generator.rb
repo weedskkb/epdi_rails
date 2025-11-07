@@ -196,9 +196,9 @@ module JournalEntryData
             credit_amount: sum_amount(credit_sum),
             abstract: key[10],
             debit_tax_class_code: nil,
-            debit_tax_rate_id: nil,
+            debit_tax_rate_code: nil,
             credit_tax_class_code: nil,
-            credit_tax_rate_id: nil
+            credit_tax_rate_code: nil
           )
         end
     end
@@ -221,6 +221,8 @@ module JournalEntryData
 
       debit_tax_class_value = tax_class_value_for(pattern, :debit, capture_category.id)
       credit_tax_class_value = tax_class_value_for(pattern, :credit, capture_category.id)
+      debit_tax_rate_value = tax_rate_value_for(pattern, :debit, capture_category.id)
+      credit_tax_rate_value = tax_rate_value_for(pattern, :credit, capture_category.id)
 
       {
         journal_entry_history_id: history.id,
@@ -240,7 +242,7 @@ module JournalEntryData
         ),
         debit_amount: debit_amount,
         debit_tax_class_code: debit_tax_class_value,
-        debit_tax_rate_id: tax_rate_for(pattern.debit_tax_rate_id, capture_category.id),
+        debit_tax_rate_code: debit_tax_rate_value,
         credit_department_code: department_for(pattern.credit_department_code, capture_row.department_code, capture_row.company_code, capture_category.id, "credit"),
         credit_account_code: credit_account_code,
         credit_account_sub_code: credit_sub_code,
@@ -252,7 +254,7 @@ module JournalEntryData
         ),
         credit_amount: credit_amount,
         credit_tax_class_code: credit_tax_class_value,
-        credit_tax_rate_id: tax_rate_for(pattern.credit_tax_rate_id, capture_category.id),
+        credit_tax_rate_code: credit_tax_rate_value,
         abstract: abstract_for(
           pattern.abstract.to_s,
           history.accrual_month,
@@ -279,14 +281,14 @@ module JournalEntryData
         debit_business_connection_code: attributes[:debit_business_connection_code],
         debit_amount: attributes[:debit_amount],
         debit_tax_class_code: attributes[:debit_tax_class_code],
-        debit_tax_rate_id: attributes[:debit_tax_rate_id],
+        debit_tax_rate_code: attributes[:debit_tax_rate_code],
         credit_department_code: attributes[:credit_department_code],
         credit_account_code: attributes[:credit_account_code],
         credit_account_sub_code: attributes[:credit_account_sub_code],
         credit_business_connection_code: attributes[:credit_business_connection_code],
         credit_amount: attributes[:credit_amount],
         credit_tax_class_code: attributes[:credit_tax_class_code],
-        credit_tax_rate_id: attributes[:credit_tax_rate_id],
+        credit_tax_rate_code: attributes[:credit_tax_rate_code],
         abstract: attributes[:abstract],
         created_by_id: current_user_id,
         created_at: Time.zone.now
@@ -543,7 +545,7 @@ module JournalEntryData
       code_name = pattern.public_send("#{side}_tax_class_code")
       return nil if code_name.nil?
 
-      if code_name == "capture_category"
+      if code_name.to_s == "capture_category"
         category = capture_category_record(capture_category_id)
         category&.tax_class_code_before_type_cast # 数値で返す
       else
@@ -552,16 +554,15 @@ module JournalEntryData
     end
 
     # JournalEntryDataListApplication::getTaxRate()
-    PATTERN_TAX_RATE_USE_CAPTURE_CATEGORY = 2
+    def tax_rate_value_for(pattern, side, capture_category_id)
+      code_name = pattern.public_send("#{side}_tax_rate_code")
+      return nil if code_name.nil?
 
-    def tax_rate_for(pattern_tax_rate_id, capture_category_id)
-      return nil if pattern_tax_rate_id.blank?
-
-      rate_id = pattern_tax_rate_id.to_i
-      if rate_id == PATTERN_TAX_RATE_USE_CAPTURE_CATEGORY
-        capture_category_record(capture_category_id).tax_rate_id
+      if code_name.to_s == "capture_category"
+        category = capture_category_record(capture_category_id)
+        category&.tax_rate_code_before_type_cast
       else
-        rate_id
+        pattern.public_send("#{side}_tax_rate_code_before_type_cast")
       end
     end
 

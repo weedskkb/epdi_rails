@@ -369,7 +369,7 @@ module CapturePaymentData
               list_cd: list_cd,
               amount: amount,
               second_amount: 0,
-              tax_rate_id: tax_rate_for(cell_string(sheet, 3, col_idx)),
+              tax_rate_code: tax_rate_for(cell_string(sheet, 3, col_idx)),
               tax_class_code: tax_class_for(cell_string(sheet, 3, col_idx))
             ) if amount != 0
           end
@@ -577,7 +577,7 @@ module CapturePaymentData
         list_cd: attrs[:list_cd],
         amount: attrs[:amount],
         second_amount: attrs[:second_amount] || 0,
-        tax_rate_id: attrs[:tax_rate_id],
+        tax_rate_code: attrs[:tax_rate_code],
         tax_class_code: attrs[:tax_class_code],
         created_by_id: user_id,
         created_at: Time.zone.now
@@ -625,11 +625,18 @@ module CapturePaymentData
       date.next_month.strftime('%Y-%m')
     end
 
-    # TODO: 変更の必要あり
+    # TODO: 変更の確認
     # CapturePaymentDataApplication::getTaxRate()
     def tax_rate_for(value)
-      # value.present? ? 8 : nil
-      return 8 unless value.nil?
+      string = value.to_s.strip
+      return nil if string.empty?
+
+      case string
+      when '8', '8%' then 8
+      when '10', '10%' then 10
+      else
+        8
+      end
     end
 
     # CapturePaymentDataApplication::getTaxClass()
