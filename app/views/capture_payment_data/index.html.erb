@@ -2,22 +2,27 @@
 
 <%= form_with model: @view_model, url: capture_capture_payment_data_path, local: true, method: :post, html: { multipart: true } do |form| %>
   <section class="capturecategory-radio">
+    <% selected = params.dig(:capture_payment_data_view_model, :select_category).to_s %>
     <ul style="list-style: none; text-align:left;">
-      <li><input type="radio" name="SelectCategory" class="uniquedata" id="storedata" value="1" /><label for="storedata"> 店舗データ: 16 経費(店舗)ﾏﾈｰｼﾞｬｰ振込</label></li>
-      <li><input type="radio" name="SelectCategory" class="uniquedata" id="fixeddata" value="1" /><label for="fixeddata"> 固定費データ: 24 経費(家賃)固定費</label></li>
-      <li><input type="radio" name="SelectCategory" class="wholedata" id="wholedata" value="2" /><label for="wholedata"> 卸データ: 1 医薬品(卸)</label></li>
-      <li><input type="radio" name="SelectCategory" class="sharedata" id="sharedata" value="2" /><label for="sharedata"> 共有データ</label></li>
+      <li>
+        <%= form.radio_button :select_category, 1, class: 'select_category uniquedata', id: 'storedata', checked: selected == '1' %>
+        <%= form.label :select_category, ' 店舗データ: 16 経費(店舗)ﾏﾈｰｼﾞｬｰ振込', for: 'storedata' %>
+      </li>
+      <li>
+        <%= form.radio_button :select_category, 2, class: 'select_category uniquedata', id: 'fixeddata', checked: selected == '2' %>
+        <%= form.label :select_category, ' 固定費データ: 24 経費(家賃)固定費', for: 'fixeddata' %>
+      </li>
+      <li>
+        <%= form.radio_button :select_category, 3, class: 'select_category wholedata', id: 'wholedata', checked: selected == '3' %>
+        <%= form.label :select_category, ' 卸データ: 1 医薬品(卸)', for: 'wholedata' %>
+      </li>
+      <li>
+        <%= form.radio_button :select_category, 4, class: 'select_category sharedata', id: 'sharedata', checked: selected == '4' %>
+        <%= form.label :select_category, ' 共有データ', for: 'sharedata' %>
+      </li>
     </ul>
     <input type="hidden" />
   </section>
-
-  <div>
-    <%= form.label :target_month, "対象月" %>
-    <%= form.text_field :target_month, placeholder: "YYYY-MM" %>
-    <% if form.object.errors[:target_month].present? %>
-      <div class="error"><%= form.object.errors[:target_month].join(', ') %></div>
-    <% end %>
-  </div>
 
   <div>
     <%= form.label :accrual_month, "発生月" %>

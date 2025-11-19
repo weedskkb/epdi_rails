@@ -72,10 +72,6 @@ module CapturePaymentData
       view_model.capture_category_id.to_i
     end
 
-    def target_month_value
-      view_model.target_month.to_s
-    end
-
     def accrual_month_value
       view_model.accrual_month.to_s.presence
     end
@@ -88,8 +84,8 @@ module CapturePaymentData
     def ensure_month_requirements
       case capture_category
       when CATEGORY_WHOLESALE, CATEGORY_STORE, CATEGORY_FIXED
-        if target_month_value.blank? && view_model.errors[:target_month].blank?
-          view_model.errors.add(:target_month, '年月選択は必須です。')
+        if accrual_month_value.blank?
+          view_model.errors.add(:accrual_month, '発生月を入力してください。')
         end
       else
         view_model.errors.add(:accrual_month, '発生月を入力してください。') if accrual_month_value.blank?
@@ -101,15 +97,14 @@ module CapturePaymentData
     def ensure_history_uniqueness
       return if capture_category.zero?
 
-      target_month_date = parse_month_string(target_month_value)
       accrual_month_date = parse_month_string(accrual_month_value)
       payment_month_date = parse_month_string(payment_month_value)
 
       exists = case capture_category
                when CATEGORY_STORE, CATEGORY_FIXED
-                 TrnCaptureHistory.exists?(capture_category_id: capture_category, accrual_month: target_month_date)
+                 TrnCaptureHistory.exists?(capture_category_id: capture_category, accrual_month: accrual_month_date)
                when CATEGORY_WHOLESALE
-                 pm = next_month_string(target_month_value)
+                 pm = next_month_string(accrual_month_value)
                  TrnCaptureHistory.exists?(capture_category_id: capture_category,
                                            payment_month: parse_month_string(pm))
                else
@@ -203,7 +198,7 @@ module CapturePaymentData
 
     # CapturePaymentDataApplication::Save() - sheet naming
     def wholesale_sheet_name
-      date = parse_month_string(target_month_value)
+      date = parse_month_string(accrual_month_value)
       return '' unless date
 
       "#{date.next_month.strftime('%-m月')}支払い一覧店舗別"
@@ -257,9 +252,9 @@ module CapturePaymentData
       history_ids = case capture_category
                     when CATEGORY_STORE, CATEGORY_FIXED
                       TrnCaptureHistory.where(capture_category_id: capture_category,
-                                              accrual_month: parse_month_string(target_month_value)).pluck(:id)
+                                              accrual_month: parse_month_string(accrual_month_value)).pluck(:id)
                     when CATEGORY_WHOLESALE
-                      pm = next_month_string(target_month_value)
+                      pm = next_month_string(accrual_month_value)
                       TrnCaptureHistory.where(capture_category_id: capture_category,
                                               payment_month: parse_month_string(pm)).pluck(:id)
                     else
@@ -280,7 +275,6 @@ module CapturePaymentData
 
     # CapturePaymentDataApplication::RecordHistory() - initialize
     def record_initial_history
-      target_month = parse_month_string(target_month_value)
       payment_month = parse_month_string(payment_month_value)
       accrual_month = parse_month_string(accrual_month_value)
 
@@ -288,9 +282,9 @@ module CapturePaymentData
                       when CATEGORY_STORE
                         nil
                       when CATEGORY_FIXED
-                        create_history(accrual_month: target_month, payment_month: target_month)
+                        create_history(accrual_month: accrual_month, payment_month: accrual_month)
                       when CATEGORY_WHOLESALE
-                        create_history(payment_month: target_month.next_month)
+                        create_history(payment_month: accrual_month.next_month)
                       else
                         create_history(accrual_month: accrual_month, payment_month: payment_month)
                       end
@@ -343,7 +337,7 @@ module CapturePaymentData
             next unless amount && business_connection_code
 
             term = cell_integer(sheet, 4, col_idx) || 0
-            payment_month = payment_month_from_term(target_month_value, term)
+            payment_month = payment_month_from_term(accrual_month_value, term)
             history = find_or_create_store_history(payment_month)
 
             account_code = cell_integer(sheet, 5, col_idx)
@@ -551,7 +545,7 @@ module CapturePaymentData
     def find_or_create_store_history(payment_month)
       TrnCaptureHistory.find_or_create_by!(
         capture_category_id: capture_category,
-        accrual_month: parse_month_string(target_month_value),
+        accrual_month: parse_month_string(accrual_month_value),
         payment_month: parse_month_string(payment_month)
       ) do |history|
         history.lock_flg = false
@@ -603,7 +597,7 @@ module CapturePaymentData
     def department_company_code(department)
       return nil unless department
 
-      month = parse_month_string(target_month_value)  # KKBでは会社情報は異動登録なので日付が必要
+      month = parse_month_string(accrual_month_value)  # KKBでは会社情報は異動登録なので日付が必要
       department.get_company_code(month)
     end
 

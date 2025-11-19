@@ -4,7 +4,6 @@ class CapturePaymentDataViewModel
   include ActiveModel::Model
   include ActiveModel::Attributes
 
-  attribute :target_month, :string
   attribute :capture_category_id, :integer
   attribute :accrual_month, :string
   attribute :payment_month, :string
@@ -12,7 +11,6 @@ class CapturePaymentDataViewModel
   attribute :file
   attribute :user
 
-  validates :target_month, presence: true
   validates :capture_category_id, presence: true
   validate  :file_presence
 

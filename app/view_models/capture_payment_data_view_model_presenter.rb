@@ -21,7 +21,6 @@ class CapturePaymentDataViewModelPresenter
 
   def build(view_model)
     view_model.user ||= current_user
-    view_model.target_month ||= current_month
     assign_histories(view_model)
     view_model
   end
