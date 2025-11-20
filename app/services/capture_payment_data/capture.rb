@@ -580,7 +580,14 @@ module CapturePaymentData
 
     def department_code_from(sheet, row_idx)
       code = cell_string(sheet, row_idx, 0).to_s.strip.presence
-      code =~ /\A\d\z/ ? '0' + code : code  # 1桁コード対応
+      dept_mapping_code(code)  # 1桁コード対応等
+    end
+
+    # HARD_CODING: 店舗コードの置換え(1桁コード対応等)
+    def dept_mapping_code(code)
+      # 1: 調剤事業部 はそのまま使用
+      mapping_codes = {"2" => "02", "3" => "03", "4" => "04", "5" => "05"}
+      mapping_codes.has_key?(code) ? mapping_codes[code] : code
     end
 
     def department_from_code(department_code)
