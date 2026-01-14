@@ -3,6 +3,9 @@
 <% if flash[:alert].present? %>
   <div class="alert"><%= flash[:alert] %></div>
 <% end %>
+<% if flash[:notice].present? %>
+  <div class="notice"><%= flash[:notice] %></div>
+<% end %>
 
 <%= form_with model: @form,
               url: journal_entry_data_display_path,
@@ -47,6 +50,10 @@
                     name: nil,
                     formaction: journal_entry_data_export_path,
                     data: { export_auth_token: form_authenticity_token(form_options: { action: journal_entry_data_export_path, method: :post }) } %>
+    <%= form.submit "奉行連携",
+                    name: nil,
+                    formaction: journal_entry_data_send_path,
+                    data: { bugyo_auth_token: form_authenticity_token(form_options: { action: journal_entry_data_send_path, method: :post }) } %>
   </div>
 <% end %>
 
@@ -107,7 +114,7 @@
         var submitter = event.submitter || document.activeElement;
         if (!submitter) return;
 
-        var token = submitter.dataset ? submitter.dataset.exportAuthToken : null;
+        var token = submitter.dataset ? (submitter.dataset.exportAuthToken || submitter.dataset.bugyoAuthToken) : null;
         tokenInput.value = token || defaultToken;
       });
 

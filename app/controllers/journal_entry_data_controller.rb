@@ -57,6 +57,34 @@ class JournalEntryDataController < ApplicationController
     end
   end
 
+  def send_to_bugyo
+    @form = build_form_from_params(export_params)
+    if @form.valid?
+      generation = JournalEntryData::Generator.call(@form)
+      if generation.success?
+        result = JournalEntryData::Exporter.send_to_bugyo(@form)
+        if result.success?
+          send_data result.payload[:zip_data],
+                    filename: result.payload[:filename],
+                    disposition: "attachment",
+                    type: "application/zip"
+        else
+          flash.now[:alert] = result.message || "出力データはありませんでした。"
+          @journal_entries = []
+          render :index, status: :unprocessable_entity
+        end
+      else
+        flash.now[:alert] = generation.message || "入力内容を確認してください。"
+        @journal_entries = []
+        render :index, status: :unprocessable_entity
+      end
+    else
+      flash.now[:alert] = "入力内容を確認してください。"
+      @journal_entries = []
+      render :index, status: :unprocessable_entity
+    end
+  end
+
   private
 
   def build_form_from_params(raw_params)

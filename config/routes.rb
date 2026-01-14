@@ -17,6 +17,7 @@ Rails.application.routes.draw do
   resources :journal_entry_data, only: [:index]
   post "/journal_entry_data/display", to: "journal_entry_data#display", as: :journal_entry_data_display
   post "/journal_entry_data/export", to: "journal_entry_data#export", as: :journal_entry_data_export
+  post "/journal_entry_data/send", to: "journal_entry_data#send_to_bugyo", as: :journal_entry_data_send
   resources :companies, only: [:index]
   resources :departments, only: [:index]
   resources :accounts, only: [:index]

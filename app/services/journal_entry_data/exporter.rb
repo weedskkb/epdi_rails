@@ -7,10 +7,12 @@ module JournalEntryData
   class Exporter
     include Support::AccountingItemLookup
     HEADER = "OBCD001, CSJS005, CSJS200, CSJS201, CSJS202, CSJS206, CSJS208, CSJS213,CSJS222,CSJS220, CSJS300, CSJS301, CSJS302, CSJS306, CSJS308, CSJS313,CSJS322,CSJS320, CSJS100"
+    BUGYO_HEADER = "company_code,OBCD001,CSJS001,CSJS002,CSJS005,CSJS010,CSJS200,CSJS201,CSJS202,CSJS203,CSJS222,CSJS220,CSJS206,CSJS207,CSJS208,CSJS209,CSJS210,CSJS213,CSJS214,CSJE201,CSJE202,CSJE203,CSJE204,CSJE205,CSJE206,CSJE207,CSJE208,CSJE209,CSJE210,CSJS300,CSJS301,CSJS302,CSJS303,CSJS322,CSJS320,CSJS306,CSJS307,CSJS308,CSJS309,CSJS310,CSJS313,CSJS314,CSJE301,CSJE302,CSJE303,CSJE304,CSJE305,CSJE306,CSJE307,CSJE308,CSJE309,CSJE310,CSJS100"
     UTF8_BOM = "\uFEFF"
     ZIP_BASENAME = "取込用CSV"
     LOGISTICS_CATEGORY = 2
     LABOR_COST_CATEGORY = 23
+    BUGYO_FILENAME_PREFIX = "basket"
 
     Row = Struct.new(
       :journal_entry_history_id,
@@ -43,6 +45,10 @@ module JournalEntryData
       new(form).call
     end
 
+    def self.send_to_bugyo(form)
+      new(form).send_to_bugyo
+    end
+
     def initialize(form)
       @form = form
     end
@@ -73,6 +79,33 @@ module JournalEntryData
         "JournalEntryData::Exporter failed: #{e.class} #{e.message}\n#{e.backtrace.join("\n")}"
       )
       failure("CSV出力に失敗しました。")
+    end
+
+    # 勘定奉行連携
+    def send_to_bugyo
+      rows = fetch_rows
+      return failure("出力データはありませんでした。") if rows.empty?
+
+      timestamp = Time.zone.now.strftime("%Y%m%d%H%M%S")
+      history_numbers = rows.map(&:journal_entry_history_id).uniq
+
+      files = build_bugyo_files(rows, timestamp)
+      zip_data = build_zip(files)
+      mark_histories_executed(history_numbers)
+
+      ServiceResult.new(
+        success: true,
+        message: "#{rows.size}行出力しました。",
+        payload: { zip_data: zip_data, filename: "#{ZIP_BASENAME}_bugyo_#{timestamp}.zip" }
+      )
+    rescue Support::AccountingItemLookup::MissingItemError => e
+      Rails.logger.error("JournalEntryData::Exporter accounting item missing (bugyo): #{e.message}")
+      failure(e.message)
+    rescue StandardError => e
+      Rails.logger.error(
+        "JournalEntryData::Exporter bugyo send failed: #{e.class} #{e.message}\n#{e.backtrace.join("\n")}"
+      )
+      failure("奉行連携の送信に失敗しました。")
     end
 
     private
@@ -259,6 +292,122 @@ module JournalEntryData
       end
       buffer.rewind
       buffer.read
+    end
+
+    # 勘定奉行向けCSV生成
+    def build_bugyo_files(rows, timestamp)
+      grouped = rows.group_by(&:company_code)
+
+      grouped.map do |company_code, company_rows|
+        sorted_rows = company_rows.sort_by do |row|
+          [row.journal_entry_history_id, row.row_no, row.department_code.to_s, row.created_at]
+        end
+        file_name = "#{BUGYO_FILENAME_PREFIX}_#{company_code}_#{timestamp}.csv"
+        [file_name, build_bugyo_company_csv(sorted_rows)]
+      end
+    end
+
+    def build_bugyo_company_csv(rows)
+      lines = [BUGYO_HEADER]
+      section = "*"
+      last_date = nil
+      last_row_no = nil
+      row_counter = 0
+
+      rows.each_with_index do |row, index|
+        ensure_accounting_item!(
+          row.debit_account_code,
+          row.debit_account_sub_code,
+          "仕訳履歴ID=#{row.journal_entry_history_id} 行No=#{row.row_no} 借方"
+        )
+        ensure_accounting_item!(
+          row.credit_account_code,
+          row.credit_account_sub_code,
+          "仕訳履歴ID=#{row.journal_entry_history_id} 行No=#{row.row_no} 貸方"
+        )
+
+        formatted_date = format_date(row.date)
+
+        if last_date != formatted_date
+          section = "*"
+          last_date = formatted_date
+          row_counter = 0
+        end
+
+        if row_counter >= 250
+          section = "*"
+          row_counter = 0
+        end
+
+        if last_row_no != row.row_no
+          section = "*"
+          last_row_no = row.row_no
+          row_counter = 0
+        end
+
+        if requires_additional_split?(row)
+          same_excel_count = rows[(index + 1)..].to_a.count do |other|
+            other.created_at > row.created_at &&
+              other.excel_row_no == row.excel_row_no &&
+              other.row_no == row.row_no
+          end
+          if row_counter + same_excel_count >= 250
+            section = "*"
+            row_counter = 0
+          end
+        end
+
+        debit_text = bugyo_side_fields(
+          row.debit_department_code,
+          row.debit_account_code,
+          row.debit_account_sub_code,
+          row.debit_business_connection_code,
+          row.debit_amount,
+          row.debit_tax_class_code,
+          row.debit_tax_rate_code
+        )
+        credit_text = bugyo_side_fields(
+          row.credit_department_code,
+          row.credit_account_code,
+          row.credit_account_sub_code,
+          row.credit_business_connection_code,
+          row.credit_amount,
+          row.credit_tax_class_code,
+          row.credit_tax_rate_code
+        )
+
+        fields = [
+          row.company_code,
+          section,
+          "00",
+          nil,
+          formatted_date,
+          nil
+        ] + debit_text + credit_text + [row.abstract.to_s]
+
+        lines << fields.map { |value| value.to_s }.join(",")
+        section = ""
+        row_counter += 1
+      end
+
+      UTF8_BOM + lines.join("\n") + "\n"
+    end
+
+    def bugyo_side_fields(department_code, account_code, sub_account_code, business_connection_code, amount, tax_class_code, tax_rate_code)
+      [
+        normalize_department_code(department_code),
+        account_code,
+        sub_account_code,
+        nil,
+        tax_class_code,
+        rate_value_for(tax_rate_code),
+        2,
+        nil,
+        business_connection_code,
+        nil,
+        nil,
+        amount
+      ] + Array.new(11, nil)
     end
 
     # TODO: 要確認
