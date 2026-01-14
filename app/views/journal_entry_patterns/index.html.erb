@@ -33,10 +33,6 @@
     text-align: left;
   }
 
-  .journal-entry-patterns-table tbody tr:nth-child(even) {
-    background: #f9fbff;
-  }
-
   .journal-entry-patterns-table th.wrap,
   .journal-entry-patterns-table td.wrap {
     white-space: normal;
@@ -67,6 +63,15 @@
     color: #fff;
     font-size: 11px;
     text-decoration: none;
+  }
+
+  .journal-entry-patterns-table tbody tr.group-highlight {
+    background: var(--group-color, #fff);
+    transition: background 0.2s ease;
+  }
+
+  .journal-entry-patterns-table tbody tr.group-highlight:hover {
+    background: var(--group-color-hover, var(--group-color, #fff));
   }
 </style>
 
@@ -110,8 +115,25 @@
       </tr>
     </thead>
     <tbody>
+      <% color_palette = ["#e8f4ff", "#fef3c7", "#e0f2f1", "#f3e8ff", "#ffe4e6", "#ede9fe", "#f0f9ff", "#fdf2f8"] %>
+      <% lighten_color = lambda do |hex, ratio = 0.85|
+          hex = hex.delete("#")
+          hex = hex.chars.flat_map { |c| [c, c] }.join if hex.length == 3
+          rgb = [
+            hex[0..1].to_i(16),
+            hex[2..3].to_i(16),
+            hex[4..5].to_i(16)
+          ]
+          blended = rgb.map do |channel|
+            [(channel * ratio + 255 * (1 - ratio)).round, 255].min
+          end
+          format("#%02x%02x%02x", *blended)
+        end %>
+      <% group_colors = {} %>
       <% @patterns.each do |pattern| %>
-        <tr>
+        <% base_color = group_colors[pattern.group_no] ||= color_palette[group_colors.size % color_palette.size] %>
+        <% hover_color = lighten_color.call(base_color, 0.7) %>
+        <tr class="group-highlight" style="--group-color: <%= base_color %>; --group-color-hover: <%= hover_color %>;">
           <td class="wrap"><%= pattern.id %></td>
           <td class="wrap"><%= pattern.group_no %></td>
           <td class="wrap"><%= pattern.name %></td>

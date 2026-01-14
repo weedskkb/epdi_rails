@@ -29,7 +29,7 @@ class JournalEntryPatternsController < ApplicationController
       :debit_business_connection,
       :credit_department,
       :credit_business_connection
-    ).order(:group_no, :row_no)
+    ).order(:group_no, :row_no, :date_pattern_no)
   end
 
   def set_pattern

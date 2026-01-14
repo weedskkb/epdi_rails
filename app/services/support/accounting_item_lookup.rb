@@ -17,10 +17,6 @@ module Support
         company_id: nil,
         code: normalized_code,
         sub_code: normalized_sub_code
-      ) || AccountingItem.find_by(
-        company_id: 7,
-        code: normalized_code,
-        sub_code: normalized_sub_code
       ) # TODO: 後で確認
     end
 
